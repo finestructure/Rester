@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "swift-build",
+            "label": "build",
             "type": "shell",
             "command": "swift build",
             "group": {
@@ -11,7 +11,7 @@
             }
         },
         {
-            "label": "swift-build-tests",
+            "label": "build tests",
             "type": "process",
             "command": "swift",
             "group": "build",
@@ -21,7 +21,7 @@
             ]
         },
         {
-            "label": "swift-test",
+            "label": "test",
             "type": "process",
             "command": "swift",
             "group": {
@@ -30,6 +30,14 @@
             },
             "args": [
                 "test"
+            ]
+        },
+        {
+            "label": "run",
+            "type": "process",
+            "command": "swift",
+            "args": [
+                "run"
             ]
         }
     ]

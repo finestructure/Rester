@@ -6,7 +6,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Run your Executable",
-            "program": "${workspaceFolder}/.build/x86_64-apple-macosx10.10/debug/Run",
+            "program": "${workspaceFolder}/.build/x86_64-apple-macosx10.10/debug/Rester",
             "args": [],
             "cwd": "${workspaceFolder}",
             // "preLaunchTask": "swift-build"
