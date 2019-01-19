@@ -28,13 +28,6 @@ extension Request {
         return Request(url: _url, method: method, validation: validation)
     }
 
-    public func execute(completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
-        guard let url = URL(string: url) else {
-            return completionHandler(nil, nil, ResterError.invalidURL(self.url))
-        }
-        URLSession.shared.dataTask(with: url, completionHandler: completionHandler).resume()
-    }
-
     public func execute() throws -> Promise<Validator> {
         guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
 
