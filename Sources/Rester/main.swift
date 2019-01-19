@@ -41,6 +41,3 @@ assert(versionReq.url == "https://dev.vbox.space/metrics/build", "was: \(version
 // TODO: parse validation.content
 
 
-// let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
-// let n = try _substitute(string: "${API_URL}/metrics/build/${foo}/${foo}", with: vars)
-// print("result: \(n)")

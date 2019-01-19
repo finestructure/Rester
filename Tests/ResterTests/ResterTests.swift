@@ -11,6 +11,11 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(env.variables!["INT_VALUE"], .int(42))
     }
 
+    func test_subtitute() throws {
+      let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
+      let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
+      XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
+    }
 }
 
 
