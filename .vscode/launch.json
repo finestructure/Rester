@@ -20,14 +20,14 @@
             "args": [
                 "${workspaceFolder}/.build/x86_64-apple-macosx10.10/debug/ResterPackageTests.xctest"
             ],
-            "preLaunchTask": "swift-build-tests"
+            "preLaunchTask": "build tests"
         },
         {
             "type": "lldb",
             "request": "launch",
             "name": "Debug tests on Linux",
             "program": "./.build/x86_64-unknown-linux/debug/ResterPackageTests.xctest",
-            "preLaunchTask": "swift-build-tests"
+            "preLaunchTask": "build tests"
         }
     ]
 }

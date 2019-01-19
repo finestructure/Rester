@@ -18,7 +18,8 @@
             "args": [
                 "build",
                 "--build-tests"
-            ]
+            ],
+            "problemMatcher": []
         },
         {
             "label": "test",

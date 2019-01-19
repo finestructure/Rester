@@ -13,9 +13,12 @@ let package = Package(
     targets: [
         .target(
             name: "Rester",
+            dependencies: ["ResterCore"]),
+        .target(
+            name: "ResterCore",
             dependencies: ["Files", "Regex", "Yams"]),
         .testTarget(
             name: "ResterTests",
-            dependencies: ["Rester"]),
+            dependencies: ["ResterCore"]),
     ]
 )
