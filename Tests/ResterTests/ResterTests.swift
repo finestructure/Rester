@@ -25,7 +25,7 @@ final class ResterTests: XCTestCase {
       let requests = rest.requests!
       let versionReq = try requests["version"]!.substitute(variables: variables)
       XCTAssertEqual(variables["API_URL"]!, .string("https://dev.vbox.space"))
-      XCTAssertEqual(versionReq.url, "https://dev.vbox.space/metrics/build")
+      XCTAssertEqual(versionReq.url, "https://dev.vbox.space/api/metrics/build")
     }
 
     func test_parse_validation() throws {
@@ -41,6 +41,38 @@ final class ResterTests: XCTestCase {
         let t = try YAMLDecoder().decode(Test.self, from: s)
         XCTAssertEqual(t.validation.status, 200)
         XCTAssertEqual(t.validation.content!["version"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
+    }
+
+    func test_request() throws {
+        let expectation = self.expectation(description: #function)
+        var status: Int?
+        struct Result: Codable {
+            let version: String
+        }
+        var result: Result?
+
+        let s = try readFixture("version.yml")
+        let rest = try YAMLDecoder().decode(Rester.self, from: s)
+        let variables = rest.variables!
+        let requests = rest.requests!
+        let versionReq = try requests["version"]!.substitute(variables: variables)
+
+        versionReq.execute { (data, response, error) in
+            if let error = error {
+                XCTFail("error: \(error)")
+            } else {
+                if let response = response as? HTTPURLResponse {
+                    status = response.statusCode
+                }
+                if let data = data, let string = String(data: data, encoding: .utf8) {
+                    result = try? YAMLDecoder().decode(Result.self, from: string)
+                }
+            }
+            expectation.fulfill()
+            }
+        waitForExpectations(timeout: 5)
+        XCTAssertEqual(status, 200)
+        XCTAssertNotNil(result?.version)
     }
 }
 
