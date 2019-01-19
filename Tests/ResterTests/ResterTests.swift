@@ -5,10 +5,21 @@ import Yams
 
 final class ResterTests: XCTestCase {
 
-    func test_variables() throws {
+    func test_decode_variables() throws {
         let s = try readFixture("env.yml")
         let env = try YAMLDecoder().decode(Rester.self, from: s)
         XCTAssertEqual(env.variables!["INT_VALUE"], .int(42))
+        XCTAssertEqual(env.variables!["STRING_VALUE"], .string("some string value"))
+    }
+
+    func test_version_request() throws {
+      let s = try readFixture("version.yml")
+      let rest = try YAMLDecoder().decode(Rester.self, from: s)
+      let variables = rest.variables!
+      let requests = rest.requests!
+      let versionReq = try requests["version"]!.substitute(variables: variables)
+      XCTAssertEqual(variables["API_URL"]!, .string("https://dev.vbox.space"))
+      XCTAssertEqual(versionReq.url, "https://dev.vbox.space/metrics/build")
     }
 
     func test_subtitute() throws {
