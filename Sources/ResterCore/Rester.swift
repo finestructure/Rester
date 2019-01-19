@@ -1,5 +1,6 @@
 import Foundation
 import Regex
+import PromiseKit
 
 
 func _substitute(string: String, with variables: Variables) throws -> String {
@@ -31,3 +32,16 @@ public struct Rester: Codable {
 }
 
 
+extension Rester {
+    public func execute(_ requestName: String) throws -> Promise<Validator> {
+        guard
+            let requests = requests,
+            let req = requests[requestName]
+            else { throw ResterError.noSuchRequest(requestName) }
+        if let variables = variables {
+            return try req.substitute(variables: variables).execute()
+        } else {
+            return try req.execute()
+        }
+    }
+}

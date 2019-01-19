@@ -44,14 +44,12 @@ final class ResterTests: XCTestCase {
     }
 
     func test_request_execute() throws {
-        struct Result: Codable {
-            let version: String
-        }
+        struct Result: Codable { let version: String }
 
         let s = try readFixture("version.yml")
-        let rest = try YAMLDecoder().decode(Rester.self, from: s)
-        let variables = rest.variables!
-        let requests = rest.requests!
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let variables = rester.variables!
+        let requests = rester.requests!
         let versionReq = try requests["version"]!.substitute(variables: variables)
 
         let expectation = self.expectation(description: #function)
@@ -64,6 +62,23 @@ final class ResterTests: XCTestCase {
                 expectation.fulfill()
         }
 
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_rester_execute() throws {
+        struct Result: Codable { let version: String }
+
+        let expectation = self.expectation(description: #function)
+
+        let s = try readFixture("version.yml")
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        _ = try rester.execute("version")
+            .map {
+                XCTAssertEqual($0.response.statusCode, 200)
+                let res = try JSONDecoder().decode(Result.self, from: $0.data)
+                XCTAssertNotNil(res.version)
+                expectation.fulfill()
+        }
         waitForExpectations(timeout: 5)
     }
 }

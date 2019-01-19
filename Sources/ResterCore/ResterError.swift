@@ -11,4 +11,5 @@ enum ResterError: Error {
     case decodingError(String)
     case undefinedVariable(String)
     case invalidURL(String)
+    case noSuchRequest(String)
 }
