@@ -28,6 +28,20 @@ final class ResterTests: XCTestCase {
       XCTAssertEqual(versionReq.url, "https://dev.vbox.space/metrics/build")
     }
 
+    func test_parse_validation() throws {
+        struct Test: Codable {
+            let validation: Validation
+        }
+        let s = """
+        validation:
+          status: 200
+          content:
+            version: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
+        """
+        let t = try YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertEqual(t.validation.status, 200)
+        XCTAssertEqual(t.validation.content!["version"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
+    }
 }
 
 
