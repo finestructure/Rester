@@ -12,6 +12,12 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(env.variables!["STRING_VALUE"], .string("some string value"))
     }
 
+    func test_subtitute() throws {
+      let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
+      let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
+      XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
+    }
+
     func test_version_request() throws {
       let s = try readFixture("version.yml")
       let rest = try YAMLDecoder().decode(Rester.self, from: s)
@@ -22,11 +28,6 @@ final class ResterTests: XCTestCase {
       XCTAssertEqual(versionReq.url, "https://dev.vbox.space/metrics/build")
     }
 
-    func test_subtitute() throws {
-      let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
-      let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
-      XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
-    }
 }
 
 
