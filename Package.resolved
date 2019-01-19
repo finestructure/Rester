@@ -11,6 +11,24 @@
         }
       },
       {
+        "package": "PMKFoundation",
+        "repositoryURL": "https://github.com/PromiseKit/Foundation.git",
+        "state": {
+          "branch": null,
+          "revision": "9e1d760fdc120f1be41ee2bc026b70ce78ea19bb",
+          "version": "3.3.0"
+        }
+      },
+      {
+        "package": "PromiseKit",
+        "repositoryURL": "https://github.com/mxcl/PromiseKit",
+        "state": {
+          "branch": null,
+          "revision": "485131b92d53c0f64898b49b4cb2197d4e6b4c0f",
+          "version": "6.7.1"
+        }
+      },
+      {
         "package": "Regex",
         "repositoryURL": "https://github.com/crossroadlabs/Regex.git",
         "state": {

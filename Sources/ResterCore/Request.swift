@@ -6,12 +6,20 @@
 //
 
 import Foundation
+import PromiseKit
+import PMKFoundation
 
 
 public struct Request: Codable {
     public let url: String
     public let method: Method
     public let validation: Validation
+}
+
+
+public struct Validator {
+    let data: Data
+    let response: HTTPURLResponse
 }
 
 extension Request {
@@ -25,5 +33,12 @@ extension Request {
             return completionHandler(nil, nil, ResterError.invalidURL(self.url))
         }
         URLSession.shared.dataTask(with: url, completionHandler: completionHandler).resume()
+    }
+
+    public func execute() throws -> Promise<Validator> {
+        guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
+
+        return URLSession.shared.dataTask(.promise, with: url)
+            .map { Validator(data: $0.data, response: $0.response as! HTTPURLResponse) }
     }
 }

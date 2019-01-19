@@ -43,13 +43,10 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(t.validation.content!["version"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
     }
 
-    func test_request() throws {
-        let expectation = self.expectation(description: #function)
-        var status: Int?
+    func test_request_execute() throws {
         struct Result: Codable {
             let version: String
         }
-        var result: Result?
 
         let s = try readFixture("version.yml")
         let rest = try YAMLDecoder().decode(Rester.self, from: s)
@@ -57,22 +54,17 @@ final class ResterTests: XCTestCase {
         let requests = rest.requests!
         let versionReq = try requests["version"]!.substitute(variables: variables)
 
-        versionReq.execute { (data, response, error) in
-            if let error = error {
-                XCTFail("error: \(error)")
-            } else {
-                if let response = response as? HTTPURLResponse {
-                    status = response.statusCode
-                }
-                if let data = data, let string = String(data: data, encoding: .utf8) {
-                    result = try? YAMLDecoder().decode(Result.self, from: string)
-                }
-            }
-            expectation.fulfill()
-            }
+        let expectation = self.expectation(description: #function)
+
+        _ = try versionReq.execute()
+            .map {
+                XCTAssertEqual($0.response.statusCode, 200)
+                let res = try JSONDecoder().decode(Result.self, from: $0.data)
+                XCTAssertNotNil(res.version)
+                expectation.fulfill()
+        }
+
         waitForExpectations(timeout: 5)
-        XCTAssertEqual(status, 200)
-        XCTAssertNotNil(result?.version)
     }
 }
 
