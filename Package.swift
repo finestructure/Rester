@@ -6,8 +6,8 @@ import PackageDescription
 let package = Package(
     name: "Rester",
     dependencies: [
+        .package(url: "https://github.com/asensei/AnyCodable.git", from: "1.2.0"),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.0.0"),
-        .package(url: "https://github.com/JohnSundell/Files.git", from: "2.0.0"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "1.0.0"),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.0.0"),
@@ -18,7 +18,7 @@ let package = Package(
             dependencies: ["ResterCore"]),
         .target(
             name: "ResterCore",
-            dependencies: ["Files", "PMKFoundation", "PromiseKit", "Regex", "Yams"]),
+            dependencies: ["AnyCodable", "PMKFoundation", "PromiseKit", "Regex", "Yams"]),
         .testTarget(
             name: "ResterTests",
             dependencies: ["ResterCore"]),
