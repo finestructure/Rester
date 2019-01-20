@@ -9,20 +9,24 @@ import Foundation
 import Regex
 
 
-public enum Matcher: Equatable {
+public enum Matcher {
     case int(Int)
     case string(String)
-    case regex(String)
+    case regex(Regex)
 }
 
-extension Matcher: Codable {
+
+extension Matcher: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         // string decoding must be possible
         let string = try container.decode(String.self)
         if
             let match = try? Regex(pattern: ".regex\\((.*?)\\)", groupNames: "regex").findFirst(in: string),
-            let regex = match?.group(named: "regex") {
+            let regexString = match?.group(named: "regex") {
+            guard let regex = regexString.r else {
+                throw ResterError.decodingError("invalid regex in '\(regexString)'")
+            }
             self = .regex(regex)
             return
         }
@@ -32,8 +36,20 @@ extension Matcher: Codable {
         }
         self = .string(string)
     }
+}
 
-    public func encode(to encoder: Encoder) throws {
 
+extension Matcher: Equatable {
+    public static func == (lhs: Matcher, rhs: Matcher) -> Bool {
+        switch (lhs, rhs) {
+        case let (.int(x), .int(y)):
+            return x == y
+        case let (.string(x), .string(y)):
+            return x == y
+        case let (.regex(x), .regex(y)):
+            return x.pattern == y.pattern
+        default:
+            return false
+        }
     }
 }

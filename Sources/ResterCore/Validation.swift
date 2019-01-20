@@ -8,7 +8,7 @@
 import Foundation
 
 
-public struct Validation: Codable {
+public struct Validation: Decodable {
     let status: Int?
     let json: [Key: Matcher]?
 }

@@ -30,7 +30,7 @@ final class ResterTests: XCTestCase {
     }
 
     func test_parse_validation() throws {
-        struct Test: Codable {
+        struct Test: Decodable {
             let validation: Validation
         }
         let s = """
@@ -45,7 +45,7 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(t.validation.status, 200)
         XCTAssertEqual(t.validation.json!["int"], Matcher.int(42))
         XCTAssertEqual(t.validation.json!["string"], Matcher.string("foo"))
-        XCTAssertEqual(t.validation.json!["regex"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
+        XCTAssertEqual(t.validation.json!["regex"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}".r!))
     }
 
     func test_request_execute() throws {
@@ -146,6 +146,37 @@ final class ResterTests: XCTestCase {
             waitForExpectations(timeout: 5)
         }
     }
+
+    func test_validate_json_regex() throws {
+        let s = try readFixture("httpbin.yml")
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+
+        do {
+            let expectation = self.expectation(description: #function)
+            _ = try rester.request("json-regex").test()
+                .map {
+                    XCTAssertEqual($0, ValidationResult.valid)
+                    expectation.fulfill()
+            }
+            waitForExpectations(timeout: 5)
+        }
+
+        do {
+            let expectation = self.expectation(description: #function)
+            _ = try rester.request("json-regex-failure").test()
+                .map {
+                    switch $0 {
+                    case .valid:
+                        XCTFail("expected failure but received success")
+                    case .invalid(let message):
+                        XCTAssert(message.starts(with: "json.uuid failed to match \'^\\w{8}$\'"))
+                    }
+                    expectation.fulfill()
+            }
+            waitForExpectations(timeout: 5)
+        }
+    }
+    
 }
 
 

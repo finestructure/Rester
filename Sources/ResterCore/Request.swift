@@ -9,9 +9,10 @@ import Foundation
 import PromiseKit
 import PMKFoundation
 import AnyCodable
+import Regex
 
 
-public struct Request: Codable {
+public struct Request: Decodable {
     public let url: String
     public let method: Method
     public let validation: Validation
@@ -86,24 +87,36 @@ func _validate(matcher: Matcher, key: Key, data: [Key: AnyCodable]) -> Validatio
     guard let value = data[key] else { return .invalid("key '\(key)' not found in JSON response") }
     switch matcher {
     case .int(let expected):
-        let res = _validate(key: key, expected: expected, found: value)
+        let res = equals(key: key, expected: expected, found: value)
         if res != .valid { return res }
     case .string(let expected):
-        let res = _validate(key: key, expected: expected, found: value)
+        let res = equals(key: key, expected: expected, found: value)
         if res != .valid { return res }
     case .regex(let regex):
-        break
+        let res = matches(key: key, regex: regex, found: value)
+        if res != .valid { return res }
     }
     return .valid
 }
 
 
-func _validate<T: Equatable>(key: Key, expected: T, found: AnyCodable) -> ValidationResult {
+func equals<T: Equatable>(key: Key, expected: T, found: AnyCodable) -> ValidationResult {
     guard let value = try? found.assertValue(T.self) else {
         return .invalid("json.\(key) expected to be of type \(T.self), was '\(found)'")
     }
     if value != expected {
         return .invalid("json.\(key) invalid, expected '\(expected)' was '\(value)'")
+    }
+    return .valid
+}
+
+
+func matches(key: Key, regex: Regex, found: AnyCodable) -> ValidationResult {
+    guard let value = try? found.assertValue(String.self) else {
+        return .invalid("json.\(key) expected to be of type \(String.self), was '\(found)'")
+    }
+    if value !~ regex {
+        return .invalid("json.\(key) failed to match '\(regex.pattern)', was '\(value)'")
     }
     return .valid
 }

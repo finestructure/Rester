@@ -1,11 +1,14 @@
 variables:
   API_URL: https://httpbin.org
+
 requests:
+
   anything:
     url: ${API_URL}/anything
     method: GET
     validation:
       status: 200
+
   failure:
     url: ${API_URL}/anything
     method: GET
@@ -32,3 +35,17 @@ requests:
     validation:
       json:
         method: 42
+
+  json-regex:
+    url: ${API_URL}/uuid
+    method: GET
+    validation:
+      json:
+        uuid: .regex(^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$)
+
+  json-regex-failure:
+    url: ${API_URL}/uuid
+    method: GET
+    validation:
+      json:
+        uuid: .regex(^\w{8}$)
