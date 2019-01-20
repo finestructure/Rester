@@ -77,18 +77,14 @@ extension Request {
 
                 switch matcher {
                 case .int(let expected):
-                    guard let found = try? value.assertValue(Int.self) else {
-                        return .invalid("failed to decode Int parameter for key '\(key)'")
-                    }
-                    if found != expected {
-                        return .invalid("json.\(key) invalid, expected '\(expected)' was '\(found)'")
+                    let res = _validate(key: key, expected: expected, found: value)
+                    if res != .valid {
+                        return res
                     }
                 case .string(let expected):
-                    guard let found = try? value.assertValue(String.self) else {
-                        return .invalid("failed to decode String parameter for key '\(key)'")
-                    }
-                    if found != expected {
-                        return .invalid("json.\(key) invalid, expected '\(expected)' was '\(found)'")
+                    let res = _validate(key: key, expected: expected, found: value)
+                    if res != .valid {
+                        return res
                     }
                 case .regex(let regex):
                     break
@@ -97,4 +93,15 @@ extension Request {
         }
         return .valid
     }
+}
+
+
+func _validate<T: Equatable>(key: Key, expected: T, found: AnyCodable) -> ValidationResult {
+    guard let value = try? found.assertValue(T.self) else {
+        return .invalid("json.\(key) expected to be of type \(T.self), was '\(found)'")
+    }
+    if value != expected {
+        return .invalid("json.\(key) invalid, expected '\(expected)' was '\(value)'")
+    }
+    return .valid
 }

@@ -25,3 +25,10 @@ requests:
     validation:
       json:
         method: nope
+
+  json-failure-type:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      json:
+        method: 42

@@ -135,6 +135,16 @@ final class ResterTests: XCTestCase {
             }
             waitForExpectations(timeout: 5)
         }
+
+        do {
+            let expectation = self.expectation(description: #function)
+            _ = try rester.request("json-failure-type").test()
+                .map {
+                    XCTAssertEqual($0, ValidationResult.invalid("json.method expected to be of type Int, was 'GET'"))
+                    expectation.fulfill()
+            }
+            waitForExpectations(timeout: 5)
+        }
     }
 }
 
