@@ -33,15 +33,14 @@ public struct Rester: Codable {
 
 
 extension Rester {
-    public func execute(_ requestName: String) throws -> Promise<Validator> {
+    public func request(_ requestName: String) throws -> Request {
         guard
             let requests = requests,
             let req = requests[requestName]
             else { throw ResterError.noSuchRequest(requestName) }
         if let variables = variables {
-            return try req.substitute(variables: variables).execute()
-        } else {
-            return try req.execute()
+            return try req.substitute(variables: variables)
         }
+        return req
     }
 }

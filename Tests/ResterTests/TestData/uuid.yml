@@ -1,0 +1,10 @@
+variables:
+    API_URL: https://httpbin.org
+requests:
+    uuid:
+        url: ${API_URL}/uuid
+        method: GET
+        validation:
+            status: 200
+            json:
+                uuid: .regex('\x{8}-\x{4}-\x{4}-\x{4}-\x{12}')

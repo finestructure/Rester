@@ -1,4 +1,6 @@
 import XCTest
+
+import AnyCodable
 import Yams
 @testable import ResterCore
 
@@ -72,11 +74,37 @@ final class ResterTests: XCTestCase {
 
         let s = try readFixture("version.yml")
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        _ = try rester.execute("version")
+        _ = try rester.request("version").execute()
             .map {
                 XCTAssertEqual($0.response.statusCode, 200)
                 let res = try JSONDecoder().decode(Result.self, from: $0.data)
                 XCTAssertNotNil(res.version)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_validate_status() throws {
+        let expectation = self.expectation(description: #function)
+        let s = try readFixture("httpbin.yml")
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        _ = try rester.request("anything").test()
+            .map { result in
+                XCTAssertEqual(result, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_validation() throws {
+        let expectation = self.expectation(description: #function)
+        let s = try readFixture("httpbin.yml")
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        _ = try rester.request("anything").execute()
+            .map {
+                XCTAssertEqual($0.response.statusCode, 200)
+                let res = try JSONDecoder().decode([String: AnyCodable].self, from: $0.data)
+                XCTAssertEqual(try res["method"]?.assertValue(String.self), "GET")
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 5)

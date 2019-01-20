@@ -6,5 +6,5 @@ requests:
         method: GET
         validation:
             status: 200
-            content:
-                version: .regex('\\d+\\.\\d+\\.\\d+|\\S{40}')
+            json:
+                version: .regex('\d+\.\d+\.\d+|\S{40}')
