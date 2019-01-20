@@ -38,11 +38,15 @@ final class ResterTests: XCTestCase {
         validation:
           status: 200
           json:
-            version: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
+            int: 42
+            string: foo
+            regex: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
         XCTAssertEqual(t.validation.status, 200)
-        XCTAssertEqual(t.validation.json!["version"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
+        XCTAssertEqual(t.validation.json!["int"], Matcher.int(42))
+        XCTAssertEqual(t.validation.json!["string"], Matcher.string("foo"))
+        XCTAssertEqual(t.validation.json!["regex"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
     }
 
     func test_request_execute() throws {

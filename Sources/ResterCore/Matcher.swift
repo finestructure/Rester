@@ -10,6 +10,8 @@ import Regex
 
 
 public enum Matcher: Equatable {
+    case int(Int)
+    case string(String)
     case regex(String)
 }
 
@@ -24,7 +26,11 @@ extension Matcher: Codable {
             self = .regex(regex)
             return
         }
-        throw ResterError.decodingError("Failed to decode Matcher from: \(string)")
+        if let int = try? container.decode(Int.self) {
+            self = .int(int)
+            return
+        }
+        self = .string(string)
     }
 
     public func encode(to encoder: Encoder) throws {
