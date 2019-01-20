@@ -1,10 +1,15 @@
 variables:
-    API_URL: https://httpbin.org
+  API_URL: https://httpbin.org
 requests:
-    anything:
-        url: ${API_URL}/anything
+  anything:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      status: 200
+      json:
         method: GET
-        validation:
-            status: 200
-            json:
-                method: GET
+  failure:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      status: 500

@@ -85,15 +85,28 @@ final class ResterTests: XCTestCase {
     }
 
     func test_validate_status() throws {
-        let expectation = self.expectation(description: #function)
         let s = try readFixture("httpbin.yml")
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        _ = try rester.request("anything").test()
-            .map { result in
-                XCTAssertEqual(result, ValidationResult.valid)
-                expectation.fulfill()
+
+        do {
+            let expectation = self.expectation(description: #function)
+            _ = try rester.request("anything").test()
+                .map { result in
+                    XCTAssertEqual(result, ValidationResult.valid)
+                    expectation.fulfill()
+            }
+            waitForExpectations(timeout: 5)
         }
-        waitForExpectations(timeout: 5)
+
+        do {
+            let expectation = self.expectation(description: #function)
+            _ = try rester.request("failure").test()
+                .map { result in
+                    XCTAssertEqual(result, ValidationResult.invalid("status invalid, expected '500' was '200'"))
+                    expectation.fulfill()
+            }
+            waitForExpectations(timeout: 5)
+        }
     }
 
     func test_validation() throws {
