@@ -1,6 +1,5 @@
 import XCTest
 
-import AnyCodable
 import Yams
 @testable import ResterCore
 
@@ -119,10 +118,19 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("anything").test()
-                .map { result in
-//                    let res = try JSONDecoder().decode([String: AnyCodable].self, from: $0.data)
-//                    XCTAssertEqual(try res["method"]?.assertValue(String.self), "GET")
+            _ = try rester.request("json-success").test()
+                .map {
+                    XCTAssertEqual($0, ValidationResult.valid)
+                    expectation.fulfill()
+            }
+            waitForExpectations(timeout: 5)
+        }
+
+        do {
+            let expectation = self.expectation(description: #function)
+            _ = try rester.request("json-failure").test()
+                .map {
+                    XCTAssertEqual($0, ValidationResult.invalid("json.method invalid, expected 'nope' was 'GET'"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)

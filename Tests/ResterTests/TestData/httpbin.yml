@@ -11,3 +11,17 @@ requests:
     method: GET
     validation:
       status: 500
+
+  json-success:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      json:
+        method: GET
+
+  json-failure:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      json:
+        method: nope
