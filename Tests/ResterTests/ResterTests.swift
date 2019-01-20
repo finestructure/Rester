@@ -37,12 +37,12 @@ final class ResterTests: XCTestCase {
         let s = """
         validation:
           status: 200
-          content:
+          json:
             version: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
         XCTAssertEqual(t.validation.status, 200)
-        XCTAssertEqual(t.validation.content!["version"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
+        XCTAssertEqual(t.validation.json!["version"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}"))
     }
 
     func test_request_execute() throws {
@@ -109,18 +109,20 @@ final class ResterTests: XCTestCase {
         }
     }
 
-    func test_validation() throws {
-        let expectation = self.expectation(description: #function)
+    func test_validate_json() throws {
         let s = try readFixture("httpbin.yml")
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        _ = try rester.request("anything").execute()
-            .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                let res = try JSONDecoder().decode([String: AnyCodable].self, from: $0.data)
-                XCTAssertEqual(try res["method"]?.assertValue(String.self), "GET")
-                expectation.fulfill()
+
+        do {
+            let expectation = self.expectation(description: #function)
+            _ = try rester.request("anything").test()
+                .map { result in
+//                    let res = try JSONDecoder().decode([String: AnyCodable].self, from: $0.data)
+//                    XCTAssertEqual(try res["method"]?.assertValue(String.self), "GET")
+                    expectation.fulfill()
+            }
+            waitForExpectations(timeout: 5)
         }
-        waitForExpectations(timeout: 5)
     }
 }
 

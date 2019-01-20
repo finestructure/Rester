@@ -10,5 +10,5 @@ import Foundation
 
 public struct Validation: Codable {
     let status: Int?
-    let content: [Key: Matcher]?
+    let json: [Key: Matcher]?
 }

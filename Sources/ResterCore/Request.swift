@@ -62,6 +62,9 @@ extension Request {
             response.status != status {
             return .invalid("status invalid, expected '\(status)' was '\(response.response.statusCode)'")
         }
+
+//        if
+//        let 
         return .valid
     }
 }

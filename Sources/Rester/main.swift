@@ -5,6 +5,6 @@ import ResterCore
 
 
 
-// TODO: parse validation.content
+// TODO: parse validation.json
 
 
