@@ -67,32 +67,34 @@ extension Request {
         if let json = validation.json {
             // assume Dictionary response
             // TODO: handle Array response
-            guard let data = try? JSONDecoder().decode([String: AnyCodable].self, from: response.data)
+            guard let data = try? JSONDecoder().decode([Key: AnyCodable].self, from: response.data)
                 else {
                     return .invalid("failed to decode JSON object from response")
             }
 
             for (key, matcher) in json {
-                guard let value = data[key] else { return .invalid("key '\(key)' not found in JSON response") }
-
-                switch matcher {
-                case .int(let expected):
-                    let res = _validate(key: key, expected: expected, found: value)
-                    if res != .valid {
-                        return res
-                    }
-                case .string(let expected):
-                    let res = _validate(key: key, expected: expected, found: value)
-                    if res != .valid {
-                        return res
-                    }
-                case .regex(let regex):
-                    break
-                }
+                let res = _validate(matcher: matcher, key: key, data: data)
+                if res != .valid { return res }
             }
         }
         return .valid
     }
+}
+
+
+func _validate(matcher: Matcher, key: Key, data: [Key: AnyCodable]) -> ValidationResult {
+    guard let value = data[key] else { return .invalid("key '\(key)' not found in JSON response") }
+    switch matcher {
+    case .int(let expected):
+        let res = _validate(key: key, expected: expected, found: value)
+        if res != .valid { return res }
+    case .string(let expected):
+        let res = _validate(key: key, expected: expected, found: value)
+        if res != .valid { return res }
+    case .regex(let regex):
+        break
+    }
+    return .valid
 }
 
 
