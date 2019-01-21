@@ -4,6 +4,46 @@ import Yams
 @testable import ResterCore
 
 
+struct Top: Decodable {
+    let requests: Requests
+}
+
+struct Requests: Decodable {
+    let items: [[String: Int]]
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
+        self.items = try container.decodeOrdered(Int.self)
+    }
+}
+
+struct OrderedCodingKeys: CodingKey {
+    var intValue: Int?
+    var stringValue: String
+
+    init?(intValue: Int) {
+        return nil
+    }
+
+    init?(stringValue: String){
+        self.stringValue = stringValue
+    }
+}
+
+extension KeyedDecodingContainer where Key == OrderedCodingKeys {
+    func decodeOrdered<T: Decodable>(_ type: T.Type) throws -> [[String: T]] {
+        var data = [[String: T]]()
+
+        for key in allKeys {
+            let value = try decode(T.self, forKey: key)
+            data.append([key.stringValue: value])
+        }
+
+        return data
+    }
+}
+
+
+
 final class ResterTests: XCTestCase {
 
     func test_decode_variables() throws {
@@ -176,7 +216,19 @@ final class ResterTests: XCTestCase {
             waitForExpectations(timeout: 5)
         }
     }
-    
+
+    func test_order() throws {
+        let s = """
+        requests:
+          a: 1
+          b: 2
+          c: 3
+          d: 4
+        """
+        let d = try YAMLDecoder().decode(Top.self, from: s)
+        XCTAssertEqual(Array(d.requests.items), [["a": 1], ["b": 2], ["c": 3], ["d": 4]])
+    }
+
 }
 
 
