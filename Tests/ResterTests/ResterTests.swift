@@ -99,7 +99,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("anything").test()
+            _ = try rester.expandedRequest("status-success").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.valid)
                     expectation.fulfill()
@@ -109,7 +109,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("failure").test()
+            _ = try rester.expandedRequest("status-failure").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.invalid("status invalid, expected '500' was '200'"))
                     expectation.fulfill()
