@@ -30,16 +30,16 @@ func wait(timeout: TimeInterval, until: () -> Bool) {
 }
 
 
-func launch(request: Request, named name: String) throws -> Promise<Bool> {
-    print("🎬  \(name.blue) started ...\n")
+func launch(request: Request) throws -> Promise<Bool> {
+    print("🎬  \(request.name.blue) started ...\n")
     return try request.test()
         .map {
             switch $0 {
             case .valid:
-                print("✅  \(name.blue) \("PASSED".green.bold)\n")
+                print("✅  \(request.name.blue) \("PASSED".green.bold)\n")
                 return true
             case .invalid(let message):
-                print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+                print("❌  \(request.name.blue) \("FAILED".red.bold) : \(message.red)\n")
                 return false
             }
     }
@@ -53,21 +53,17 @@ let main = command { (filename: String) in
         let yml = try String(contentsOfFile: filename)
         let rester = try YAMLDecoder().decode(Rester.self, from: yml)
 
-        guard let requests = rester.requests else {
-            print("⚠️  no requests defined in \(filename.bold)!\n")
-            return
+        guard rester.requestCount > 0 else {
+            print("⚠️  no requests defined in \(filename.bold)!")
+            exit(0)
         }
 
         var results = [Bool]()
         var chain = Promise()
 
-        // FIXME: run tests in order
-        for name in requests.keys {
+        for req in try rester.expandedRequests() {
             chain = chain.then {
-                try launch(request: try rester.request(name), named: name)
-                    .map {
-                        results.append($0)
-                }
+                try launch(request: req).map { results.append($0) }
             }
         }
 

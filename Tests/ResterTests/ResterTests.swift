@@ -4,6 +4,46 @@ import Yams
 @testable import ResterCore
 
 
+struct Top: Decodable {
+    let requests: Requests
+}
+
+struct Requests: Decodable {
+    let items: [[String: Int]]
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
+        self.items = try container.decodeOrdered(Int.self)
+    }
+}
+
+struct OrderedCodingKeys: CodingKey {
+    var intValue: Int?
+    var stringValue: String
+
+    init?(intValue: Int) {
+        return nil
+    }
+
+    init?(stringValue: String) {
+        self.stringValue = stringValue
+    }
+}
+
+extension KeyedDecodingContainer where Key == OrderedCodingKeys {
+    func decodeOrdered<T: Decodable>(_ type: T.Type) throws -> [[String: T]] {
+        var data = [[String: T]]()
+
+        for key in allKeys {
+            let value = try decode(T.self, forKey: key)
+            data.append([key.stringValue: value])
+        }
+
+        return data
+    }
+}
+
+
+
 final class ResterTests: XCTestCase {
 
     func test_decode_variables() throws {
@@ -14,19 +54,19 @@ final class ResterTests: XCTestCase {
     }
 
     func test_subtitute() throws {
-      let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
-      let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
-      XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
+        let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
+        let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
+        XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
     }
 
     func test_version_request() throws {
-      let s = try readFixture("version.yml")
-      let rest = try YAMLDecoder().decode(Rester.self, from: s)
-      let variables = rest.variables!
-      let requests = rest.requests!
-      let versionReq = try requests["version"]!.substitute(variables: variables)
-      XCTAssertEqual(variables["API_URL"]!, .string("https://dev.vbox.space"))
-      XCTAssertEqual(versionReq.url, "https://dev.vbox.space/api/metrics/build")
+        let s = try readFixture("version.yml")
+        let rest = try YAMLDecoder().decode(Rester.self, from: s)
+        let variables = rest.variables!
+        let requests = rest.requests!
+        let versionReq = try requests["version"]!.substitute(variables: variables)
+        XCTAssertEqual(variables["API_URL"]!, .string("https://dev.vbox.space"))
+        XCTAssertEqual(versionReq.url, "https://dev.vbox.space/api/metrics/build")
     }
 
     func test_parse_validation() throws {
@@ -77,7 +117,7 @@ final class ResterTests: XCTestCase {
 
         let s = try readFixture("version.yml")
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        _ = try rester.request("version").execute()
+        _ = try rester.expandedRequest("version").execute()
             .map {
                 XCTAssertEqual($0.response.statusCode, 200)
                 let res = try JSONDecoder().decode(Result.self, from: $0.data)
@@ -93,7 +133,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("anything").test()
+            _ = try rester.expandedRequest("anything").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.valid)
                     expectation.fulfill()
@@ -103,7 +143,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("failure").test()
+            _ = try rester.expandedRequest("failure").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.invalid("status invalid, expected '500' was '200'"))
                     expectation.fulfill()
@@ -118,7 +158,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-success").test()
+            _ = try rester.expandedRequest("json-success").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.valid)
                     expectation.fulfill()
@@ -128,7 +168,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-failure").test()
+            _ = try rester.expandedRequest("json-failure").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.invalid("json.method invalid, expected 'nope' was 'GET'"))
                     expectation.fulfill()
@@ -138,7 +178,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-failure-type").test()
+            _ = try rester.expandedRequest("json-failure-type").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.invalid("json.method expected to be of type Int, was 'GET'"))
                     expectation.fulfill()
@@ -153,7 +193,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-regex").test()
+            _ = try rester.expandedRequest("json-regex").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.valid)
                     expectation.fulfill()
@@ -163,7 +203,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-regex-failure").test()
+            _ = try rester.expandedRequest("json-regex-failure").test()
                 .map {
                     switch $0 {
                     case .valid:
@@ -176,7 +216,25 @@ final class ResterTests: XCTestCase {
             waitForExpectations(timeout: 5)
         }
     }
-    
+
+    func test_order() throws {
+        let s = """
+        requests:
+          a: 1
+          b: 2
+          c: 3
+          d: 4
+        """
+        let d = try YAMLDecoder().decode(Top.self, from: s)
+        XCTAssertEqual(Array(d.requests.items), [["a": 1], ["b": 2], ["c": 3], ["d": 4]])
+    }
+
+    func test_request_order() throws {
+        let s = try readFixture("httpbin.yml")
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+//        let requests = rester.requests
+    }
+
 }
 
 

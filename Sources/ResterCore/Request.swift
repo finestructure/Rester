@@ -13,9 +13,12 @@ import Regex
 
 
 public struct Request: Decodable {
-    public let url: String
-    public let method: Method
-    public let validation: Validation
+    public let name: String
+    let details: RequestDetails
+
+    public var url: String { return details.url }
+    public var method: Method { return details.method }
+    public var validation: Validation { return details.validation }
 }
 
 
@@ -38,7 +41,8 @@ public enum ValidationResult: Equatable {
 extension Request {
     public func substitute(variables: Variables) throws -> Request {
         let _url = try _substitute(string: url, with: variables)
-        return Request(url: _url, method: method, validation: validation)
+        let _details = RequestDetails(url: _url, method: method, validation: validation)
+        return Request(name: name, details: _details)
     }
 
     public func execute() throws -> Promise<Response> {
