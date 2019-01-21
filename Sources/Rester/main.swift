@@ -30,16 +30,16 @@ func wait(timeout: TimeInterval, until: () -> Bool) {
 }
 
 
-func launch(request: Request, named name: String) throws -> Promise<Bool> {
-    print("🎬  \(name.blue) started ...\n")
+func launch(request: Request) throws -> Promise<Bool> {
+    print("🎬  \(request.name.blue) started ...\n")
     return try request.test()
         .map {
             switch $0 {
             case .valid:
-                print("✅  \(name.blue) \("PASSED".green.bold)\n")
+                print("✅  \(request.name.blue) \("PASSED".green.bold)\n")
                 return true
             case .invalid(let message):
-                print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+                print("❌  \(request.name.blue) \("FAILED".red.bold) : \(message.red)\n")
                 return false
             }
     }
@@ -61,13 +61,9 @@ let main = command { (filename: String) in
         var results = [Bool]()
         var chain = Promise()
 
-        // FIXME: run tests in order
-        for name in requests.keys {
+        for req in requests {
             chain = chain.then {
-                try launch(request: try rester.request(name), named: name)
-                    .map {
-                        results.append($0)
-                }
+                try launch(request: try rester.request(req.name)).map { results.append($0) }
             }
         }
 

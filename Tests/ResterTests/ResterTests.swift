@@ -24,7 +24,7 @@ struct OrderedCodingKeys: CodingKey {
         return nil
     }
 
-    init?(stringValue: String){
+    init?(stringValue: String) {
         self.stringValue = stringValue
     }
 }
@@ -54,19 +54,19 @@ final class ResterTests: XCTestCase {
     }
 
     func test_subtitute() throws {
-      let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
-      let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
-      XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
+        let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
+        let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
+        XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
     }
 
     func test_version_request() throws {
-      let s = try readFixture("version.yml")
-      let rest = try YAMLDecoder().decode(Rester.self, from: s)
-      let variables = rest.variables!
-      let requests = rest.requests!
-      let versionReq = try requests["version"]!.substitute(variables: variables)
-      XCTAssertEqual(variables["API_URL"]!, .string("https://dev.vbox.space"))
-      XCTAssertEqual(versionReq.url, "https://dev.vbox.space/api/metrics/build")
+        let s = try readFixture("version.yml")
+        let rest = try YAMLDecoder().decode(Rester.self, from: s)
+        let variables = rest.variables!
+        let requests = rest.requests!
+        let versionReq = try requests["version"]!.substitute(variables: variables)
+        XCTAssertEqual(variables["API_URL"]!, .string("https://dev.vbox.space"))
+        XCTAssertEqual(versionReq.url, "https://dev.vbox.space/api/metrics/build")
     }
 
     func test_parse_validation() throws {
@@ -227,6 +227,12 @@ final class ResterTests: XCTestCase {
         """
         let d = try YAMLDecoder().decode(Top.self, from: s)
         XCTAssertEqual(Array(d.requests.items), [["a": 1], ["b": 2], ["c": 3], ["d": 4]])
+    }
+
+    func test_request_order() throws {
+        let s = try readFixture("httpbin.yml")
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+//        let requests = rester.requests
     }
 
 }

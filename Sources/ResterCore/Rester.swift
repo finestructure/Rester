@@ -28,15 +28,14 @@ public typealias Variables = [Key: Value]
 
 public struct Rester: Decodable {
     public let variables: Variables?
-    public let requests: [String: Request]?
+    public let requests: Requests?
 }
 
 
 extension Rester {
     public func request(_ requestName: String) throws -> Request {
         guard
-            let requests = requests,
-            let req = requests[requestName]
+            let req = requests?[requestName]
             else { throw ResterError.noSuchRequest(requestName) }
         if let variables = variables {
             return try req.substitute(variables: variables)
