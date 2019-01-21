@@ -38,8 +38,12 @@
             "type": "process",
             "command": "swift",
             "args": [
-                "run"
-            ]
+                "run",
+                "Rester",
+                // "test.yml"
+                "./Tests/ResterTests/TestData/httpbin.yml"
+            ],
+            "problemMatcher": []
         }
     ]
 }
