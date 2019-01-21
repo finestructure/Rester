@@ -1,6 +1,7 @@
 import Commander
 import Foundation
 import PromiseKit
+import Rainbow
 import ResterCore
 import Yams
 
@@ -30,14 +31,14 @@ func wait(timeout: TimeInterval, until: () -> Bool) {
 
 
 func launch(request: Request, named name: String) throws -> Promise<Void> {
-    print("→  Starting request '\(name)' ...")
+    print("→  \(name.blue) started ...")
     return try request.test()
         .map {
             switch $0 {
             case .valid:
-                print("✅  \(name) PASSED")
+                print("✅  \(name.blue) \("PASSED".green.bold)")
             case .invalid(let message):
-                print("❌  \(name) FAILED: \(message)")
+                print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)")
             }
     }
 }
@@ -45,13 +46,13 @@ func launch(request: Request, named name: String) throws -> Promise<Void> {
 
 let main = command { (filename: String) in
     do {
-        print("→  Resting '\(filename)' ...")
+        print("→  Resting \(filename.bold) ...")
 
         let yml = try String(contentsOfFile: filename)
         let rester = try YAMLDecoder().decode(Rester.self, from: yml)
 
         guard let requests = rester.requests else {
-            print("⚠️  no requests defined in '\(filename)'!")
+            print("⚠️  no requests defined in \(filename.bold)!")
             return
         }
 
