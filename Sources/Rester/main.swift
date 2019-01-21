@@ -53,9 +53,9 @@ let main = command { (filename: String) in
         let yml = try String(contentsOfFile: filename)
         let rester = try YAMLDecoder().decode(Rester.self, from: yml)
 
-        guard let requests = rester.requests else {
-            print("⚠️  no requests defined in \(filename.bold)!\n")
-            return
+        guard rester.requestCount > 0 else {
+            print("⚠️  no requests defined in \(filename.bold)!")
+            exit(0)
         }
 
         var results = [Bool]()

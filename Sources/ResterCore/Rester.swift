@@ -33,6 +33,10 @@ public struct Rester: Decodable {
 
 
 extension Rester {
+    public var requestCount: Int {
+        return requests?.items.count ?? 0
+    }
+
     public func expandedRequests() throws -> [Request] {
         guard
             let requests = requests,
