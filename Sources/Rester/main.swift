@@ -31,15 +31,15 @@ func wait(timeout: TimeInterval, until: () -> Bool) {
 
 
 func launch(request: Request, named name: String) throws -> Promise<Bool> {
-    print("→  \(name.blue) started ...")
+    print("🎬  \(name.blue) started ...\n")
     return try request.test()
         .map {
             switch $0 {
             case .valid:
-                print("✅  \(name.blue) \("PASSED".green.bold)")
+                print("✅  \(name.blue) \("PASSED".green.bold)\n")
                 return true
             case .invalid(let message):
-                print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)")
+                print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
                 return false
             }
     }
@@ -48,13 +48,13 @@ func launch(request: Request, named name: String) throws -> Promise<Bool> {
 
 let main = command { (filename: String) in
     do {
-        print("→  Resting \(filename.bold) ...")
+        print("🚀  Resting \(filename.bold) ...\n")
 
         let yml = try String(contentsOfFile: filename)
         let rester = try YAMLDecoder().decode(Rester.self, from: yml)
 
         guard let requests = rester.requests else {
-            print("⚠️  no requests defined in \(filename.bold)!")
+            print("⚠️  no requests defined in \(filename.bold)!\n")
             return
         }
 
