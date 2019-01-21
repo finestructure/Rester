@@ -61,9 +61,9 @@ let main = command { (filename: String) in
         var results = [Bool]()
         var chain = Promise()
 
-        for req in requests {
+        for req in try rester.expandedRequests() {
             chain = chain.then {
-                try launch(request: try rester.request(req.name)).map { results.append($0) }
+                try launch(request: req).map { results.append($0) }
             }
         }
 

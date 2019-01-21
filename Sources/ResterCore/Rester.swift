@@ -27,13 +27,23 @@ public typealias Variables = [Key: Value]
 
 
 public struct Rester: Decodable {
-    public let variables: Variables?
-    public let requests: Requests?
+    let variables: Variables?
+    let requests: Requests?
 }
 
 
 extension Rester {
-    public func request(_ requestName: String) throws -> Request {
+    public func expandedRequests() throws -> [Request] {
+        guard
+            let requests = requests,
+            let variables = variables
+            else { return [] }
+        return try requests.compactMap {
+            try $0.substitute(variables: variables)
+        }
+    }
+
+    public func expandedRequest(_ requestName: String) throws -> Request {
         guard
             let req = requests?[requestName]
             else { throw ResterError.noSuchRequest(requestName) }

@@ -117,7 +117,7 @@ final class ResterTests: XCTestCase {
 
         let s = try readFixture("version.yml")
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        _ = try rester.request("version").execute()
+        _ = try rester.expandedRequest("version").execute()
             .map {
                 XCTAssertEqual($0.response.statusCode, 200)
                 let res = try JSONDecoder().decode(Result.self, from: $0.data)
@@ -133,7 +133,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("anything").test()
+            _ = try rester.expandedRequest("anything").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.valid)
                     expectation.fulfill()
@@ -143,7 +143,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("failure").test()
+            _ = try rester.expandedRequest("failure").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.invalid("status invalid, expected '500' was '200'"))
                     expectation.fulfill()
@@ -158,7 +158,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-success").test()
+            _ = try rester.expandedRequest("json-success").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.valid)
                     expectation.fulfill()
@@ -168,7 +168,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-failure").test()
+            _ = try rester.expandedRequest("json-failure").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.invalid("json.method invalid, expected 'nope' was 'GET'"))
                     expectation.fulfill()
@@ -178,7 +178,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-failure-type").test()
+            _ = try rester.expandedRequest("json-failure-type").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.invalid("json.method expected to be of type Int, was 'GET'"))
                     expectation.fulfill()
@@ -193,7 +193,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-regex").test()
+            _ = try rester.expandedRequest("json-regex").test()
                 .map {
                     XCTAssertEqual($0, ValidationResult.valid)
                     expectation.fulfill()
@@ -203,7 +203,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.request("json-regex-failure").test()
+            _ = try rester.expandedRequest("json-regex-failure").test()
                 .map {
                     switch $0 {
                     case .valid:
