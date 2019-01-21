@@ -17,8 +17,8 @@ public struct Request: Decodable {
     let details: RequestDetails
 
     public var url: String { return details.url }
-    public var method: Method { return details.method }
-    public var validation: Validation { return details.validation }
+    public var method: Method { return details.method ?? .get }
+    public var validation: Validation? { return details.validation }
 }
 
 
@@ -64,12 +64,12 @@ extension Request {
 
     public func validate(_ response: Response) -> ValidationResult {
         if
-            let status = validation.status,
+            let status = validation?.status,
             response.status != status {
             return .invalid("status invalid, expected '\(status)' was '\(response.response.statusCode)'")
         }
 
-        if let json = validation.json {
+        if let json = validation?.json {
             // assume Dictionary response
             // TODO: handle Array response
             guard let data = try? JSONDecoder().decode([Key: AnyCodable].self, from: response.data)
