@@ -3,13 +3,13 @@ variables:
 
 requests:
 
-  anything:
+  status-success:
     url: ${API_URL}/anything
     method: GET
     validation:
       status: 200
 
-  failure:
+  status-failure:
     url: ${API_URL}/anything
     method: GET
     validation:

@@ -4,50 +4,17 @@ import Yams
 @testable import ResterCore
 
 
-struct Top: Decodable {
-    let requests: Requests
-}
-
-struct Requests: Decodable {
-    let items: [[String: Int]]
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
-        self.items = try container.decodeOrdered(Int.self)
-    }
-}
-
-struct OrderedCodingKeys: CodingKey {
-    var intValue: Int?
-    var stringValue: String
-
-    init?(intValue: Int) {
-        return nil
-    }
-
-    init?(stringValue: String) {
-        self.stringValue = stringValue
-    }
-}
-
-extension KeyedDecodingContainer where Key == OrderedCodingKeys {
-    func decodeOrdered<T: Decodable>(_ type: T.Type) throws -> [[String: T]] {
-        var data = [[String: T]]()
-
-        for key in allKeys {
-            let value = try decode(T.self, forKey: key)
-            data.append([key.stringValue: value])
-        }
-
-        return data
-    }
-}
 
 
 
 final class ResterTests: XCTestCase {
 
     func test_decode_variables() throws {
-        let s = try readFixture("env.yml")
+        let s = """
+            variables:
+              INT_VALUE: 42
+              STRING_VALUE: some string value
+            """
         let env = try YAMLDecoder().decode(Rester.self, from: s)
         XCTAssertEqual(env.variables!["INT_VALUE"], .int(42))
         XCTAssertEqual(env.variables!["STRING_VALUE"], .string("some string value"))
@@ -59,14 +26,23 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
     }
 
-    func test_version_request() throws {
-        let s = try readFixture("version.yml")
+    func test_basic_request() throws {
+        let s = """
+            variables:
+              API_URL: https://httpbin.org
+            requests:
+              basic:
+                url: ${API_URL}/anything
+                method: GET
+                validation:
+                  status: 200
+            """
         let rest = try YAMLDecoder().decode(Rester.self, from: s)
         let variables = rest.variables!
         let requests = rest.requests!
-        let versionReq = try requests["version"]!.substitute(variables: variables)
-        XCTAssertEqual(variables["API_URL"]!, .string("https://dev.vbox.space"))
-        XCTAssertEqual(versionReq.url, "https://dev.vbox.space/api/metrics/build")
+        let versionReq = try requests["basic"]!.substitute(variables: variables)
+        XCTAssertEqual(variables["API_URL"]!, .string("https://httpbin.org"))
+        XCTAssertEqual(versionReq.url, "https://httpbin.org/anything")
     }
 
     func test_parse_validation() throws {
@@ -89,41 +65,31 @@ final class ResterTests: XCTestCase {
     }
 
     func test_request_execute() throws {
-        struct Result: Codable { let version: String }
-
-        let s = try readFixture("version.yml")
+        let s = """
+            variables:
+              API_URL: https://httpbin.org
+            requests:
+              basic:
+                url: ${API_URL}/anything
+                method: GET
+                validation:
+                  status: 200
+            """
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        let variables = rester.variables!
-        let requests = rester.requests!
-        let versionReq = try requests["version"]!.substitute(variables: variables)
 
         let expectation = self.expectation(description: #function)
 
-        _ = try versionReq.execute()
+        _ = try rester.expandedRequest("basic").execute()
             .map {
                 XCTAssertEqual($0.response.statusCode, 200)
+                // httpbin returns the request data back to us:
+                // { "method": "GET", ... }
+                struct Result: Codable { let method: String }
                 let res = try JSONDecoder().decode(Result.self, from: $0.data)
-                XCTAssertNotNil(res.version)
+                XCTAssertEqual(res.method, "GET")
                 expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 5)
-    }
-
-    func test_rester_execute() throws {
-        struct Result: Codable { let version: String }
-
-        let expectation = self.expectation(description: #function)
-
-        let s = try readFixture("version.yml")
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        _ = try rester.expandedRequest("version").execute()
-            .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                let res = try JSONDecoder().decode(Result.self, from: $0.data)
-                XCTAssertNotNil(res.version)
-                expectation.fulfill()
-        }
         waitForExpectations(timeout: 5)
     }
 
@@ -133,7 +99,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("anything").test()
+            _ = try rester.expandedRequest("status-success").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.valid)
                     expectation.fulfill()
@@ -143,7 +109,7 @@ final class ResterTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("failure").test()
+            _ = try rester.expandedRequest("status-failure").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.invalid("status invalid, expected '500' was '200'"))
                     expectation.fulfill()
@@ -217,22 +183,19 @@ final class ResterTests: XCTestCase {
         }
     }
 
-    func test_order() throws {
-        let s = """
-        requests:
-          a: 1
-          b: 2
-          c: 3
-          d: 4
-        """
-        let d = try YAMLDecoder().decode(Top.self, from: s)
-        XCTAssertEqual(Array(d.requests.items), [["a": 1], ["b": 2], ["c": 3], ["d": 4]])
-    }
-
     func test_request_order() throws {
-        let s = try readFixture("httpbin.yml")
+        let s = """
+            requests:
+              first:
+                url: http://foo.com
+              second:
+                url: http://foo.com
+              3rd:
+                url: http://foo.com
+            """
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-//        let requests = rester.requests
+        let names = rester.requests?.names
+        XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
 }

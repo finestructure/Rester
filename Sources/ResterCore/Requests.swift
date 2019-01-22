@@ -13,8 +13,8 @@ typealias RequestName = String
 
 struct RequestDetails: Decodable {
     let url: String
-    let method: Method
-    let validation: Validation
+    let method: Method?
+    let validation: Validation?
 }
 
 
@@ -24,8 +24,19 @@ public struct Requests {
 
 
 extension Requests {
+    var names: [String] {
+        return items.compactMap { $0.keys.first }
+    }
+
     subscript(requestName: String) -> Request? {
         guard let item = items.first(where: { $0.contains {$0.key == requestName} }) else { return nil }
+        precondition(item.count == 1, "must have single item at this point")
+        let r = item.map { Request(name: $0.key, details: $0.value) }
+        return r.first
+    }
+
+    subscript(index: Int) -> Request? {
+        let item = items[index]
         precondition(item.count == 1, "must have single item at this point")
         let r = item.map { Request(name: $0.key, details: $0.value) }
         return r.first
@@ -38,17 +49,14 @@ extension Requests: Sequence {
         public typealias Element = Request
         var currentIndex = 0
         let requests: Requests
-        let names: [RequestName]
 
         init(_ requests: Requests) {
             self.requests = requests
-            names = requests.items.compactMap { $0.keys.first }
         }
 
         mutating public func next() -> Request? {
-            guard currentIndex < names.count else { return nil }
-            let name = names[currentIndex]
-            let request = requests[name]
+            guard currentIndex < requests.items.count else { return nil }
+            let request = requests[currentIndex]
             currentIndex += 1
             return request
         }
