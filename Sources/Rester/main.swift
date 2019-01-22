@@ -6,24 +6,38 @@ import ResterCore
 import Yams
 
 
-func wait(timeout: TimeInterval, until: () -> Bool) {
+func _autoreleasepool(block: () -> ()) {
+    #if os(Linux)
+    block()
+    #else
+    autoreleasepool { block() }
+    #endif
+}
+
+
+func wait(timeout: TimeInterval, condition: () -> Bool) {
+    #if os(Linux)
+    let runLoopModes = [RunLoopMode.defaultRunLoopMode, RunLoopMode.commonModes]
+    #else
     let runLoopModes = [RunLoop.Mode.default, RunLoop.Mode.common]
-    let checkEveryInterval: TimeInterval = 0.01
-    let runUntilDate = NSDate(timeIntervalSinceNow: timeout)
-    var runIndex = 0
+    #endif
 
-    while !until() {
-        let mode = runLoopModes[runIndex % runLoopModes.count]
-        runIndex += 1
+    let pollingInterval: TimeInterval = 0.01
+    let endDate = NSDate(timeIntervalSinceNow: timeout)
+    var index = 0
 
-        autoreleasepool {
-            let checkDate = Date(timeIntervalSinceNow: checkEveryInterval)
+    while !condition() {
+        let mode = runLoopModes[index % runLoopModes.count]
+        let checkDate = Date(timeIntervalSinceNow: pollingInterval)
+        index += 1
+
+        _autoreleasepool {
             if !RunLoop.current.run(mode: mode, before: checkDate) {
-                Thread.sleep(forTimeInterval: checkEveryInterval)
+                Thread.sleep(forTimeInterval: pollingInterval)
             }
         }
 
-        if runUntilDate.compare(Date()) == .orderedAscending {
+        if endDate.compare(Date()) == .orderedAscending {
             break
         }
     }
