@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "Rester",
+    products: [
+        .executable(name: "rester", targets: ["Rester"])
+    ],
     dependencies: [
         .package(url: "https://github.com/asensei/AnyCodable.git", from: "1.2.0"),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.0.0"),
