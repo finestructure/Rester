@@ -198,6 +198,44 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
+    func test_launch_binary() throws {
+        // Some of the APIs that we use below are available in macOS 10.13 and above.
+        guard #available(macOS 10.13, *) else {
+            return
+        }
+
+        let binary = productsDirectory.appendingPathComponent("rester")
+        let requestFile = url(for: "basic.yml").path
+
+        let process = Process()
+        process.executableURL = binary
+        process.arguments = [requestFile]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+
+        #if os(Linux)
+        process.launch()
+        #else
+        try process.run()
+        #endif
+        
+        process.waitUntilExit()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8)
+        let status = process.terminationStatus
+
+        XCTAssert(
+            output?.starts(with: "🚀  Resting") ?? false,
+            "output start does not match, was: \(output ?? "")"
+        )
+        XCTAssert(
+            status == 0,
+            "exit status not 0, was: \(status), output: \(output ?? "")"
+        )
+    }
+
 }
 
 
@@ -210,4 +248,15 @@ func url(for fixture: String, path: String = #file) -> URL {
 func readFixture(_ fixture: String, path: String = #file) throws -> String {
   let file = url(for: fixture)
   return try String(contentsOf: file)
+}
+
+var productsDirectory: URL {
+    #if os(macOS)
+    for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
+        return bundle.bundleURL.deletingLastPathComponent()
+    }
+    fatalError("couldn't find the products directory")
+    #else
+    return Bundle.main.bundleURL
+    #endif
 }

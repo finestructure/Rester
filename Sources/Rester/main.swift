@@ -95,7 +95,8 @@ let main = command { (filename: String) in
         }
 
     } catch {
-        print("Error: \(error)")
+        print("Error: \(error.localizedDescription)")
+        exit(1)
     }
 }
 

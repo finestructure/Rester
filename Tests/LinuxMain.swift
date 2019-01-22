@@ -18,6 +18,7 @@ extension ResterTests {
       ("test_validate_json", test_validate_json),
       ("test_validate_json_regex", test_validate_json_regex),
       ("test_request_order", test_request_order),
+      ("test_launch_binary", test_launch_binary),
   ]
 }
 
