@@ -45,18 +45,20 @@ jobs:
 
     - stage: build
       os: linux
-      script:
-      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - docker build -t rester .
-      - docker images
-      - REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
-      - IMAGE=finestructure/rester:$REV
-      - docker tag rester $IMAGE
-      - docker push $IMAGE
+      script: |
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker build -t rester .
+        docker images
+        REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
+        IMAGE=finestructure/rester:$REV
+        docker tag rester $IMAGE
+        docker push $IMAGE
 
     - stage: test
       script: swift test
     
     - stage: test
       os: linux
-      script: docker run --rm rester
+      script: |
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker run --rm $IMAGE
