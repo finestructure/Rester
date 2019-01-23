@@ -51,9 +51,8 @@ jobs:
       - docker images
       - REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
       - IMAGE=finestructure/rester:$REV
-      - echo "Image name: $IMAGE"
-      # - docker tag rester $IMAGE
-      # - docker push $IMAGE
+      - docker tag rester $IMAGE
+      - docker push $IMAGE
 
     - stage: test
       script: swift test
