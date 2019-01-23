@@ -23,11 +23,11 @@ script:
   - swift test
 
 
-os:
-  - linux
-    dist: trusty
-  - osx
-    osx_image: xcode10.1
+# os:
+#   - linux
+#     dist: trusty
+#   - osx
+#     osx_image: xcode10.1
 # matrix:
 #   include:
 #     - os: linux
@@ -38,6 +38,11 @@ os:
 
 jobs:
   include:
+    - os: linux
+      dist: trusty
+    - os: osx
+      osx_image: xcode10.1
+
     - stage: build
       os: linux
       script:
