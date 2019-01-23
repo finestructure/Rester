@@ -49,9 +49,9 @@ jobs:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker build -t rester .
       - docker images
-      - REV=${TRAVIS_TAG:-TRAVIS_COMMIT}
+      - REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
       - IMAGE=finestructure/rester:$REV
-      - echo Image name: $IMAGE
+      - echo "Image name: $IMAGE"
       # - docker tag rester $IMAGE
       # - docker push $IMAGE
 
