@@ -23,22 +23,36 @@ script:
   - swift test
 
 
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-    - os: osx
-      osx_image: xcode10.1
+os:
+  - linux
+    dist: trusty
+  - osx
+    osx_image: xcode10.1
+# matrix:
+#   include:
+#     - os: linux
+#       dist: trusty
+#     - os: osx
+#       osx_image: xcode10.1
+
 
 jobs:
   include:
     - stage: build
+      os: linux
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker build -t rester .
       - docker images
-      # - IMAGE=finestructure/rester
+      - REV=${TRAVIS_TAG:-TRAVIS_COMMIT}
+      - IMAGE=finestructure/rester:$REV
+      - echo Image name: $IMAGE
       # - docker tag rester $IMAGE
       # - docker push $IMAGE
+
     - stage: test
       script: swift test
+    
+    - stage: test
+      os: linux
+      script: docker run --rm rester
