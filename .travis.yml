@@ -61,4 +61,6 @@ jobs:
       os: linux
       script: |
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
+        IMAGE=finestructure/rester:$REV
         docker run --rm $IMAGE
