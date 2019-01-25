@@ -4,9 +4,6 @@ import Yams
 @testable import ResterCore
 
 
-
-
-
 final class ResterTests: XCTestCase {
 
     func test_decode_variables() throws {
@@ -234,6 +231,33 @@ final class ResterTests: XCTestCase {
             status == 0,
             "exit status not 0, was: \(status), output: \(output ?? "")"
         )
+    }
+
+    func test_post_request() throws {
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                validation:
+                  status: 200
+            """
+
+        let expectation = self.expectation(description: #function)
+
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        _ = try rester.expandedRequest("post").execute()
+            .map {
+                XCTAssertEqual($0.response.statusCode, 200)
+                // httpbin returns the request data back to us:
+                // { "method": "GET", ... }
+                struct Result: Codable { let method: String }
+                let res = try JSONDecoder().decode(Result.self, from: $0.data)
+                XCTAssertEqual(res.method, "POST")
+                expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 5)
     }
 
 }

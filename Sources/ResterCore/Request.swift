@@ -47,8 +47,10 @@ extension Request {
 
     public func execute() throws -> Promise<Response> {
         guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method.rawValue
 
-        return URLSession.shared.dataTask(.promise, with: url)
+        return URLSession.shared.dataTask(.promise, with: urlRequest)
             .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
     }
 
