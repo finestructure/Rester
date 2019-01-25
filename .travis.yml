@@ -25,7 +25,8 @@ jobs:
     - os: osx
       osx_image: xcode10.1
 
-    - stage: build base image
+    - stage: build
+      name: build base image
       os: linux
       script: |
         # login
@@ -37,7 +38,8 @@ jobs:
         docker build --pull -t $IMG -f Dockerfile.$i .
         docker push $IMG
 
-    - stage: build app image
+    - stage: build
+      name: build app image
       os: linux
       script: |
         # login
@@ -50,9 +52,11 @@ jobs:
         docker push $IMG
 
     - stage: test
+      name: swift test
       script: swift test
     
     - stage: test
+      name: docker swift test
       os: linux
       script: |
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
