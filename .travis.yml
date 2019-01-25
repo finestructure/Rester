@@ -8,7 +8,8 @@ env:
 
 
 stages:
-  - build
+  - build base image
+  - build app image
   - test
 
 
@@ -25,8 +26,7 @@ jobs:
     - os: osx
       osx_image: xcode10.1
 
-    - stage: build
-      name: build base image
+    - stage: build base image
       os: linux
       script: |
         # login
@@ -39,8 +39,7 @@ jobs:
         docker build --pull -t $IMG -f Dockerfile.$tag .
         docker push $IMG
 
-    - stage: build
-      name: build app image
+    - stage: build app image
       os: linux
       script: |
         # login
