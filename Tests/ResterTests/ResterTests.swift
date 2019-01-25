@@ -245,25 +245,17 @@ final class ResterTests: XCTestCase {
                 validation:
                   status: 200
                   json:
+                    method: POST
                     data:
                       foo: bar
             """
-
-        let expectation = self.expectation(description: #function)
-
         let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        _ = try rester.expandedRequest("post").execute()
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("post").test()
             .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                // httpbin returns the request data back to us:
-                // { "method": "GET", ... }
-                struct Result: Codable { let method: String }
-                let res = try JSONDecoder().decode(Result.self, from: $0.data)
-                XCTAssertEqual(res.method, "POST")
-                XCTFail("must fail because we're skipping validation")
+                XCTAssertEqual($0, ValidationResult.valid)
                 expectation.fulfill()
         }
-
         waitForExpectations(timeout: 5)
     }
 

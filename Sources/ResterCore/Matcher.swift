@@ -13,7 +13,7 @@ public enum Matcher {
     case int(Int)
     case string(String)
     case regex(Regex)
-    case object([String: Matcher])
+    case object([Key: Matcher])
 }
 
 
@@ -41,7 +41,7 @@ extension Matcher: Decodable {
             }
         }
 
-        if let object = try? container.decode([String: Matcher].self) {
+        if let object = try? container.decode([Key: Matcher].self) {
             self = .object(object)
             return
         }

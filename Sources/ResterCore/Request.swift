@@ -55,13 +55,7 @@ extension Request {
     }
 
     public func test() throws -> Promise<ValidationResult> {
-        guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
-
-        return URLSession.shared.dataTask(.promise, with: url)
-            .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
-            .map {
-                self.validate($0)
-        }
+        return try execute().map { self.validate($0) }
     }
 
     public func validate(_ response: Response) -> ValidationResult {
@@ -101,9 +95,9 @@ func _validate(matcher: Matcher, key: Key, data: [Key: AnyCodable]) -> Validatio
     case .regex(let regex):
         let res = matches(key: key, regex: regex, found: value)
         if res != .valid { return res }
-    case .object:
-        // FIXME: implement
-        return .invalid("not implemented")
+    case .object(let object):
+        let res = matches(key: key, object: object, found: value)
+        if res != .valid { return res }
     }
     return .valid
 }
@@ -128,4 +122,9 @@ func matches(key: Key, regex: Regex, found: AnyCodable) -> ValidationResult {
         return .invalid("json.\(key) failed to match '\(regex.pattern)', was '\(value)'")
     }
     return .valid
+}
+
+
+func matches(key: Key, object: [Key: Matcher], found: AnyCodable) -> ValidationResult {
+    return .invalid("not implemented")
 }
