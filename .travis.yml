@@ -23,19 +23,6 @@ script:
   - swift test
 
 
-# os:
-#   - linux
-#     dist: trusty
-#   - osx
-#     osx_image: xcode10.1
-# matrix:
-#   include:
-#     - os: linux
-#       dist: trusty
-#     - os: osx
-#       osx_image: xcode10.1
-
-
 jobs:
   include:
     - os: linux
@@ -63,4 +50,4 @@ jobs:
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
         IMAGE=finestructure/rester:$REV
-        docker run --rm $IMAGE
+        docker run --rm $IMAGE swift test
