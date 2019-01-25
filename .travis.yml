@@ -49,6 +49,8 @@ jobs:
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
         IMG=finestructure/rester:$VERSION
         docker build --pull -t $IMG -f Dockerfile.app --build-arg VERSION=$VERSION .
+
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         docker push $IMG
 
     - stage: test
