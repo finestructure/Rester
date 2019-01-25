@@ -65,5 +65,5 @@ jobs:
       script: |
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
-        IMAGE=finestructure/rester/base:$VERSION
+        IMAGE=finestructure/rester:base-$VERSION
         docker run --rm $IMAGE swift test
