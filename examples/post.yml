@@ -1,0 +1,15 @@
+requests:
+  post_example:
+    url: https://httpbin.org/anything
+    method: POST
+    data:
+      json:
+        foo: bar
+    validation:
+      status: 200
+      json:
+        # httpbin echos back the post data,
+        # which we validate here
+        data:
+          foo: bar
+

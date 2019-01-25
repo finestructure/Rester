@@ -13,28 +13,40 @@ public enum Matcher {
     case int(Int)
     case string(String)
     case regex(Regex)
+    case object([String: Matcher])
 }
 
 
 extension Matcher: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        // string decoding must be possible
-        let string = try container.decode(String.self)
-        if
-            let match = try? Regex(pattern: ".regex\\((.*?)\\)", groupNames: "regex").findFirst(in: string),
-            let regexString = match?.group(named: "regex") {
-            guard let regex = regexString.r else {
-                throw ResterError.decodingError("invalid regex in '\(regexString)'")
-            }
-            self = .regex(regex)
-            return
-        }
+
         if let int = try? container.decode(Int.self) {
             self = .int(int)
             return
         }
-        self = .string(string)
+
+        if let string = try? container.decode(String.self) {
+            if
+                let match = try? Regex(pattern: ".regex\\((.*?)\\)", groupNames: "regex").findFirst(in: string),
+                let regexString = match?.group(named: "regex") {
+                guard let regex = regexString.r else {
+                    throw ResterError.decodingError("invalid regex in '\(regexString)'")
+                }
+                self = .regex(regex)
+                return
+            } else {
+                self = .string(string)
+                return
+            }
+        }
+
+        if let object = try? container.decode([String: Matcher].self) {
+            self = .object(object)
+            return
+        }
+
+        throw ResterError.decodingError("failed to decode Matcher")
     }
 }
 
@@ -48,6 +60,8 @@ extension Matcher: Equatable {
             return x == y
         case let (.regex(x), .regex(y)):
             return x.pattern == y.pattern
+        case let (.object(x), .object(y)):
+            return x == y
         default:
             return false
         }

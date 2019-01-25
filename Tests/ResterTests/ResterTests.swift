@@ -53,12 +53,15 @@ final class ResterTests: XCTestCase {
             int: 42
             string: foo
             regex: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
+            object:
+              foo: bar
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
         XCTAssertEqual(t.validation.status, 200)
         XCTAssertEqual(t.validation.json!["int"], Matcher.int(42))
         XCTAssertEqual(t.validation.json!["string"], Matcher.string("foo"))
         XCTAssertEqual(t.validation.json!["regex"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}".r!))
+        XCTAssertEqual(t.validation.json!["object"], Matcher.object(["foo": .string("bar")]))
     }
 
     func test_request_execute() throws {
@@ -241,6 +244,9 @@ final class ResterTests: XCTestCase {
                 method: POST
                 validation:
                   status: 200
+                  json:
+                    data:
+                      foo: bar
             """
 
         let expectation = self.expectation(description: #function)
@@ -254,6 +260,7 @@ final class ResterTests: XCTestCase {
                 struct Result: Codable { let method: String }
                 let res = try JSONDecoder().decode(Result.self, from: $0.data)
                 XCTAssertEqual(res.method, "POST")
+                XCTFail("must fail because we're skipping validation")
                 expectation.fulfill()
         }
 

@@ -101,6 +101,9 @@ func _validate(matcher: Matcher, key: Key, data: [Key: AnyCodable]) -> Validatio
     case .regex(let regex):
         let res = matches(key: key, regex: regex, found: value)
         if res != .valid { return res }
+    case .object:
+        // FIXME: implement
+        return .invalid("not implemented")
     }
     return .valid
 }

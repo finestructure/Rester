@@ -1,0 +1,8 @@
+variables:
+  API_URL: https://httpbin.org
+requests:
+  get_example:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      status: 200
