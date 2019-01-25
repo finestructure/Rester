@@ -11,7 +11,7 @@ extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_subtitute", test_subtitute),
-      ("test_basic_request", test_basic_request),
+      ("test_parse_basic", test_parse_basic),
       ("test_parse_validation", test_parse_validation),
       ("test_request_execute", test_request_execute),
       ("test_validate_status", test_validate_status),

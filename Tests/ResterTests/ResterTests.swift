@@ -23,7 +23,7 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
     }
 
-    func test_basic_request() throws {
+    func test_parse_basic() throws {
         let s = """
             variables:
               API_URL: https://httpbin.org
