@@ -8,7 +8,8 @@ env:
 
 
 stages:
-  - build
+  - build base image
+  - build app image
   - test
 
 
@@ -25,24 +26,44 @@ jobs:
     - os: osx
       osx_image: xcode10.1
 
-    - stage: build
+    - stage: build base image
       os: linux
       script: |
+        # login
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        docker build -t rester .
-        docker images
-        REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
-        IMAGE=finestructure/rester:$REV
-        docker tag rester $IMAGE
-        docker push $IMAGE
+
+        # build
+        tag=base
+        VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
+        IMG=finestructure/rester:$tag-$VERSION
+        docker build --pull -t $IMG -f Dockerfile.$tag .
+
+        # push
+        docker push $IMG
+
+    - stage: build app image
+      os: linux
+      script: |
+        # login
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+        # build
+        VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
+        IMG=finestructure/rester:$VERSION
+        docker build --pull -t $IMG -f Dockerfile.app --build-arg VERSION=$VERSION .
+
+        #push
+        docker push $IMG
 
     - stage: test
+      name: swift test
       script: swift test
     
     - stage: test
+      name: docker swift test
       os: linux
       script: |
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        REV=${TRAVIS_TAG:-$TRAVIS_COMMIT}
-        IMAGE=finestructure/rester:$REV
+        VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
+        IMAGE=finestructure/rester:base-$VERSION
         docker run --rm $IMAGE swift test
