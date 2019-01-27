@@ -18,6 +18,7 @@ public struct Request: Decodable {
 
     public var url: String { return details.url }
     public var method: Method { return details.method ?? .get }
+    public var body: Body? { return details.body }
     public var validation: Validation? { return details.validation }
 }
 
@@ -41,7 +42,7 @@ public enum ValidationResult: Equatable {
 extension Request {
     public func substitute(variables: Variables) throws -> Request {
         let _url = try _substitute(string: url, with: variables)
-        let _details = RequestDetails(url: _url, method: method, validation: validation)
+        let _details = RequestDetails(url: _url, method: method, body: body, validation: validation)
         return Request(name: name, details: _details)
     }
 
@@ -49,6 +50,14 @@ extension Request {
         guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
+        if
+            method == .post,
+            let body = body?.json,
+            let postData = try? JSONEncoder().encode(body) {
+            urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            // urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
+            urlRequest.httpBody = postData
+        }
 
         return URLSession.shared.dataTask(.promise, with: urlRequest)
             .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
@@ -126,5 +135,14 @@ func matches(key: Key, regex: Regex, found: AnyCodable) -> ValidationResult {
 
 
 func matches(key: Key, object: [Key: Matcher], found: AnyCodable) -> ValidationResult {
-    return .invalid("not implemented")
+    // FIXME: decode from [Key: Value] and ditch AnyCodable as the type
+    // FIXME: Combine Matcher and Value somehow
+    guard let foundObject = try? found.assertValue([Key: AnyCodable].self) else {
+        return .invalid("json.\(key) expected to be object, was '\(found)'")
+    }
+    for (key, matcher) in object {
+        let res = _validate(matcher: matcher, key: key, data: foundObject)
+        if res != .valid { return res }
+    }
+    return .valid
 }

@@ -1,5 +1,7 @@
 import XCTest
 
+import AnyCodable
+import PromiseKit
 import Yams
 @testable import ResterCore
 
@@ -62,6 +64,19 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(t.validation.json!["string"], Matcher.string("foo"))
         XCTAssertEqual(t.validation.json!["regex"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}".r!))
         XCTAssertEqual(t.validation.json!["object"], Matcher.object(["foo": .string("bar")]))
+    }
+
+    func test_parse_body() throws {
+        struct Test: Decodable {
+            let body: Body
+        }
+        let s = """
+            body:
+              json:
+                foo: bar
+        """
+        let t = try YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
     }
 
     func test_request_execute() throws {
@@ -242,11 +257,14 @@ final class ResterTests: XCTestCase {
               post:
                 url: https://httpbin.org/anything
                 method: POST
+                body:
+                  json:
+                    foo: bar
                 validation:
                   status: 200
                   json:
                     method: POST
-                    data:
+                    json:
                       foo: bar
             """
         let rester = try YAMLDecoder().decode(Rester.self, from: s)

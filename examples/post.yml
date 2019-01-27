@@ -10,6 +10,6 @@ requests:
       json:
         # httpbin echos back the post data,
         # which we validate here
-        data:
+        json:
           foo: bar
 

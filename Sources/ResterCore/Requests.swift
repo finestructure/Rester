@@ -14,6 +14,7 @@ typealias RequestName = String
 struct RequestDetails: Decodable {
     let url: String
     let method: Method?
+    let body: Body?
     let validation: Validation?
 }
 

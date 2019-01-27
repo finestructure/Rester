@@ -13,6 +13,7 @@ extension ResterTests {
       ("test_subtitute", test_subtitute),
       ("test_parse_basic", test_parse_basic),
       ("test_parse_validation", test_parse_validation),
+      ("test_parse_body", test_parse_body),
       ("test_request_execute", test_request_execute),
       ("test_validate_status", test_validate_status),
       ("test_validate_json", test_validate_json),
