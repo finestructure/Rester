@@ -22,7 +22,6 @@ func _substitute(string: String, with variables: Variables) throws -> String {
 }
 
 
-public typealias Key = String
 public typealias Variables = [Key: Value]
 
 

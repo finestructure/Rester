@@ -26,7 +26,7 @@ extension ResterTests {
 }
 extension ValueTests {
   static var allTests: [(String, (ValueTests) -> () throws -> Void)] = [
-      ("test_basic_types", test_basic_types),
+      ("test_decodeBasicTypes", test_decodeBasicTypes),
   ]
 }
 
