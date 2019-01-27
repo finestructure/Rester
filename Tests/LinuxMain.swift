@@ -21,6 +21,7 @@ extension ResterTests {
       ("test_request_order", test_request_order),
       ("test_launch_binary", test_launch_binary),
       ("test_post_request", test_post_request),
+      ("test_anycodable_dict", test_anycodable_dict),
   ]
 }
 

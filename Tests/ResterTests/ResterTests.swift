@@ -277,6 +277,24 @@ final class ResterTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_anycodable_dict() throws {
+        struct Test: Decodable {
+            let dict: AnyCodable
+        }
+        let s = """
+            dict:
+                foo: bar
+        """
+        let t = try? YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertNotNil(t)
+        let anyDict = try? t?.dict.assertValue([String: AnyCodable].self)
+        XCTAssertNotNil(anyDict)   // <- fails. This is the issue with matching the json object in
+        // Request.swift:140
+        // guard let foundObject = try? found.assertValue([Key: AnyCodable].self) else {
+        // where the guard triggers and bails out of validation
+        let stringDict = try? t?.dict.assertValue([String: String].self)
+        XCTAssertNotNil(stringDict)
+    }
 }
 
 
