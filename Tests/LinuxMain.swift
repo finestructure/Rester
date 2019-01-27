@@ -24,8 +24,14 @@ extension ResterTests {
       ("test_anycodable_dict", test_anycodable_dict),
   ]
 }
+extension ValueTests {
+  static var allTests: [(String, (ValueTests) -> () throws -> Void)] = [
+      ("test_basic_types", test_basic_types),
+  ]
+}
 
 XCTMain([
   testCase(ResterTests.allTests),
+  testCase(ValueTests.allTests),
 ])
 // swiftlint:enable trailing_comma
