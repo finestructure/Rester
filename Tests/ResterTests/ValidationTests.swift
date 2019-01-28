@@ -62,6 +62,22 @@ enum _Matcher {
 
         return .equals(.string(string))
     }
+
+    func validate(_ value: Value) -> ValidationResult {
+        switch (self, value) {
+        case let (.equals(expected), value):
+            return expected == value
+                ? .valid
+                : .invalid("(\(value)) is not equal to (\(expected))")
+        case let (.regex(expected), .string(value)):
+            return expected ~= value
+                ? .valid
+                : .invalid("(\(value)) does not match (\(expected.pattern))")
+        default:
+            return .invalid("to be implemented")
+        }
+    }
+
 }
 
 
@@ -80,6 +96,31 @@ extension _Matcher: Equatable {
     }
 }
 
+
+// conveniece initialisers
+extension _Matcher {
+    init(_ int: Int) {
+        self = .equals(.int(int))
+    }
+    init(_ double: Double) {
+        self = .equals(.double(double))
+    }
+    init(_ string: String) throws {
+        self = try _Matcher.parse(string: string)
+    }
+}
+
+extension Value: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self = .string(value)
+    }
+}
+
+extension Value: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int) {
+        self = .int(value)
+    }
+}
 
 class ValidationTests: XCTestCase {
 
@@ -126,4 +167,11 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(t.validation.json?["object"], .contains(["foo": .string("bar")]))
     }
 
+    func test_validate() throws {
+        XCTAssertEqual(_Matcher(200).validate(.int(200)), .valid)
+        XCTAssertEqual(_Matcher(200).validate(.int(404)), .invalid("(404) is not equal to (200)"))
+        XCTAssertEqual(try _Matcher("foo").validate("foo"), .valid)
+        XCTAssertEqual(try _Matcher(".regex(\\d\\d)").validate("foo42"), .valid)
+        XCTAssertEqual(try _Matcher(".regex(\\d\\d)").validate("foo"), .invalid("(foo) does not match (\\d\\d)"))
+    }
 }
