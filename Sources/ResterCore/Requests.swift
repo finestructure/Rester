@@ -14,6 +14,7 @@ typealias RequestName = String
 struct RequestDetails: Decodable {
     let url: String
     let method: Method?
+    let body: Body?
     let validation: Validation?
 }
 
@@ -73,7 +74,6 @@ extension Requests: Decodable {
         let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
         self.items = try container.decodeOrdered(RequestDetails.self)
     }
-
 }
 
 

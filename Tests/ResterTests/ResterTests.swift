@@ -1,10 +1,16 @@
 import XCTest
 
+import AnyCodable
+import PromiseKit
 import Yams
 @testable import ResterCore
 
 
-
+extension String {
+    func ends(with string: String) -> Bool {
+        return reversed().starts(with: string.reversed())
+    }
+}
 
 
 final class ResterTests: XCTestCase {
@@ -26,7 +32,7 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
     }
 
-    func test_basic_request() throws {
+    func test_parse_basic() throws {
         let s = """
             variables:
               API_URL: https://httpbin.org
@@ -45,23 +51,17 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(versionReq.url, "https://httpbin.org/anything")
     }
 
-    func test_parse_validation() throws {
+    func test_parse_body() throws {
         struct Test: Decodable {
-            let validation: Validation
+            let body: Body
         }
         let s = """
-        validation:
-          status: 200
-          json:
-            int: 42
-            string: foo
-            regex: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
+            body:
+              json:
+                foo: bar
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertEqual(t.validation.status, 200)
-        XCTAssertEqual(t.validation.json!["int"], Matcher.int(42))
-        XCTAssertEqual(t.validation.json!["string"], Matcher.string("foo"))
-        XCTAssertEqual(t.validation.json!["regex"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}".r!))
+        XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
     }
 
     func test_request_execute() throws {
@@ -111,7 +111,7 @@ final class ResterTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("status-failure").test()
                 .map { result in
-                    XCTAssertEqual(result, ValidationResult.invalid("status invalid, expected '500' was '200'"))
+                    XCTAssertEqual(result, ValidationResult.invalid("status invalid: (200) is not equal to (500)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -136,7 +136,7 @@ final class ResterTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure").test()
                 .map {
-                    XCTAssertEqual($0, ValidationResult.invalid("json.method invalid, expected 'nope' was 'GET'"))
+                    XCTAssertEqual($0, ValidationResult.invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -146,7 +146,7 @@ final class ResterTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure-type").test()
                 .map {
-                    XCTAssertEqual($0, ValidationResult.invalid("json.method expected to be of type Int, was 'GET'"))
+                    XCTAssertEqual($0, ValidationResult.invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -175,7 +175,8 @@ final class ResterTests: XCTestCase {
                     case .valid:
                         XCTFail("expected failure but received success")
                     case .invalid(let message):
-                        XCTAssert(message.starts(with: "json.uuid failed to match \'^\\w{8}$\'"))
+                        XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
+                        XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
                     }
                     expectation.fulfill()
             }
@@ -236,6 +237,31 @@ final class ResterTests: XCTestCase {
         )
     }
 
+    func test_post_request() throws {
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    foo: bar
+                validation:
+                  status: 200
+                  json:
+                    method: POST
+                    json:
+                      foo: bar
+            """
+        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("post").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
 }
 
 

@@ -8,7 +8,7 @@ func _substitute(string: String, with variables: Variables) throws -> String {
     let res = regex.replaceAll(in: string) { match in
         if
             let varName = match.group(named: "variable"),
-            let value = variables[varName]?.description {
+            let value = variables[varName]?.substitutionDescription {
             return value
         } else {
             return nil
@@ -22,7 +22,6 @@ func _substitute(string: String, with variables: Variables) throws -> String {
 }
 
 
-public typealias Key = String
 public typealias Variables = [Key: Value]
 
 
