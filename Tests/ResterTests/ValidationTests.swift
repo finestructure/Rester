@@ -64,8 +64,8 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo"), .invalid("(foo) does not match (\\d\\d)"))
 
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar"]), .valid)
-        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["nope": "-"]), .invalid("Key \'foo\' not found in \'[\"nope\": \"-\"]\'"))
-        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "-"]), .invalid("Key \'foo\' validation error: (\"-\") is not equal to (\"bar\")"))
+        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["nope": "-"]), .invalid("key \'foo\' not found in \'[\"nope\": \"-\"]\'"))
+        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "-"]), .invalid("key \'foo\' validation error: (\"-\") is not equal to (\"bar\")"))
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "extra": "value"]), .valid)
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "mixed_type": 1]), .valid)
     }

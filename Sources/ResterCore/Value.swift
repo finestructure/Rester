@@ -17,6 +17,7 @@ public enum Value: Equatable {
     case double(Double)
     case dictionary([Key: Value])
     case array([Value])
+    case null
 }
 
 
@@ -34,13 +35,11 @@ extension Value: Codable {
             return
         }
 
-        // string decoding must be possible at this point
-        let string = try container.decode(String.self)
-
-        // strings with a colon get parsed as Numeric (with value 0) *)
-        // therefore just accept them as string and return
-        // *) probably due to dictionary syntax
-        if string.contains(":") {
+        if let string = try? container.decode(String.self),
+            // strings with a colon get parsed as Numeric (with value 0) *)
+            // therefore just accept them as string and return
+            // *) probably due to dictionary syntax
+            string.contains(":") {
             self = .string(string)
             return
         }
@@ -55,8 +54,17 @@ extension Value: Codable {
             return
         }
 
-        // default to string
-        self = .string(string)
+        if let string = try? container.decode(String.self) {
+            self = .string(string)
+            return
+        }
+
+        if container.decodeNil() {
+            self = .null
+            return
+        }
+
+        throw DecodingError.dataCorruptedError(in: container, debugDescription: "could not find any decodable value")
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -73,6 +81,8 @@ extension Value: Codable {
             try container.encode(v)
         case .array(let v):
             try container.encode(v)
+        case .null:
+            try container.encodeNil()
         }
     }
 }
@@ -91,6 +101,8 @@ extension Value: CustomStringConvertible {
             return v.description
         case .array(let v):
             return v.description
+        case .null:
+            return "null"
         }
     }
 }
@@ -109,6 +121,8 @@ extension Value {
             return v.description
         case .array(let v):
             return v.description
+        case .null:
+            return "null"
         }
     }
 }

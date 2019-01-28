@@ -19,7 +19,7 @@ enum Matcher {
 extension Matcher {
     init(value: Value) throws {
         switch value {
-        case .int, .double, .array:
+        case .int, .double, .array, .null:
             self = .equals(value)
         case .string(let string):
             self = try Matcher.parse(string: string)
@@ -54,9 +54,9 @@ extension Matcher {
                 : .invalid("(\(value)) does not match (\(expected.pattern))")
         case let (.contains(expected), .dictionary(dict)):
             for (key, exp) in expected {
-                guard let val = dict[key] else { return .invalid("Key '\(key)' not found in '\(dict)'") }
+                guard let val = dict[key] else { return .invalid("key '\(key)' not found in '\(dict)'") }
                 if case let .invalid(error) = exp.validate(val) {
-                    return .invalid("Key '\(key)' validation error: \(error)")
+                    return .invalid("key '\(key)' validation error: \(error)")
                 }
             }
             return .valid

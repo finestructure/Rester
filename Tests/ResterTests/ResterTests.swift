@@ -136,7 +136,7 @@ final class ResterTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure").test()
                 .map {
-                    XCTAssertEqual($0, ValidationResult.invalid("json.method invalid, expected 'nope' was 'GET'"))
+                    XCTAssertEqual($0, ValidationResult.invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -146,7 +146,7 @@ final class ResterTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure-type").test()
                 .map {
-                    XCTAssertEqual($0, ValidationResult.invalid("json.method expected to be of type Int, was 'GET'"))
+                    XCTAssertEqual($0, ValidationResult.invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -175,7 +175,7 @@ final class ResterTests: XCTestCase {
                     case .valid:
                         XCTFail("expected failure but received success")
                     case .invalid(let message):
-                        XCTAssert(message.starts(with: "json invalid: Key 'uuid' validation error"), "message was: \(message)")
+                        XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
                         XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
                     }
                     expectation.fulfill()

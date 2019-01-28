@@ -33,6 +33,9 @@ extension ValueTests {
   static var allTests: [(String, (ValueTests) -> () throws -> Void)] = [
       ("test_decodeBasicTypes", test_decodeBasicTypes),
       ("test_encodeBasicTypes", test_encodeBasicTypes),
+      ("test_null_json", test_null_json),
+      ("test_encode_null", test_encode_null),
+      ("test_decodeComplexResponse", test_decodeComplexResponse),
   ]
 }
 
