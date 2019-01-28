@@ -47,8 +47,6 @@ enum _Matcher {
             self = try _Matcher.parse(string: string)
         case .dictionary(let dict):
             self = .contains(dict)
-        default:
-            throw ResterError.decodingError("Failed to initialise Matcher with value '\(value)'")
         }
     }
 
