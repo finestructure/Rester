@@ -21,15 +21,15 @@ struct ValidationDetail: Decodable {
 }
 
 public struct _Validation: Decodable {
-    let status: Matcher?
-    let json: [Key: Matcher]?
+    let status: _Matcher?
+    let json: [Key: _Matcher]?
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let details = try container.decode(ValidationDetail.self)
 
-        status = nil
-        json = nil
+        status = try details.status.map { try _Matcher(value: $0) }
+        json = try details.json?.mapValues { try _Matcher(value: $0) }
     }
 }
 
@@ -95,6 +95,7 @@ class ValidationTests: XCTestCase {
 
         let regex = Value.string(".regex(.*)")
         XCTAssertEqual(try _Matcher(value: regex), .regex(".*".r!))
+
         // TODO: implement .in operator
         //        let `in` = Value.string(".in(200, 201)")
         //        XCTAssertEqual(try _Matcher(value: `in`), .in([.int(200), .int(201)]))
@@ -113,18 +114,16 @@ class ValidationTests: XCTestCase {
           json:
             int: 42
             string: foo
-            regex: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
+            regex: .regex(.*)
             object:
               foo: bar
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertEqual(t.validation.status, .int(200))
-        XCTAssertEqual(t.validation.json?["int"], .int(42))
-        XCTAssertEqual(t.validation.json?["string"], .string("foo"))
-//        XCTAssertEqual(t.validation.json!["regex"], .regex("\\d+\\.\\d+\\.\\d+|\\S{40}".r!))
-//        XCTAssertEqual(t.validation.json!["object"], .object(["foo": .string("bar")]))
-        XCTAssertEqual(t.validation.json?["regex"], .string(".regex(\\d+\\.\\d+\\.\\d+|\\S{40})"))
-//        XCTAssertEqual(t.validation.json!["object"], .dictionary(["foo": .string("bar")]))
+        XCTAssertEqual(t.validation.status, .equals(.int(200)))
+        XCTAssertEqual(t.validation.json?["int"], .equals(.int(42)))
+        XCTAssertEqual(t.validation.json?["string"], .equals(.string("foo")))
+        XCTAssertEqual(t.validation.json?["regex"], .regex(".*".r!))
+        XCTAssertEqual(t.validation.json?["object"], .contains(["foo": .string("bar")]))
     }
 
 }
