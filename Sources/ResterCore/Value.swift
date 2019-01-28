@@ -17,6 +17,7 @@ public enum Value: Equatable {
     case double(Double)
     case dictionary([Key: Value])
     case array([Value])
+    case null
 }
 
 
@@ -34,13 +35,11 @@ extension Value: Codable {
             return
         }
 
-        // string decoding must be possible at this point
-        let string = try container.decode(String.self)
-
-        // strings with a colon get parsed as Numeric (with value 0) *)
-        // therefore just accept them as string and return
-        // *) probably due to dictionary syntax
-        if string.contains(":") {
+        if let string = try? container.decode(String.self),
+            // strings with a colon get parsed as Numeric (with value 0) *)
+            // therefore just accept them as string and return
+            // *) probably due to dictionary syntax
+            string.contains(":") {
             self = .string(string)
             return
         }
@@ -55,8 +54,17 @@ extension Value: Codable {
             return
         }
 
-        // default to string
-        self = .string(string)
+        if let string = try? container.decode(String.self) {
+            self = .string(string)
+            return
+        }
+
+        if container.decodeNil() {
+            self = .null
+            return
+        }
+
+        throw DecodingError.dataCorruptedError(in: container, debugDescription: "could not find any decodable value")
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -73,6 +81,8 @@ extension Value: Codable {
             try container.encode(v)
         case .array(let v):
             try container.encode(v)
+        case .null:
+            try container.encodeNil()
         }
     }
 }
@@ -84,6 +94,26 @@ extension Value: CustomStringConvertible {
         case .int(let v):
             return v.description
         case .string(let v):
+            return "\"\(v)\""
+        case .double(let v):
+            return v.description
+        case .dictionary(let v):
+            return v.description
+        case .array(let v):
+            return v.description
+        case .null:
+            return "null"
+        }
+    }
+}
+
+
+extension Value {
+    public var substitutionDescription: String {
+        switch self {
+        case .int(let v):
+            return v.description
+        case .string(let v):
             return v
         case .double(let v):
             return v.description
@@ -91,7 +121,31 @@ extension Value: CustomStringConvertible {
             return v.description
         case .array(let v):
             return v.description
+        case .null:
+            return "null"
         }
+    }
+}
+
+
+extension Value: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self = .string(value)
+    }
+}
+
+
+extension Value: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int) {
+        self = .int(value)
+    }
+}
+
+
+extension Value: ExpressibleByDictionaryLiteral {
+    public init(dictionaryLiteral elements: (Key, Value)...) {
+        let dict = Dictionary(uniqueKeysWithValues: elements)
+        self = .dictionary(dict)
     }
 }
 
