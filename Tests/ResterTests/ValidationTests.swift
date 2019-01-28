@@ -184,16 +184,18 @@ class ValidationTests: XCTestCase {
     }
 
     func test_validate() throws {
-        XCTAssertEqual(try _Matcher(200).validate(.int(200)), .valid)
-        XCTAssertEqual(try _Matcher(200).validate(.int(404)), .invalid("(404) is not equal to (200)"))
+        XCTAssertEqual(try _Matcher(200).validate(200), .valid)
+        XCTAssertEqual(try _Matcher(200).validate(404), .invalid("(404) is not equal to (200)"))
         XCTAssertEqual(try _Matcher("foo").validate("foo"), .valid)
+        XCTAssertEqual(try _Matcher(200).validate("foo"), .invalid("(\"foo\") is not equal to (200)"))
+        XCTAssertEqual(try _Matcher(200).validate("200"), .invalid("(\"200\") is not equal to (200)"))
 
         XCTAssertEqual(try _Matcher(".regex(\\d\\d)").validate("foo42"), .valid)
         XCTAssertEqual(try _Matcher(".regex(\\d\\d)").validate("foo"), .invalid("(foo) does not match (\\d\\d)"))
 
         XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "bar"]), .valid)
-        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["nope": "-"]), .invalid("Key \'foo\' not found in \'[\"nope\": -]\'"))
-        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "-"]), .invalid("Key \'foo\' validation error: (-) is not equal to (bar)"))
+        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["nope": "-"]), .invalid("Key \'foo\' not found in \'[\"nope\": \"-\"]\'"))
+        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "-"]), .invalid("Key \'foo\' validation error: (\"-\") is not equal to (\"bar\")"))
         XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "bar", "extra": "value"]), .valid)
         XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "bar", "mixed_type": 1]), .valid)
     }

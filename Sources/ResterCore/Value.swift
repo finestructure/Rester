@@ -84,7 +84,7 @@ extension Value: CustomStringConvertible {
         case .int(let v):
             return v.description
         case .string(let v):
-            return v
+            return "\"\(v)\""
         case .double(let v):
             return v.description
         case .dictionary(let v):
