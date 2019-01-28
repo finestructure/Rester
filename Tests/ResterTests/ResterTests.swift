@@ -6,6 +6,13 @@ import Yams
 @testable import ResterCore
 
 
+extension String {
+    func ends(with string: String) -> Bool {
+        return reversed().starts(with: string.reversed())
+    }
+}
+
+
 final class ResterTests: XCTestCase {
 
     func test_decode_variables() throws {
@@ -104,7 +111,7 @@ final class ResterTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("status-failure").test()
                 .map { result in
-                    XCTAssertEqual(result, ValidationResult.invalid("status invalid, expected '500' was '200'"))
+                    XCTAssertEqual(result, ValidationResult.invalid("status invalid: (200) is not equal to (500)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -168,7 +175,8 @@ final class ResterTests: XCTestCase {
                     case .valid:
                         XCTFail("expected failure but received success")
                     case .invalid(let message):
-                        XCTAssert(message.starts(with: "json.uuid failed to match \'^\\w{8}$\'"))
+                        XCTAssert(message.starts(with: "json invalid: Key 'uuid' validation error"), "message was: \(message)")
+                        XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
                     }
                     expectation.fulfill()
             }
@@ -253,25 +261,6 @@ final class ResterTests: XCTestCase {
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 5)
-    }
-
-    func test_anycodable_dict() throws {
-        struct Test: Decodable {
-            let dict: AnyCodable
-        }
-        let s = """
-            dict:
-                foo: bar
-        """
-        let t = try? YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertNotNil(t)
-        let anyDict = try? t?.dict.assertValue([String: AnyCodable].self)
-        XCTAssertNotNil(anyDict)   // <- fails. This is the issue with matching the json object in
-        // Request.swift:140
-        // guard let foundObject = try? found.assertValue([Key: AnyCodable].self) else {
-        // where the guard triggers and bails out of validation
-        let stringDict = try? t?.dict.assertValue([String: String].self)
-        XCTAssertNotNil(stringDict)
     }
 }
 

@@ -70,79 +70,25 @@ extension Request {
     public func validate(_ response: Response) -> ValidationResult {
         if
             let status = validation?.status,
-            response.status != status {
-            return .invalid("status invalid, expected '\(status)' was '\(response.response.statusCode)'")
+            case let .invalid(error) = status.validate(Value.int(response.status)) {
+            return .invalid("status invalid: \(error)")
         }
 
         if let json = validation?.json {
             // assume Dictionary response
             // TODO: handle Array response
-            guard let data = try? JSONDecoder().decode([Key: AnyCodable].self, from: response.data)
+            guard let data = try? JSONDecoder().decode([Key: Value].self, from: response.data)
                 else {
                     return .invalid("failed to decode JSON object from response")
             }
 
-            for (key, matcher) in json {
-                let res = _validate(matcher: matcher, key: key, data: data)
-                if res != .valid { return res }
+            // TODO: make json a Matcher to begin with
+            let matcher = Matcher.contains(json)
+            if case let .invalid(error) = matcher.validate(Value.dictionary(data)) {
+                return .invalid("json invalid: \(error)")
             }
         }
         return .valid
     }
 }
 
-
-func _validate(matcher: Matcher, key: Key, data: [Key: AnyCodable]) -> ValidationResult {
-    guard let value = data[key] else { return .invalid("key '\(key)' not found in JSON response") }
-    switch matcher {
-    case .int(let expected):
-        let res = equals(key: key, expected: expected, found: value)
-        if res != .valid { return res }
-    case .string(let expected):
-        let res = equals(key: key, expected: expected, found: value)
-        if res != .valid { return res }
-    case .regex(let regex):
-        let res = matches(key: key, regex: regex, found: value)
-        if res != .valid { return res }
-    case .object(let object):
-        let res = matches(key: key, object: object, found: value)
-        if res != .valid { return res }
-    }
-    return .valid
-}
-
-
-func equals<T: Equatable>(key: Key, expected: T, found: AnyCodable) -> ValidationResult {
-    guard let value = try? found.assertValue(T.self) else {
-        return .invalid("json.\(key) expected to be of type \(T.self), was '\(found)'")
-    }
-    if value != expected {
-        return .invalid("json.\(key) invalid, expected '\(expected)' was '\(value)'")
-    }
-    return .valid
-}
-
-
-func matches(key: Key, regex: Regex, found: AnyCodable) -> ValidationResult {
-    guard let value = try? found.assertValue(String.self) else {
-        return .invalid("json.\(key) expected to be of type \(String.self), was '\(found)'")
-    }
-    if value !~ regex {
-        return .invalid("json.\(key) failed to match '\(regex.pattern)', was '\(value)'")
-    }
-    return .valid
-}
-
-
-func matches(key: Key, object: [Key: Matcher], found: AnyCodable) -> ValidationResult {
-    // FIXME: decode from [Key: Value] and ditch AnyCodable as the type
-    // FIXME: Combine Matcher and Value somehow
-    guard let foundObject = try? found.assertValue([Key: AnyCodable].self) else {
-        return .invalid("json.\(key) expected to be object, was '\(found)'")
-    }
-    for (key, matcher) in object {
-        let res = _validate(matcher: matcher, key: key, data: foundObject)
-        if res != .valid { return res }
-    }
-    return .valid
-}

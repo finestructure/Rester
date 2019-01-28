@@ -9,44 +9,60 @@ import Foundation
 import Regex
 
 
-public enum Matcher {
-    case int(Int)
-    case string(String)
+enum Matcher {
+    case equals(Value)
     case regex(Regex)
-    case object([Key: Matcher])
+    case contains([Key: Matcher])
 }
 
 
-extension Matcher: Decodable {
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        if let int = try? container.decode(Int.self) {
-            self = .int(int)
-            return
+extension Matcher {
+    init(value: Value) throws {
+        switch value {
+        case .int, .double, .array:
+            self = .equals(value)
+        case .string(let string):
+            self = try Matcher.parse(string: string)
+        case .dictionary(let dict):
+            let matcherDict = try dict.mapValues { try Matcher(value: $0) }
+            self = .contains(matcherDict)
         }
+    }
 
-        if let string = try? container.decode(String.self) {
-            if
-                let match = try? Regex(pattern: ".regex\\((.*?)\\)", groupNames: "regex").findFirst(in: string),
-                let regexString = match?.group(named: "regex") {
-                guard let regex = regexString.r else {
-                    throw ResterError.decodingError("invalid regex in '\(regexString)'")
-                }
-                self = .regex(regex)
-                return
-            } else {
-                self = .string(string)
-                return
+    static func parse(string: String) throws -> Matcher {
+        if  // .regex(...)
+            let match = try? Regex(pattern: ".regex\\((.*?)\\)", groupNames: "regex").findFirst(in: string),
+            let regexString = match?.group(named: "regex") {
+            guard let regex = regexString.r else {
+                throw ResterError.decodingError("invalid .regex in '\(regexString)'")
             }
+            return .regex(regex)
         }
 
-        if let object = try? container.decode([Key: Matcher].self) {
-            self = .object(object)
-            return
-        }
+        return .equals(.string(string))
+    }
 
-        throw ResterError.decodingError("failed to decode Matcher")
+    func validate(_ value: Value) -> ValidationResult {
+        switch (self, value) {
+        case let (.equals(expected), value):
+            return expected == value
+                ? .valid
+                : .invalid("(\(value)) is not equal to (\(expected))")
+        case let (.regex(expected), .string(value)):
+            return expected ~= value
+                ? .valid
+                : .invalid("(\(value)) does not match (\(expected.pattern))")
+        case let (.contains(expected), .dictionary(dict)):
+            for (key, exp) in expected {
+                guard let val = dict[key] else { return .invalid("Key '\(key)' not found in '\(dict)'") }
+                if case let .invalid(error) = exp.validate(val) {
+                    return .invalid("Key '\(key)' validation error: \(error)")
+                }
+            }
+            return .valid
+        default:
+            return .invalid("to be implemented")
+        }
     }
 }
 
@@ -54,16 +70,36 @@ extension Matcher: Decodable {
 extension Matcher: Equatable {
     public static func == (lhs: Matcher, rhs: Matcher) -> Bool {
         switch (lhs, rhs) {
-        case let (.int(x), .int(y)):
-            return x == y
-        case let (.string(x), .string(y)):
+        case let (.equals(x), .equals(y)):
             return x == y
         case let (.regex(x), .regex(y)):
             return x.pattern == y.pattern
-        case let (.object(x), .object(y)):
+        case let (.contains(x), .contains(y)):
             return x == y
         default:
             return false
         }
     }
 }
+
+
+// conveniece initialisers
+extension Matcher {
+    init(_ int: Int) throws {
+        try self.init(value: Value.int(int))
+    }
+    init(_ double: Double) throws {
+        try self.init(value: Value.double(double))
+    }
+    init(_ string: String) throws {
+        try self.init(value: Value.string(string))
+    }
+    init(_ dict: [Key: Value]) throws {
+        try self.init(value: Value.dictionary(dict))
+    }
+    init(_ dict: [Key: Matcher]) throws {
+        // TODO: not ideal, better would be to go through main initialiser
+        self = .contains(dict)
+    }
+}
+

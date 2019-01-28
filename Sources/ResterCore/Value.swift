@@ -95,3 +95,43 @@ extension Value: CustomStringConvertible {
     }
 }
 
+
+extension Value {
+    public var substitutionDescription: String {
+        switch self {
+        case .int(let v):
+            return v.description
+        case .string(let v):
+            return v
+        case .double(let v):
+            return v.description
+        case .dictionary(let v):
+            return v.description
+        case .array(let v):
+            return v.description
+        }
+    }
+}
+
+
+extension Value: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self = .string(value)
+    }
+}
+
+
+extension Value: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int) {
+        self = .int(value)
+    }
+}
+
+
+extension Value: ExpressibleByDictionaryLiteral {
+    public init(dictionaryLiteral elements: (Key, Value)...) {
+        let dict = Dictionary(uniqueKeysWithValues: elements)
+        self = .dictionary(dict)
+    }
+}
+
