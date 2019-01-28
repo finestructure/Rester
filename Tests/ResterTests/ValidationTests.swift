@@ -15,18 +15,19 @@ import Yams
 
 public typealias Key = String
 
-struct ValidationDetail: Decodable {
-    let status: Value?
-    let json: [Key: Value]?
-}
 
 public struct _Validation: Decodable {
     let status: _Matcher?
     let json: [Key: _Matcher]?
 
+    private struct Detail: Decodable {
+        let status: Value?
+        let json: [Key: Value]?
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let details = try container.decode(ValidationDetail.self)
+        let details = try container.decode(Detail.self)
 
         status = try details.status.map { try _Matcher(value: $0) }
         json = try details.json?.mapValues { try _Matcher(value: $0) }
