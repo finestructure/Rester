@@ -13,7 +13,7 @@ import Yams
 
 
 
-typealias Key = String
+public typealias Key = String
 
 struct ValidationDetail: Decodable {
     let status: Value?
@@ -37,7 +37,7 @@ public struct _Validation: Decodable {
 enum _Matcher {
     case equals(Value)
     case regex(Regex)
-    case contains([Key: Value])
+    case contains([Key: _Matcher])
 
     init(value: Value) throws {
         switch value {
@@ -46,7 +46,8 @@ enum _Matcher {
         case .string(let string):
             self = try _Matcher.parse(string: string)
         case .dictionary(let dict):
-            self = .contains(dict)
+            let matcherDict = try dict.mapValues { try _Matcher(value: $0) }
+            self = .contains(matcherDict)
         }
     }
 
@@ -73,6 +74,14 @@ enum _Matcher {
             return expected ~= value
                 ? .valid
                 : .invalid("(\(value)) does not match (\(expected.pattern))")
+        case let (.contains(expected), .dictionary(dict)):
+            for (key, exp) in expected {
+                guard let val = dict[key] else { return .invalid("Key '\(key)' not found in '\(dict)'") }
+                if case let .invalid(error) = exp.validate(val) {
+                    return .invalid("Key '\(key)' validation error: \(error)")
+                }
+            }
+            return .valid
         default:
             return .invalid("to be implemented")
         }
@@ -99,14 +108,17 @@ extension _Matcher: Equatable {
 
 // conveniece initialisers
 extension _Matcher {
-    init(_ int: Int) {
-        self = .equals(.int(int))
+    init(_ int: Int) throws {
+        try self.init(value: Value.int(int))
     }
-    init(_ double: Double) {
-        self = .equals(.double(double))
+    init(_ double: Double) throws {
+        try self.init(value: Value.double(double))
     }
     init(_ string: String) throws {
-        self = try _Matcher.parse(string: string)
+        try self.init(value: Value.string(string))
+    }
+    init(_ dict: [Key: Value]) throws {
+        try self.init(value: Value.dictionary(dict))
     }
 }
 
@@ -119,6 +131,13 @@ extension Value: ExpressibleByStringLiteral {
 extension Value: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int) {
         self = .int(value)
+    }
+}
+
+extension Value: ExpressibleByDictionaryLiteral {
+    public init(dictionaryLiteral elements: (Key, Value)...) {
+        let dict = Dictionary(uniqueKeysWithValues: elements)
+        self = .dictionary(dict)
     }
 }
 
@@ -137,12 +156,8 @@ class ValidationTests: XCTestCase {
         let regex = Value.string(".regex(.*)")
         XCTAssertEqual(try _Matcher(value: regex), .regex(".*".r!))
 
-        // TODO: implement .in operator
-        //        let `in` = Value.string(".in(200, 201)")
-        //        XCTAssertEqual(try _Matcher(value: `in`), .in([.int(200), .int(201)]))
-
         let dict = Value.dictionary(["foo" : .string("bar")])
-        XCTAssertEqual(try _Matcher(value: dict), .contains(["foo" : .string("bar")]))
+        XCTAssertEqual(try _Matcher(value: dict), .contains(["foo" : .equals("bar")]))
     }
 
     func test_parse_Validation() throws {
@@ -164,14 +179,21 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(t.validation.json?["int"], .equals(.int(42)))
         XCTAssertEqual(t.validation.json?["string"], .equals(.string("foo")))
         XCTAssertEqual(t.validation.json?["regex"], .regex(".*".r!))
-        XCTAssertEqual(t.validation.json?["object"], .contains(["foo": .string("bar")]))
+        XCTAssertEqual(t.validation.json?["object"], .contains(["foo": .equals("bar")]))
     }
 
     func test_validate() throws {
-        XCTAssertEqual(_Matcher(200).validate(.int(200)), .valid)
-        XCTAssertEqual(_Matcher(200).validate(.int(404)), .invalid("(404) is not equal to (200)"))
+        XCTAssertEqual(try _Matcher(200).validate(.int(200)), .valid)
+        XCTAssertEqual(try _Matcher(200).validate(.int(404)), .invalid("(404) is not equal to (200)"))
         XCTAssertEqual(try _Matcher("foo").validate("foo"), .valid)
+
         XCTAssertEqual(try _Matcher(".regex(\\d\\d)").validate("foo42"), .valid)
         XCTAssertEqual(try _Matcher(".regex(\\d\\d)").validate("foo"), .invalid("(foo) does not match (\\d\\d)"))
+
+        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "bar"]), .valid)
+        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["nope": "-"]), .invalid("Key \'foo\' not found in \'[\"nope\": -]\'"))
+        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "-"]), .invalid("Key \'foo\' validation error: (-) is not equal to (bar)"))
+        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "bar", "extra": "value"]), .valid)
+        XCTAssertEqual(try _Matcher(["foo": "bar"]).validate(["foo": "bar", "mixed_type": 1]), .valid)
     }
 }
