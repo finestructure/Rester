@@ -44,28 +44,6 @@ final class ResterTests: XCTestCase {
         XCTAssertEqual(versionReq.url, "https://httpbin.org/anything")
     }
 
-    func test_parse_validation() throws {
-        struct Test: Decodable {
-            let validation: Validation
-        }
-        let s = """
-        validation:
-          status: 200
-          json:
-            int: 42
-            string: foo
-            regex: .regex(\\d+\\.\\d+\\.\\d+|\\S{40})
-            object:
-              foo: bar
-        """
-        let t = try YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertEqual(t.validation.status, 200)
-        XCTAssertEqual(t.validation.json!["int"], Matcher.int(42))
-        XCTAssertEqual(t.validation.json!["string"], Matcher.string("foo"))
-        XCTAssertEqual(t.validation.json!["regex"], Matcher.regex("\\d+\\.\\d+\\.\\d+|\\S{40}".r!))
-        XCTAssertEqual(t.validation.json!["object"], Matcher.object(["foo": .string("bar")]))
-    }
-
     func test_parse_body() throws {
         struct Test: Decodable {
             let body: Body
