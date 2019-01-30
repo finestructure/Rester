@@ -4,7 +4,7 @@ import Yams
 @testable import ResterCore
 
 
-class RestfileTests: XCTestCase {
+class RestfileDecodingTests: XCTestCase {
 
     func test_decode_variables() throws {
         let s = """
@@ -47,6 +47,16 @@ class RestfileTests: XCTestCase {
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
         XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
+    }
+
+    func test_parse_batch() throws {
+        let s = """
+            restfiles:
+              - env.yml
+              - system/version.yml
+              - fixed_user/login.yml
+        """
+        XCTFail("implement me")
     }
 
 }

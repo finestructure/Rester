@@ -19,11 +19,12 @@ extension ResterTests {
       ("test_post_request", test_post_request),
   ]
 }
-extension RestfileTests {
-  static var allTests: [(String, (RestfileTests) -> () throws -> Void)] = [
+extension RestfileDecodingTests {
+  static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
       ("test_parse_body", test_parse_body),
+      ("test_parse_batch", test_parse_batch),
   ]
 }
 extension ValidationTests {
@@ -45,7 +46,7 @@ extension ValueTests {
 
 XCTMain([
   testCase(ResterTests.allTests),
-  testCase(RestfileTests.allTests),
+  testCase(RestfileDecodingTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
 ])
