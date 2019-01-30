@@ -62,7 +62,7 @@ func launch(request: Request) throws -> Promise<Bool> {
 
 let main = command(
     Argument<String>("filename", description: "A Restfile"),
-    Flag("verbose", description: "Verbose output")
+    Flag("verbose", flag: "v", description: "Verbose output")
 ) { filename, verbose in
     do {
         print("🚀  Resting \(filename.bold) ...\n")
