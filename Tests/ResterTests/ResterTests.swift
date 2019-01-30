@@ -32,7 +32,7 @@ final class ResterTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         let expectation = self.expectation(description: #function)
 
@@ -52,7 +52,7 @@ final class ResterTests: XCTestCase {
 
     func test_validate_status() throws {
         let s = try readFixture("httpbin.yml")
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -77,7 +77,7 @@ final class ResterTests: XCTestCase {
 
     func test_validate_json() throws {
         let s = try readFixture("httpbin.yml")
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -112,7 +112,7 @@ final class ResterTests: XCTestCase {
 
     func test_validate_json_regex() throws {
         let s = try readFixture("httpbin.yml")
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -151,7 +151,7 @@ final class ResterTests: XCTestCase {
               3rd:
                 url: http://foo.com
             """
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let names = rester.requests?.names
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
@@ -210,7 +210,7 @@ final class ResterTests: XCTestCase {
                     json:
                       foo: bar
             """
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
         _ = try rester.expandedRequest("post").test()
             .map {

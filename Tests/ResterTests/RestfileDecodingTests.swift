@@ -12,7 +12,7 @@ class RestfileDecodingTests: XCTestCase {
               INT_VALUE: 42
               STRING_VALUE: some string value
             """
-        let env = try YAMLDecoder().decode(Rester.self, from: s)
+        let env = try YAMLDecoder().decode(Restfile.self, from: s)
         XCTAssertEqual(env.variables!["INT_VALUE"], .int(42))
         XCTAssertEqual(env.variables!["STRING_VALUE"], .string("some string value"))
     }
@@ -28,7 +28,7 @@ class RestfileDecodingTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rest = try YAMLDecoder().decode(Rester.self, from: s)
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
         let variables = rest.variables!
         let requests = rest.requests!
         let versionReq = try requests["basic"]!.substitute(variables: variables)

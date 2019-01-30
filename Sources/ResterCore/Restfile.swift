@@ -25,13 +25,13 @@ func _substitute(string: String, with variables: Variables) throws -> String {
 public typealias Variables = [Key: Value]
 
 
-public struct Rester: Decodable {
+public struct Restfile: Decodable {
     public let variables: Variables?
     let requests: Requests?
 }
 
 
-extension Rester {
+extension Restfile {
     public var requestCount: Int {
         return requests?.items.count ?? 0
     }

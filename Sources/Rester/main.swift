@@ -68,7 +68,7 @@ let main = command(
         print("🚀  Resting \(filename.bold) ...\n")
 
         let yml = try String(contentsOfFile: filename)
-        let rester = try YAMLDecoder().decode(Rester.self, from: yml)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: yml)
 
         if verbose {
             if let vars = rester.variables {
