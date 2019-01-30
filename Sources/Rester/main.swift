@@ -60,12 +60,25 @@ func launch(request: Request) throws -> Promise<Bool> {
 }
 
 
-let main = command { (filename: String) in
+let main = command(
+    Argument<String>("filename", description: "A Restfile"),
+    Flag("verbose", flag: "v", description: "Verbose output")
+) { filename, verbose in
     do {
         print("🚀  Resting \(filename.bold) ...\n")
 
         let yml = try String(contentsOfFile: filename)
         let rester = try YAMLDecoder().decode(Rester.self, from: yml)
+
+        if verbose {
+            if let vars = rester.variables {
+                print("Defined variables:")
+                for v in vars.keys {
+                    print("  - \(v)")
+                }
+                print("")
+            }
+        }
 
         guard rester.requestCount > 0 else {
             print("⚠️  no requests defined in \(filename.bold)!")

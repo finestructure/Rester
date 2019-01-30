@@ -26,7 +26,7 @@ public typealias Variables = [Key: Value]
 
 
 public struct Rester: Decodable {
-    let variables: Variables?
+    public let variables: Variables?
     let requests: Requests?
 }
 
