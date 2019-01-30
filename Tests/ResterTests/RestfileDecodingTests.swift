@@ -66,9 +66,3 @@ class RestfileDecodingTests: XCTestCase {
     }
 
 }
-
-
-func testDataDirectory(path: String = #file) -> Path? {
-    guard let p = Path(path)?.parent else { return nil }
-    return p/"TestData"
-}

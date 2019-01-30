@@ -51,7 +51,7 @@ final class RestfileRequestTests: XCTestCase {
     }
 
     func test_validate_status() throws {
-        let s = try readFixture("httpbin.yml")
+        let s = try readFixture("httpbin.yml")!
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
@@ -76,7 +76,7 @@ final class RestfileRequestTests: XCTestCase {
     }
 
     func test_validate_json() throws {
-        let s = try readFixture("httpbin.yml")
+        let s = try readFixture("httpbin.yml")!
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
@@ -111,7 +111,7 @@ final class RestfileRequestTests: XCTestCase {
     }
 
     func test_validate_json_regex() throws {
-        let s = try readFixture("httpbin.yml")
+        let s = try readFixture("httpbin.yml")!
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
@@ -163,11 +163,11 @@ final class RestfileRequestTests: XCTestCase {
         }
 
         let binary = productsDirectory.appendingPathComponent("rester")
-        let requestFile = url(for: "basic.yml").path
+        let requestFile = path(for: "basic.yml")!
 
         let process = Process()
         process.executableURL = binary
-        process.arguments = [requestFile]
+        process.arguments = [requestFile.string]
 
         let pipe = Pipe()
         process.standardOutput = pipe
@@ -227,24 +227,3 @@ final class RestfileRequestTests: XCTestCase {
 }
 
 
-func url(for fixture: String, path: String = #file) -> URL {
-  let testDir = URL(fileURLWithPath: path).deletingLastPathComponent()
-  return testDir.appendingPathComponent("TestData/\(fixture)")
-}
-
-
-func readFixture(_ fixture: String, path: String = #file) throws -> String {
-  let file = url(for: fixture)
-  return try String(contentsOf: file)
-}
-
-var productsDirectory: URL {
-    #if os(macOS)
-    for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-        return bundle.bundleURL.deletingLastPathComponent()
-    }
-    fatalError("couldn't find the products directory")
-    #else
-    return Bundle.main.bundleURL
-    #endif
-}
