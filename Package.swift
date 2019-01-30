@@ -13,6 +13,7 @@ let package = Package(
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.0.0"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "1.0.0"),
         .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
+        .package(url: "https://github.com/mxcl/Path.swift.git", from: "0.0.0"),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.0.0"),

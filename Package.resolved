@@ -29,6 +29,15 @@
         }
       },
       {
+        "package": "Path.swift",
+        "repositoryURL": "https://github.com/mxcl/Path.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "c432f710eb946fff28053cdc8602036f22d83b54",
+          "version": "0.10.0"
+        }
+      },
+      {
         "package": "PromiseKit",
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
