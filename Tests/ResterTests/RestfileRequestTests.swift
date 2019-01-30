@@ -13,7 +13,7 @@ extension String {
 }
 
 
-final class ResterTests: XCTestCase {
+final class RestfileRequestTests: XCTestCase {
 
     func test_subtitute() throws {
         let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
