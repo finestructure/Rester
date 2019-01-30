@@ -1,6 +1,8 @@
 import Foundation
-import Regex
+import Path
 import PromiseKit
+import Regex
+import Yams
 
 
 func _substitute(string: String, with variables: Variables) throws -> String {
@@ -28,6 +30,15 @@ public typealias Variables = [Key: Value]
 public struct Restfile: Decodable {
     public let variables: Variables?
     let requests: Requests?
+    let restfiles: [Path]?
+}
+
+
+extension Restfile {
+    init(path: Path) throws {
+        let s = try String(contentsOf: path)
+        self = try YAMLDecoder().decode(Restfile.self, from: s)
+    }
 }
 
 

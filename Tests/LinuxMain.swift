@@ -12,7 +12,9 @@ extension RestfileDecodingTests {
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
       ("test_parse_body", test_parse_body),
-      ("test_parse_restfiles", test_parse_restfiles),
+      ("test_parse_restfiles_basic", test_parse_restfiles_basic),
+      ("test_Restfile_init", test_Restfile_init),
+      ("test_parse_restfiles_Restfile", test_parse_restfiles_Restfile),
   ]
 }
 extension RestfileRequestTests {

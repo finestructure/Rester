@@ -50,7 +50,7 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
     }
 
-    func test_parse_restfiles() throws {
+    func test_parse_restfiles_basic() throws {
         let s = """
             restfiles:
               - env.yml
@@ -65,4 +65,27 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(t.restfiles.map { $0.exists }, [true, true])
     }
 
+    func test_Restfile_init() throws {
+        let workDir = testDataDirectory()!
+        let r = try Restfile(path: workDir/"nested/basic.yml")
+        XCTAssertEqual(r.requests?.names, ["basic"])
+    }
+
+    func test_parse_restfiles_Restfile() throws {
+        let workDir = testDataDirectory()!
+
+        let s = """
+            restfiles:
+              - env.yml
+              - nested/basic.yml
+        """
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
+        let rfs = try rest.restfiles?.map { try Restfile(path: $0) }
+        XCTAssertEqual(rfs?.count, 2)
+        XCTAssertEqual(rfs?.first?.variables, ["API_URL": "https://httpbin.org"])
+        XCTAssertEqual(rfs?.last?.requests?.names, ["basic"])
+
+        // FIXME: feed aggregated variables into expandedRequests
+        XCTAssertEqual(try rest.expandedRequests().count, 1)
+    }
 }
