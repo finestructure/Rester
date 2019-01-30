@@ -220,7 +220,7 @@ final class RestfileRequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
-    func test_process_batch() throws {
+    func test_batch_processing() throws {
         XCTFail("implement batch test")
     }
 

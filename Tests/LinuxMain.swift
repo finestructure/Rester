@@ -25,7 +25,7 @@ extension RestfileRequestTests {
       ("test_request_order", test_request_order),
       ("test_launch_binary", test_launch_binary),
       ("test_post_request", test_post_request),
-      ("test_process_batch", test_process_batch),
+      ("test_batch_processing", test_batch_processing),
   ]
 }
 extension ValidationTests {
