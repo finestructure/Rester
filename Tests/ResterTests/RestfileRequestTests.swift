@@ -219,6 +219,11 @@ final class RestfileRequestTests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
+
+    func test_process_batch() throws {
+        XCTFail("implement batch test")
+    }
+
 }
 
 

@@ -49,14 +49,19 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
     }
 
-    func test_parse_batch() throws {
+    func test_parse_restfiles() throws {
         let s = """
             restfiles:
               - env.yml
               - system/version.yml
               - fixed_user/login.yml
         """
-        XCTFail("implement me")
+        typealias Path = String
+        struct Test: Decodable {
+            let restfiles: [Path]
+        }
+        let t = try YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertEqual(t.restfiles, ["env.yml", "system/version.yml", "fixed_user/login.yml"])
     }
 
 }

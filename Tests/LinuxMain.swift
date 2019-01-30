@@ -12,7 +12,7 @@ extension RestfileDecodingTests {
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
       ("test_parse_body", test_parse_body),
-      ("test_parse_batch", test_parse_batch),
+      ("test_parse_restfiles", test_parse_restfiles),
   ]
 }
 extension RestfileRequestTests {
@@ -25,6 +25,7 @@ extension RestfileRequestTests {
       ("test_request_order", test_request_order),
       ("test_launch_binary", test_launch_binary),
       ("test_post_request", test_post_request),
+      ("test_process_batch", test_process_batch),
   ]
 }
 extension ValidationTests {
