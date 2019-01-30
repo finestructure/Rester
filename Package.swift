@@ -24,7 +24,7 @@ let package = Package(
             dependencies: ["Commander", "Rainbow", "ResterCore"]),
         .target(
             name: "ResterCore",
-            dependencies: ["AnyCodable", "PMKFoundation", "PromiseKit", "Regex", "Yams"]),
+            dependencies: ["AnyCodable", "PMKFoundation", "Path", "PromiseKit", "Regex", "Yams"]),
         .testTarget(
             name: "ResterTests",
             dependencies: ["ResterCore"]),

@@ -1,5 +1,6 @@
 import XCTest
 
+import Path
 import Yams
 @testable import ResterCore
 
@@ -53,15 +54,21 @@ class RestfileDecodingTests: XCTestCase {
         let s = """
             restfiles:
               - env.yml
-              - system/version.yml
-              - fixed_user/login.yml
+              - nested/basic.yml
         """
-        typealias Path = String
         struct Test: Decodable {
             let restfiles: [Path]
         }
-        let t = try YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertEqual(t.restfiles, ["env.yml", "system/version.yml", "fixed_user/login.yml"])
+        let tdd = testDataDirectory()!
+        let t = try YAMLDecoder().decode(Test.self, from: s, userInfo: [.relativePath: tdd])
+        XCTAssertEqual(t.restfiles, [tdd/"env.yml", tdd/"nested/basic.yml"])
+        XCTAssertEqual(t.restfiles.map { $0.exists }, [true, true])
     }
 
+}
+
+
+func testDataDirectory(path: String = #file) -> Path? {
+    guard let p = Path(path)?.parent else { return nil }
+    return p/"TestData"
 }

@@ -1,0 +1,6 @@
+requests:
+  basic:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      status: 200
