@@ -8,19 +8,8 @@
 import Foundation
 
 
-typealias RequestName = String
-
-
-struct RequestDetails: Decodable {
-    let url: String
-    let method: Method?
-    let body: Body?
-    let validation: Validation?
-}
-
-
 public struct Requests {
-    let items: [[RequestName: RequestDetails]]
+    let items: [[Request.Name: Request.Details]]
 }
 
 
@@ -72,7 +61,7 @@ extension Requests: Sequence {
 extension Requests: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
-        self.items = try container.decodeOrdered(RequestDetails.self)
+        self.items = try container.decodeOrdered(Request.Details.self)
     }
 }
 
