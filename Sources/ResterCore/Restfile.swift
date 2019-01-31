@@ -41,7 +41,7 @@ extension Restfile {
 
 extension Restfile {
     public var requestCount: Int {
-        return requests?.count ?? 0
+        return aggregatedRequests.count
     }
 
     var aggregatedVariables: [Key: Value] {

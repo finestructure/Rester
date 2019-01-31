@@ -1,0 +1,4 @@
+restfiles:
+  - env.yml
+  - nested/basic.yml
+  - nested/basic2.yml

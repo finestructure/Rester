@@ -86,6 +86,7 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(rfs?.first?.variables, ["API_URL": "https://httpbin.org"])
         XCTAssertEqual(rfs?.last?.requests?.map { $0.name }, ["basic2"])
 
+        XCTAssertEqual(rest.requestCount, 2)
         XCTAssertEqual(rest.aggregatedVariables, ["API_URL": "https://httpbin.org"])
         XCTAssertEqual(rest.aggregatedRequests.map { $0.name }, ["basic", "basic2"])
 
