@@ -152,7 +152,7 @@ final class RestfileRequestTests: XCTestCase {
                 url: http://foo.com
             """
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
-        let names = rester.requests?.names
+        let names = rester.requests?.map { $0.name }
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
@@ -221,6 +221,12 @@ final class RestfileRequestTests: XCTestCase {
     }
 
     func test_batch_processing() throws {
+//        let s = """
+//            restfiles:
+//              - env.yml
+//              - nested/basic.yml
+//        """
+//        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
         XCTFail("implement batch test")
     }
 

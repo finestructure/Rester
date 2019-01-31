@@ -68,7 +68,7 @@ class RestfileDecodingTests: XCTestCase {
     func test_Restfile_init() throws {
         let workDir = testDataDirectory()!
         let r = try Restfile(path: workDir/"nested/basic.yml")
-        XCTAssertEqual(r.requests?.names, ["basic"])
+        XCTAssertEqual(r.requests?.map { $0.name }, ["basic"])
     }
 
     func test_parse_restfiles_Restfile() throws {
@@ -83,9 +83,10 @@ class RestfileDecodingTests: XCTestCase {
         let rfs = try rest.restfiles?.map { try Restfile(path: $0) }
         XCTAssertEqual(rfs?.count, 2)
         XCTAssertEqual(rfs?.first?.variables, ["API_URL": "https://httpbin.org"])
-        XCTAssertEqual(rfs?.last?.requests?.names, ["basic"])
+        XCTAssertEqual(rfs?.last?.requests?.map { $0.name }, ["basic"])
 
         // FIXME: feed aggregated variables into expandedRequests
         XCTAssertEqual(try rest.expandedRequests().count, 1)
     }
+
 }

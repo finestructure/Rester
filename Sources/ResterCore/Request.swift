@@ -92,3 +92,9 @@ extension Request {
     }
 }
 
+
+extension Array where Element == Request {
+    subscript(requestName: String) -> Request? {
+        return first(where: { $0.name == requestName } )
+    }
+}

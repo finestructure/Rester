@@ -27,10 +27,29 @@ func _substitute(string: String, with variables: Variables) throws -> String {
 public typealias Variables = [Key: Value]
 
 
-public struct Restfile: Decodable {
+public struct Restfile {
     public let variables: Variables?
-    let requests: Requests?
+    let requests: [Request]?
     let restfiles: [Path]?
+}
+
+
+extension Restfile: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        variables = try? container.decode(Variables.self, forKey: .variables)
+        do {
+            let req = try? container.decode(Requests.self, forKey: .requests)
+            requests = req?.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) }
+        }
+        restfiles = try? container.decode([Path].self, forKey: .restfiles)
+    }
+
+    enum CodingKeys: CodingKey {
+        case variables
+        case requests
+        case restfiles
+    }
 }
 
 
@@ -44,7 +63,7 @@ extension Restfile {
 
 extension Restfile {
     public var requestCount: Int {
-        return requests?.items.count ?? 0
+        return requests?.count ?? 0
     }
 
     public func expandedRequests() throws -> [Request] {
@@ -59,7 +78,7 @@ extension Restfile {
 
     public func expandedRequest(_ requestName: String) throws -> Request {
         guard
-            let req = requests?[requestName]
+            let req = requests?.first(where: { $0.name == requestName } )
             else { throw ResterError.noSuchRequest(requestName) }
         if let variables = variables {
             return try req.substitute(variables: variables)
