@@ -39,7 +39,7 @@ extension Restfile: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         variables = try? container.decode(Variables.self, forKey: .variables)
         do {
-            let req = try? container.decode(Requests.self, forKey: .requests)
+            let req = try? container.decode(Requests<Request.Name, Request.Details>.self, forKey: .requests)
             requests = req?.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) }
         }
         restfiles = try? container.decode([Path].self, forKey: .restfiles)
