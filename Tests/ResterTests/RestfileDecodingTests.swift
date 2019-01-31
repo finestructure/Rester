@@ -78,15 +78,18 @@ class RestfileDecodingTests: XCTestCase {
             restfiles:
               - env.yml
               - nested/basic.yml
+              - nested/basic2.yml
         """
         let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
-        let rfs = try rest.restfiles?.map { try Restfile(path: $0) }
-        XCTAssertEqual(rfs?.count, 2)
+        let rfs = rest.restfiles
+        XCTAssertEqual(rfs?.count, 3)
         XCTAssertEqual(rfs?.first?.variables, ["API_URL": "https://httpbin.org"])
-        XCTAssertEqual(rfs?.last?.requests?.map { $0.name }, ["basic"])
+        XCTAssertEqual(rfs?.last?.requests?.map { $0.name }, ["basic2"])
 
-        // FIXME: feed aggregated variables into expandedRequests
-        XCTAssertEqual(try rest.expandedRequests().count, 1)
+        XCTAssertEqual(rest.aggregatedVariables, ["API_URL": "https://httpbin.org"])
+        XCTAssertEqual(rest.aggregatedRequests.map { $0.name }, ["basic", "basic2"])
+
+        XCTAssertEqual(try rest.expandedRequests().count, 2)
     }
 
 }
