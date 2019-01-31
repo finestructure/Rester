@@ -5,7 +5,7 @@ import Regex
 import Yams
 
 
-func _substitute(string: String, with variables: Variables) throws -> String {
+func _substitute(string: String, with variables: [Key: Value]) throws -> String {
     let regex = try Regex(pattern: "\\$\\{(.*?)\\}", groupNames: "variable")
     let res = regex.replaceAll(in: string) { match in
         if
@@ -24,11 +24,8 @@ func _substitute(string: String, with variables: Variables) throws -> String {
 }
 
 
-public typealias Variables = [Key: Value]
-
-
 public struct Restfile {
-    public let variables: Variables?
+    public let variables: [Key: Value]?
     let requests: [Request]?
     let restfiles: [Path]?
 }
@@ -37,7 +34,7 @@ public struct Restfile {
 extension Restfile: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        variables = try? container.decode(Variables.self, forKey: .variables)
+        variables = try? container.decode([Key: Value].self, forKey: .variables)
         do {
             let req = try? container.decode(OrderedDict<Request.Name, Request.Details>.self, forKey: .requests)
             requests = req?.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) }
