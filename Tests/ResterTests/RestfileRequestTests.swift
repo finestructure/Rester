@@ -15,12 +15,6 @@ extension String {
 
 final class RestfileRequestTests: XCTestCase {
 
-    func test_subtitute() throws {
-        let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
-        let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
-        XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
-    }
-
     func test_request_execute() throws {
         let s = """
             variables:
@@ -152,7 +146,7 @@ final class RestfileRequestTests: XCTestCase {
                 url: http://foo.com
             """
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
-        let names = rester.requests?.names
+        let names = rester.requests?.map { $0.name }
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
@@ -221,6 +215,12 @@ final class RestfileRequestTests: XCTestCase {
     }
 
     func test_batch_processing() throws {
+//        let s = """
+//            restfiles:
+//              - env.yml
+//              - nested/basic.yml
+//        """
+//        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
         XCTFail("implement batch test")
     }
 

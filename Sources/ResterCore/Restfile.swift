@@ -1,36 +1,32 @@
 import Foundation
 import Path
 import PromiseKit
-import Regex
 import Yams
 
 
-func _substitute(string: String, with variables: Variables) throws -> String {
-    let regex = try Regex(pattern: "\\$\\{(.*?)\\}", groupNames: "variable")
-    let res = regex.replaceAll(in: string) { match in
-        if
-            let varName = match.group(named: "variable"),
-            let value = variables[varName]?.substitutionDescription {
-            return value
-        } else {
-            return nil
-        }
-    }
-
-    if res =~ regex {
-        throw ResterError.undefinedVariable("Undefined variable: \(res)")
-    }
-    return res
+public struct Restfile {
+    public let variables: [Key: Value]?
+    let requests: [Request]?
+    let restfiles: [Path]?
 }
 
 
-public typealias Variables = [Key: Value]
+extension Restfile: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        variables = try? container.decode([Key: Value].self, forKey: .variables)
+        do {
+            let req = try? container.decode(OrderedDict<Request.Name, Request.Details>.self, forKey: .requests)
+            requests = req?.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) }
+        }
+        restfiles = try? container.decode([Path].self, forKey: .restfiles)
+    }
 
-
-public struct Restfile: Decodable {
-    public let variables: Variables?
-    let requests: Requests?
-    let restfiles: [Path]?
+    enum CodingKeys: CodingKey {
+        case variables
+        case requests
+        case restfiles
+    }
 }
 
 
@@ -44,7 +40,7 @@ extension Restfile {
 
 extension Restfile {
     public var requestCount: Int {
-        return requests?.items.count ?? 0
+        return requests?.count ?? 0
     }
 
     public func expandedRequests() throws -> [Request] {
@@ -58,8 +54,7 @@ extension Restfile {
     }
 
     public func expandedRequest(_ requestName: String) throws -> Request {
-        guard
-            let req = requests?[requestName]
+        guard let req = requests?[requestName]
             else { throw ResterError.noSuchRequest(requestName) }
         if let variables = variables {
             return try req.substitute(variables: variables)

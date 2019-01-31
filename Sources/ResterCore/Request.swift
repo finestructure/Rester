@@ -13,8 +13,17 @@ import Regex
 
 
 public struct Request: Decodable {
+    typealias Name = String
+
+    struct Details: Decodable {
+        let url: String
+        let method: Method?
+        let body: Body?
+        let validation: Validation?
+    }
+
     public let name: String
-    let details: RequestDetails
+    let details: Details
 
     public var url: String { return details.url }
     public var method: Method { return details.method ?? .get }
@@ -40,9 +49,9 @@ public enum ValidationResult: Equatable {
 
 
 extension Request {
-    public func substitute(variables: Variables) throws -> Request {
-        let _url = try _substitute(string: url, with: variables)
-        let _details = RequestDetails(url: _url, method: method, body: body, validation: validation)
+    public func substitute(variables: [Key: Value]) throws -> Request {
+        let _url = try ResterCore.substitute(string: url, with: variables)
+        let _details = Details(url: _url, method: method, body: body, validation: validation)
         return Request(name: name, details: _details)
     }
 
@@ -92,3 +101,9 @@ extension Request {
     }
 }
 
+
+extension Array where Element == Request {
+    subscript(requestName: String) -> Request? {
+        return first(where: { $0.name == requestName } )
+    }
+}
