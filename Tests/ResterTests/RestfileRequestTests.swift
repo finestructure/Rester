@@ -15,12 +15,6 @@ extension String {
 
 final class RestfileRequestTests: XCTestCase {
 
-    func test_subtitute() throws {
-        let vars: [Key: Value] = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
-        let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
-        XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
-    }
-
     func test_request_execute() throws {
         let s = """
             variables:

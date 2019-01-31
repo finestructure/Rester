@@ -50,7 +50,7 @@ public enum ValidationResult: Equatable {
 
 extension Request {
     public func substitute(variables: [Key: Value]) throws -> Request {
-        let _url = try _substitute(string: url, with: variables)
+        let _url = try ResterCore.substitute(string: url, with: variables)
         let _details = Details(url: _url, method: method, body: body, validation: validation)
         return Request(name: name, details: _details)
     }
