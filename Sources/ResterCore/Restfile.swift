@@ -54,8 +54,7 @@ extension Restfile {
     }
 
     public func expandedRequest(_ requestName: String) throws -> Request {
-        guard
-            let req = requests?.first(where: { $0.name == requestName } )
+        guard let req = requests?[requestName]
             else { throw ResterError.noSuchRequest(requestName) }
         if let variables = variables {
             return try req.substitute(variables: variables)
