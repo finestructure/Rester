@@ -8,12 +8,12 @@
 import Foundation
 
 
-public struct Requests<Key: Hashable & Decodable, Value: Decodable> {
+public struct OrderedDict<Key: Hashable & Decodable, Value: Decodable> {
     let items: [[Key: Value]]
 }
 
 
-extension Requests: Decodable {
+extension OrderedDict: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
         self.items = try container.decodeOrdered(Request.Details.self) as! [[Key : Value]]
