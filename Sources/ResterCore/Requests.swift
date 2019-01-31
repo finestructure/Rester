@@ -13,51 +13,6 @@ public struct Requests {
 }
 
 
-extension Requests {
-    var names: [String] {
-        return items.compactMap { $0.keys.first }
-    }
-
-    subscript(requestName: String) -> Request? {
-        guard let item = items.first(where: { $0.contains {$0.key == requestName} }) else { return nil }
-        precondition(item.count == 1, "must have single item at this point")
-        let r = item.map { Request(name: $0.key, details: $0.value) }
-        return r.first
-    }
-
-    subscript(index: Int) -> Request? {
-        let item = items[index]
-        precondition(item.count == 1, "must have single item at this point")
-        let r = item.map { Request(name: $0.key, details: $0.value) }
-        return r.first
-    }
-}
-
-
-extension Requests: Sequence {
-    public struct Iterator: IteratorProtocol {
-        public typealias Element = Request
-        var currentIndex = 0
-        let requests: Requests
-
-        init(_ requests: Requests) {
-            self.requests = requests
-        }
-
-        mutating public func next() -> Request? {
-            guard currentIndex < requests.items.count else { return nil }
-            let request = requests[currentIndex]
-            currentIndex += 1
-            return request
-        }
-    }
-
-    public func makeIterator() -> Requests.Iterator {
-        return Iterator(self)
-    }
-}
-
-
 extension Requests: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
