@@ -50,28 +50,13 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
     }
 
-    func test_parse_restfiles_basic() throws {
-        let s = """
-            restfiles:
-              - env.yml
-              - nested/basic.yml
-        """
-        struct Test: Decodable {
-            let restfiles: [Path]
-        }
-        let tdd = testDataDirectory()!
-        let t = try YAMLDecoder().decode(Test.self, from: s, userInfo: [.relativePath: tdd])
-        XCTAssertEqual(t.restfiles, [tdd/"env.yml", tdd/"nested/basic.yml"])
-        XCTAssertEqual(t.restfiles.map { $0.exists }, [true, true])
-    }
-
     func test_Restfile_init() throws {
         let workDir = testDataDirectory()!
         let r = try Restfile(path: workDir/"nested/basic.yml")
         XCTAssertEqual(r.requests?.map { $0.name }, ["basic"])
     }
 
-    func test_parse_restfiles_Restfile() throws {
+    func test_parse_restfiles_basic() throws {
         let workDir = testDataDirectory()!
 
         let s = """
@@ -91,6 +76,19 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(rest.aggregatedRequests.map { $0.name }, ["basic", "basic2"])
 
         XCTAssertEqual(try rest.expandedRequests().count, 2)
+    }
+
+    func test_parse_restfiles_invalid_path() throws {
+        let workDir = testDataDirectory()!
+
+        let s = """
+            restfiles:
+              - env.yml
+              - _env.yml
+        """
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
+        let rfs = rest.restfiles
+        XCTAssertEqual(rfs?.count, 3)
     }
 
 }

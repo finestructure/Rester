@@ -5,6 +5,7 @@ import Yams
 
 
 public struct Restfile {
+    // TODO: make these non-optional
     public let variables: [Key: Value]?
     let requests: [Request]?
     let restfiles: [Restfile]?
@@ -33,6 +34,9 @@ extension Restfile: Decodable {
 
 extension Restfile {
     init(path: Path) throws {
+        if !path.exists {
+            throw ResterError.fileNotFound(path)
+        }
         let s = try String(contentsOf: path)
         self = try YAMLDecoder().decode(Restfile.self, from: s)
     }
@@ -44,7 +48,7 @@ extension Restfile {
         return aggregatedRequests.count
     }
 
-    var aggregatedVariables: [Key: Value] {
+    public var aggregatedVariables: [Key: Value] {
         let topLevelVariables = variables ?? [:]
 
         if let otherVariableDicts = restfiles?.compactMap({ $0.variables }) {

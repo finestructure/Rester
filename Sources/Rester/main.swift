@@ -1,5 +1,6 @@
 import Commander
 import Foundation
+import Path
 import PromiseKit
 import Rainbow
 import ResterCore
@@ -60,18 +61,39 @@ func launch(request: Request) throws -> Promise<Bool> {
 }
 
 
+func getWorkDir(input: String) -> Path {
+    guard !input.isEmpty else { return Path.cwd }
+
+    if let path = Path(input) {
+        return path
+    }
+
+    // take is as relative path
+    return Path.cwd/input
+}
+
+
 let main = command(
     Argument<String>("filename", description: "A Restfile"),
-    Flag("verbose", flag: "v", description: "Verbose output")
-) { filename, verbose in
+    Flag("verbose", flag: "v", description: "Verbose output"),
+    Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)")
+) { filename, verbose, wdir in
     do {
         print("🚀  Resting \(filename.bold) ...\n")
 
-        let yml = try String(contentsOfFile: filename)
-        let rester = try YAMLDecoder().decode(Restfile.self, from: yml)
+        let workDir = getWorkDir(input: wdir)
 
         if verbose {
-            if let vars = rester.variables {
+            print("Working directory: \(workDir)\n")
+        }
+
+        let yml = try String(contentsOfFile: filename)
+
+        let restfile = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
+
+        if verbose {
+            let vars = restfile.aggregatedVariables
+            if vars.count > 0 {
                 print("Defined variables:")
                 for v in vars.keys {
                     print("  - \(v)")
@@ -80,7 +102,7 @@ let main = command(
             }
         }
 
-        guard rester.requestCount > 0 else {
+        guard restfile.requestCount > 0 else {
             print("⚠️  no requests defined in \(filename.bold)!")
             exit(0)
         }
@@ -88,7 +110,7 @@ let main = command(
         var results = [Bool]()
         var chain = Promise()
 
-        for req in try rester.expandedRequests() {
+        for req in try restfile.expandedRequests() {
             chain = chain.then {
                 try launch(request: req).map { results.append($0) }
             }
@@ -107,8 +129,23 @@ let main = command(
             exit(1)
         }
 
+    } catch let error as DecodingError {
+        if
+            case let .dataCorrupted(error) = error,
+            let underlying = error.underlyingError {
+
+
+            if let e = underlying as? ResterError {
+                print("❌  \(e.localizedDescription)")
+            } else {
+                print("❌  Error: \(underlying.localizedDescription)")
+            }
+        } else {
+            print("❌  Error: \(error.localizedDescription)")
+        }
+        exit(1)
     } catch {
-        print("Error: \(error.localizedDescription)")
+        print("❌  Error: \(error.localizedDescription)")
         exit(1)
     }
 }
