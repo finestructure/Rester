@@ -47,21 +47,21 @@ extension Matcher {
         case let (.equals(expected), value):
             return expected == value
                 ? .valid
-                : .invalid("(\(value)) is not equal to (\(expected))")
+                : .invalid("(\(value)) is not equal to (\(expected))", response: nil)
         case let (.regex(expected), .string(value)):
             return expected ~= value
                 ? .valid
-                : .invalid("(\(value)) does not match (\(expected.pattern))")
+                : .invalid("(\(value)) does not match (\(expected.pattern))", response: nil)
         case let (.contains(expected), .dictionary(dict)):
             for (key, exp) in expected {
-                guard let val = dict[key] else { return .invalid("key '\(key)' not found in '\(dict)'") }
-                if case let .invalid(error) = exp.validate(val) {
-                    return .invalid("key '\(key)' validation error: \(error)")
+                guard let val = dict[key] else { return .invalid("key '\(key)' not found in '\(dict)'", response: nil) }
+                if case let .invalid(msg, resp) = exp.validate(val) {
+                    return .invalid("key '\(key)' validation error: \(msg)", response: resp)
                 }
             }
             return .valid
         default:
-            return .invalid("to be implemented")
+            return .invalid("to be implemented", response: nil)
         }
     }
 }

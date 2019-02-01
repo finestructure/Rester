@@ -35,35 +35,19 @@ public struct Request: Decodable {
 extension Request: Substitutable {
     func substitute(variables: [Key: Value]) throws -> Request {
         let _url = try ResterCore.substitute(string: url, with: variables)
-        let _details = Details(url: _url, method: method, body: body, validation: validation)
+        let _body = try body?.substitute(variables: variables)
+        let _details = Details(url: _url, method: method, body: _body, validation: validation)
         return Request(name: name, details: _details)
     }
 }
 
 
-public struct Response {
-    let data: Data
-    let response: HTTPURLResponse
-
-    var status: Int {
-        return response.statusCode
-    }
-}
-
-
-public enum ValidationResult: Equatable {
-    case valid
-    case invalid(String)
-}
-
-
 extension Request {
-    public func execute() throws -> Promise<Response> {
+    public func execute(debug: Bool = false) throws -> Promise<Response> {
         guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         if method == .post {
-
             if
                 let body = body?.json,
                 let postData = try? JSONEncoder().encode(body) {
@@ -74,6 +58,12 @@ extension Request {
                 let postData = body.data(using: .utf8) {
                 urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
                 urlRequest.httpBody = postData
+                if debug {
+                    print("Request:")
+                    dump(urlRequest)
+                    print("Body:")
+                    dump(body)
+                }
             }
         }
 
@@ -88,8 +78,8 @@ extension Request {
     public func validate(_ response: Response) -> ValidationResult {
         if
             let status = validation?.status,
-            case let .invalid(error) = status.validate(Value.int(response.status)) {
-            return .invalid("status invalid: \(error)")
+            case let .invalid(msg, _) = status.validate(Value.int(response.status)) {
+            return .invalid("status invalid: \(msg)", response: response)
         }
 
         if let json = validation?.json {
@@ -97,13 +87,13 @@ extension Request {
             // TODO: handle Array response
             guard let data = try? JSONDecoder().decode([Key: Value].self, from: response.data)
                 else {
-                    return .invalid("failed to decode JSON object from response")
+                    return .invalid("failed to decode JSON object from response", response: response)
             }
 
             // TODO: make json a Matcher to begin with
             let matcher = Matcher.contains(json)
-            if case let .invalid(error) = matcher.validate(Value.dictionary(data)) {
-                return .invalid("json invalid: \(error)")
+            if case let .invalid(msg, _) = matcher.validate(Value.dictionary(data)) {
+                return .invalid("json invalid: \(msg)", response: response)
             }
         }
         return .valid

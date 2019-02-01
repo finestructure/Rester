@@ -45,7 +45,7 @@ func wait(timeout: TimeInterval, condition: () -> Bool) {
 }
 
 
-func launch(request: Request) throws -> Promise<Bool> {
+func launch(request: Request, verbose: Bool = false) throws -> Promise<Bool> {
     print("🎬  \(request.name.blue) started ...\n")
     return try request.test()
         .map {
@@ -53,7 +53,16 @@ func launch(request: Request) throws -> Promise<Bool> {
             case .valid:
                 print("✅  \(request.name.blue) \("PASSED".green.bold)\n")
                 return true
-            case .invalid(let message):
+            case let .invalid(message, response: response):
+                if verbose {
+                    if let response = response {
+                        debugPrint("Response was:")
+                        debugPrint("\(response)")
+                    } else {
+                        debugPrint("Response was nil")
+                    }
+                    print("")
+                }
                 print("❌  \(request.name.blue) \("FAILED".red.bold) : \(message.red)\n")
                 return false
             }
@@ -119,7 +128,7 @@ let main = command(
 
         for req in try restfile.expandedRequests() {
             chain = chain.then {
-                try launch(request: req).map { results.append($0) }
+                try launch(request: req, verbose: verbose).map { results.append($0) }
             }
         }
 

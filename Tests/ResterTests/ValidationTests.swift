@@ -55,17 +55,17 @@ class ValidationTests: XCTestCase {
 
     func test_validate() throws {
         XCTAssertEqual(try Matcher(200).validate(200), .valid)
-        XCTAssertEqual(try Matcher(200).validate(404), .invalid("(404) is not equal to (200)"))
+        XCTAssertEqual(try Matcher(200).validate(404), .init(invalid: "(404) is not equal to (200)"))
         XCTAssertEqual(try Matcher("foo").validate("foo"), .valid)
-        XCTAssertEqual(try Matcher(200).validate("foo"), .invalid("(\"foo\") is not equal to (200)"))
-        XCTAssertEqual(try Matcher(200).validate("200"), .invalid("(\"200\") is not equal to (200)"))
+        XCTAssertEqual(try Matcher(200).validate("foo"), .init(invalid: "(\"foo\") is not equal to (200)"))
+        XCTAssertEqual(try Matcher(200).validate("200"), .init(invalid: "(\"200\") is not equal to (200)"))
 
         XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo42"), .valid)
-        XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo"), .invalid("(foo) does not match (\\d\\d)"))
+        XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo"), .init(invalid: "(foo) does not match (\\d\\d)"))
 
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar"]), .valid)
-        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["nope": "-"]), .invalid("key \'foo\' not found in \'[\"nope\": \"-\"]\'"))
-        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "-"]), .invalid("key \'foo\' validation error: (\"-\") is not equal to (\"bar\")"))
+        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["nope": "-"]), .init(invalid: "key \'foo\' not found in \'[\"nope\": \"-\"]\'"))
+        XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "-"]), .init(invalid: "key \'foo\' validation error: (\"-\") is not equal to (\"bar\")"))
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "extra": "value"]), .valid)
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "mixed_type": 1]), .valid)
     }
