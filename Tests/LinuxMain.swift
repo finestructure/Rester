@@ -16,7 +16,8 @@ extension RestfileDecodingTests {
   static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
-      ("test_parse_body", test_parse_body),
+      ("test_parse_body_json", test_parse_body_json),
+      ("test_parse_body_form", test_parse_body_form),
       ("test_Restfile_init", test_Restfile_init),
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
@@ -30,7 +31,8 @@ extension RestfileRequestTests {
       ("test_validate_json_regex", test_validate_json_regex),
       ("test_request_order", test_request_order),
       ("test_launch_binary", test_launch_binary),
-      ("test_post_request", test_post_request),
+      ("test_post_request_json", test_post_request_json),
+      ("test_post_request_form", test_post_request_form),
   ]
 }
 extension ValidationTests {

@@ -188,7 +188,7 @@ final class RestfileRequestTests: XCTestCase {
         )
     }
 
-    func test_post_request() throws {
+    func test_post_request_json() throws {
         let s = """
             requests:
               post:
@@ -202,6 +202,32 @@ final class RestfileRequestTests: XCTestCase {
                   json:
                     method: POST
                     json:
+                      foo: bar
+            """
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("post").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_post_request_form() throws {
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  form:
+                    foo: bar
+                validation:
+                  status: 200
+                  json:
+                    method: POST
+                    form:
                       foo: bar
             """
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)

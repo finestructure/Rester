@@ -37,7 +37,7 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(versionReq.url, "https://httpbin.org/anything")
     }
 
-    func test_parse_body() throws {
+    func test_parse_body_json() throws {
         struct Test: Decodable {
             let body: Body
         }
@@ -48,6 +48,19 @@ class RestfileDecodingTests: XCTestCase {
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
         XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
+    }
+
+    func test_parse_body_form() throws {
+        struct Test: Decodable {
+            let body: Body
+        }
+        let s = """
+            body:
+              form:
+                foo: bar
+        """
+        let t = try YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertEqual(t.body.form?["foo"], Value.string("bar"))
     }
 
     func test_Restfile_init() throws {

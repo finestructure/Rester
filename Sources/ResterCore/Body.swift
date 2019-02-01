@@ -9,5 +9,6 @@ import Foundation
 
 
 public struct Body: Codable {
-    let json: [String: Value]?
+    let json: [Key: Value]?
+    let form: [Key: Value]?
 }
