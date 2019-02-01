@@ -13,56 +13,7 @@ extension String {
 }
 
 
-final class ResterTests: XCTestCase {
-
-    func test_decode_variables() throws {
-        let s = """
-            variables:
-              INT_VALUE: 42
-              STRING_VALUE: some string value
-            """
-        let env = try YAMLDecoder().decode(Rester.self, from: s)
-        XCTAssertEqual(env.variables!["INT_VALUE"], .int(42))
-        XCTAssertEqual(env.variables!["STRING_VALUE"], .string("some string value"))
-    }
-
-    func test_subtitute() throws {
-        let vars: Variables = ["API_URL": .string("https://foo.bar"), "foo": .int(5)]
-        let sub = try _substitute(string: "${API_URL}/baz/${foo}/${foo}", with: vars)
-        XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
-    }
-
-    func test_parse_basic() throws {
-        let s = """
-            variables:
-              API_URL: https://httpbin.org
-            requests:
-              basic:
-                url: ${API_URL}/anything
-                method: GET
-                validation:
-                  status: 200
-            """
-        let rest = try YAMLDecoder().decode(Rester.self, from: s)
-        let variables = rest.variables!
-        let requests = rest.requests!
-        let versionReq = try requests["basic"]!.substitute(variables: variables)
-        XCTAssertEqual(variables["API_URL"]!, .string("https://httpbin.org"))
-        XCTAssertEqual(versionReq.url, "https://httpbin.org/anything")
-    }
-
-    func test_parse_body() throws {
-        struct Test: Decodable {
-            let body: Body
-        }
-        let s = """
-            body:
-              json:
-                foo: bar
-        """
-        let t = try YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertEqual(t.body.json?["foo"], Value.string("bar"))
-    }
+final class RestfileRequestTests: XCTestCase {
 
     func test_request_execute() throws {
         let s = """
@@ -75,7 +26,7 @@ final class ResterTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         let expectation = self.expectation(description: #function)
 
@@ -94,8 +45,8 @@ final class ResterTests: XCTestCase {
     }
 
     func test_validate_status() throws {
-        let s = try readFixture("httpbin.yml")
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let s = try readFixture("httpbin.yml")!
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -119,8 +70,8 @@ final class ResterTests: XCTestCase {
     }
 
     func test_validate_json() throws {
-        let s = try readFixture("httpbin.yml")
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let s = try readFixture("httpbin.yml")!
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -154,8 +105,8 @@ final class ResterTests: XCTestCase {
     }
 
     func test_validate_json_regex() throws {
-        let s = try readFixture("httpbin.yml")
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let s = try readFixture("httpbin.yml")!
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -194,8 +145,8 @@ final class ResterTests: XCTestCase {
               3rd:
                 url: http://foo.com
             """
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
-        let names = rester.requests?.names
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let names = rester.requests?.map { $0.name }
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
@@ -206,11 +157,11 @@ final class ResterTests: XCTestCase {
         }
 
         let binary = productsDirectory.appendingPathComponent("rester")
-        let requestFile = url(for: "basic.yml").path
+        let requestFile = path(for: "basic.yml")!
 
         let process = Process()
         process.executableURL = binary
-        process.arguments = [requestFile]
+        process.arguments = [requestFile.string]
 
         let pipe = Pipe()
         process.standardOutput = pipe
@@ -253,7 +204,7 @@ final class ResterTests: XCTestCase {
                     json:
                       foo: bar
             """
-        let rester = try YAMLDecoder().decode(Rester.self, from: s)
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
         _ = try rester.expandedRequest("post").test()
             .map {
@@ -262,27 +213,7 @@ final class ResterTests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
+
 }
 
 
-func url(for fixture: String, path: String = #file) -> URL {
-  let testDir = URL(fileURLWithPath: path).deletingLastPathComponent()
-  return testDir.appendingPathComponent("TestData/\(fixture)")
-}
-
-
-func readFixture(_ fixture: String, path: String = #file) throws -> String {
-  let file = url(for: fixture)
-  return try String(contentsOf: file)
-}
-
-var productsDirectory: URL {
-    #if os(macOS)
-    for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-        return bundle.bundleURL.deletingLastPathComponent()
-    }
-    fatalError("couldn't find the products directory")
-    #else
-    return Bundle.main.bundleURL
-    #endif
-}
