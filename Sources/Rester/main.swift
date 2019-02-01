@@ -61,8 +61,8 @@ func launch(request: Request) throws -> Promise<Bool> {
 }
 
 
-func getWorkDir(input: String) -> Path {
-    guard !input.isEmpty else { return Path.cwd }
+func getWorkDir(input: String) -> Path? {
+    guard !input.isEmpty else { return nil }
 
     if let path = Path(input) {
         return path
@@ -70,6 +70,11 @@ func getWorkDir(input: String) -> Path {
 
     // take is as relative path
     return Path.cwd/input
+}
+
+
+func debugPrint(_ msg: String) {
+    print(msg.lightWhite.italic)
 }
 
 
@@ -81,22 +86,24 @@ let main = command(
     do {
         print("🚀  Resting \(filename.bold) ...\n")
 
-        let workDir = getWorkDir(input: wdir)
+        let restfilePath = Path(filename) ?? Path.cwd/filename
+        let workDir = getWorkDir(input: wdir) ?? (restfilePath).parent
 
         if verbose {
-            print("Working directory: \(workDir)\n")
+            debugPrint("Restfile path: \(restfilePath)")
+            debugPrint("Working directory: \(workDir)\n")
         }
 
-        let yml = try String(contentsOfFile: filename)
+        let yml = try String(contentsOf: restfilePath)
 
         let restfile = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
 
         if verbose {
             let vars = restfile.aggregatedVariables
             if vars.count > 0 {
-                print("Defined variables:")
+                debugPrint("Defined variables:")
                 for v in vars.keys {
-                    print("  - \(v)")
+                    debugPrint("  - \(v)")
                 }
                 print("")
             }
