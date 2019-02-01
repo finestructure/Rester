@@ -149,3 +149,23 @@ extension Value: ExpressibleByDictionaryLiteral {
     }
 }
 
+
+extension Value: URLEncoding {
+    var urlEncoded: String? {
+        switch self {
+        case .int(let v):
+            return String(v).urlEncoded
+        case .string(let v):
+            return v.urlEncoded
+        case .double(let v):
+            return String(v).urlEncoded
+        case .dictionary(let v):
+            return v.formUrlEncoded
+        case .array(let v):
+            return "[" + v.compactMap { $0.urlEncoded }.joined(separator: ",") + "]"
+        case .null:
+            return "null"
+        }
+    }
+}
+

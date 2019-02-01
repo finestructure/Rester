@@ -59,13 +59,19 @@ extension Request {
         guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
-        if
-            method == .post,
-            let body = body?.json,
-            let postData = try? JSONEncoder().encode(body) {
-            urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            // urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
-            urlRequest.httpBody = postData
+        if method == .post {
+
+            if
+                let body = body?.json,
+                let postData = try? JSONEncoder().encode(body) {
+                urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                urlRequest.httpBody = postData
+            } else if
+                let body = body?.form?.formUrlEncoded,
+                let postData = body.data(using: .utf8) {
+                urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+                urlRequest.httpBody = postData
+            }
         }
 
         return URLSession.shared.dataTask(.promise, with: urlRequest)

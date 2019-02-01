@@ -158,4 +158,21 @@ class ValueTests: XCTestCase {
             XCTAssertNotNil(res)
         }
     }
+
+
+    func test_formUrlEncoded() throws {
+        do {
+            let d: [Key: Value] = ["foo": "bar"]
+            XCTAssertEqual(d.formUrlEncoded, "foo=bar")
+        }
+        do {
+            let d: [Key: Value] = ["data": "test/test=42"]
+            XCTAssertEqual(d.formUrlEncoded, "data=test%2Ftest=42")
+        }
+        do {
+            let d: [Key: Value] = ["a": "1", "b": 2]
+            XCTAssert(["a=1&b=2", "b=2&a=1"].contains(d.formUrlEncoded), "was: \(d.formUrlEncoded)")
+        }
+    }
+
 }
