@@ -1,11 +1,17 @@
 //
-//  Utils.swift
+//  Substitutable.swift
 //  ResterCore
 //
-//  Created by Sven A. Schmidt on 31/01/2019.
+//  Created by Sven A. Schmidt on 01/02/2019.
 //
 
+import Foundation
 import Regex
+
+
+protocol Substitutable {
+    func substitute(variables: [Key: Value]) throws -> Self
+}
 
 
 func substitute(string: String, with variables: [Key: Value]) throws -> String {
@@ -25,5 +31,4 @@ func substitute(string: String, with variables: [Key: Value]) throws -> String {
     }
     return res
 }
-
 

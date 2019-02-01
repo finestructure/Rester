@@ -169,3 +169,14 @@ extension Value: URLEncoding {
     }
 }
 
+
+extension Value: Substitutable {
+    func substitute(variables: [Key : Value]) throws -> Value {
+        switch self {
+        case .string(let string):
+            return try .string(ResterCore.substitute(string: string, with: variables))
+        default:
+            return self
+        }
+    }
+}

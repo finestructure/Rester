@@ -7,11 +7,6 @@ import XCTest
 @testable import ResterTests
 
 // swiftlint:disable trailing_comma
-extension GlobalTests {
-  static var allTests: [(String, (GlobalTests) -> () throws -> Void)] = [
-      ("test_subtitute", test_subtitute),
-  ]
-}
 extension RestfileDecodingTests {
   static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
@@ -21,6 +16,7 @@ extension RestfileDecodingTests {
       ("test_Restfile_init", test_Restfile_init),
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
+      ("test_parse_complex_form", test_parse_complex_form),
   ]
 }
 extension RestfileRequestTests {
@@ -33,6 +29,12 @@ extension RestfileRequestTests {
       ("test_launch_binary", test_launch_binary),
       ("test_post_request_json", test_post_request_json),
       ("test_post_request_form", test_post_request_form),
+  ]
+}
+extension SubstitutableTests {
+  static var allTests: [(String, (SubstitutableTests) -> () throws -> Void)] = [
+      ("test_substitute", test_substitute),
+      ("test_substitute_Body", test_substitute_Body),
   ]
 }
 extension ValidationTests {
@@ -54,9 +56,9 @@ extension ValueTests {
 }
 
 XCTMain([
-  testCase(GlobalTests.allTests),
   testCase(RestfileDecodingTests.allTests),
   testCase(RestfileRequestTests.allTests),
+  testCase(SubstitutableTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
 ])

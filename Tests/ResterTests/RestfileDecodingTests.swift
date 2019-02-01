@@ -32,9 +32,9 @@ class RestfileDecodingTests: XCTestCase {
         let rest = try YAMLDecoder().decode(Restfile.self, from: s)
         let variables = rest.variables!
         let requests = rest.requests!
-        let versionReq = try requests["basic"]!.substitute(variables: variables)
+        let req = try requests["basic"]!.substitute(variables: variables)
         XCTAssertEqual(variables["API_URL"]!, .string("https://httpbin.org"))
-        XCTAssertEqual(versionReq.url, "https://httpbin.org/anything")
+        XCTAssertEqual(req.url, "https://httpbin.org/anything")
     }
 
     func test_parse_body_json() throws {
@@ -113,6 +113,59 @@ class RestfileDecodingTests: XCTestCase {
                 XCTFail("expected file not found exception, found: \(error)")
             }
         }
+    }
+
+    func test_parse_complex_form() throws {
+        let s = """
+            variables:
+              api_url: https://httpbin.org
+              client_id: 8a8099f9-8149-4039-a3fd-59ad69330038
+              email_username: foo.bar.baz
+              email_domain: example.com
+              password: "29%x)(+&id28xY%f42cq"
+            requests:
+              login:
+                url: ${api_url}/anything
+                method: POST
+                body:
+                  form:
+                    grant_type: password
+                    scope: read:user write:user
+                    client_id: ${client_id}
+                    username: ${email_username}@${email_domain}
+                    password: ${password}
+            """
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
+        guard let variables = rest.variables else {
+            XCTFail("variables must not be nil")
+            return
+        }
+        guard let requests = rest.requests else {
+            XCTFail("requests must not be nil")
+            return
+        }
+
+        XCTAssertEqual(variables["api_url"], "https://httpbin.org")
+        XCTAssertEqual(variables["client_id"], "8a8099f9-8149-4039-a3fd-59ad69330038")
+        XCTAssertEqual(variables["email_username"], "foo.bar.baz")
+        XCTAssertEqual(variables["email_domain"], "example.com")
+        XCTAssertEqual(variables["password"], "29%x)(+&id28xY%f42cq")
+
+        let req = try requests["login"]?.substitute(variables: variables)
+        XCTAssertEqual(req?.url, "https://httpbin.org/anything")
+
+        let expandedBody = try req?.body?.substitute(variables: variables)
+        XCTAssertEqual(expandedBody?.form?["grant_type"], "password")
+        XCTAssertEqual(expandedBody?.form?["scope"], "read:user write:user")
+        XCTAssertEqual(expandedBody?.form?["client_id"], "8a8099f9-8149-4039-a3fd-59ad69330038")
+        XCTAssertEqual(expandedBody?.form?["username"], "foo.bar.baz@example.com")
+        XCTAssertEqual(expandedBody?.form?["password"], "29%x)(+&id28xY%f42cq")
+
+        guard let encodedForm = expandedBody?.form?.formUrlEncoded else {
+            XCTFail("encoded form must not be nil")
+            return
+        }
+        XCTAssert(encodedForm.contains("username=foo.bar.baz%40example.com"), "was: \(encodedForm)")
     }
 
 }
