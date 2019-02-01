@@ -14,6 +14,7 @@ public enum ResterError: Error {
     case invalidURL(String)
     case noSuchRequest(String)
     case fileNotFound(String)
+    case internalError(String)
 
     public var localizedDescription: String {
         switch self {
@@ -27,6 +28,8 @@ public enum ResterError: Error {
             return "no such request: \(req)"
         case .fileNotFound(let file):
             return "file not found: \(file)"
+        case .internalError(let msg):
+            return "internal error: \(msg)"
         }
     }
 }

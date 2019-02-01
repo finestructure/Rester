@@ -7,6 +7,7 @@
 
 import Foundation
 import Path
+import ResterCore
 
 
 func path(for fixture: String) -> Path? {
@@ -34,4 +35,18 @@ var productsDirectory: URL {
 
 func testDataDirectory(path: String = #file) -> Path? {
     return Path(path)?.parent.join("TestData")
+}
+
+
+extension ValidationResult: Equatable {
+    public static func == (lhs: ValidationResult, rhs: ValidationResult) -> Bool {
+        switch (lhs, rhs) {
+        case (.valid, .valid):
+            return true
+        case (.invalid(let x, response: _), .invalid(let y, response: _)):
+            return x == y
+        default:
+            return false
+        }
+    }
 }

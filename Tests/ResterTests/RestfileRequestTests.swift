@@ -62,7 +62,7 @@ final class RestfileRequestTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("status-failure").test()
                 .map { result in
-                    XCTAssertEqual(result, ValidationResult.invalid("status invalid: (200) is not equal to (500)"))
+                    XCTAssertEqual(result, .init(invalid: "status invalid: (200) is not equal to (500)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -87,7 +87,7 @@ final class RestfileRequestTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure").test()
                 .map {
-                    XCTAssertEqual($0, ValidationResult.invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
+                    XCTAssertEqual($0, .init(invalid: "json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -97,7 +97,7 @@ final class RestfileRequestTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure-type").test()
                 .map {
-                    XCTAssertEqual($0, ValidationResult.invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
+                    XCTAssertEqual($0, .init(invalid: "json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -125,7 +125,7 @@ final class RestfileRequestTests: XCTestCase {
                     switch $0 {
                     case .valid:
                         XCTFail("expected failure but received success")
-                    case .invalid(let message):
+                    case let .invalid(message, response: _):
                         XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
                         XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
                     }
@@ -188,7 +188,7 @@ final class RestfileRequestTests: XCTestCase {
         )
     }
 
-    func test_post_request() throws {
+    func test_post_request_json() throws {
         let s = """
             requests:
               post:
@@ -202,6 +202,32 @@ final class RestfileRequestTests: XCTestCase {
                   json:
                     method: POST
                     json:
+                      foo: bar
+            """
+        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("post").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_post_request_form() throws {
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  form:
+                    foo: bar
+                validation:
+                  status: 200
+                  json:
+                    method: POST
+                    form:
                       foo: bar
             """
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
