@@ -134,7 +134,6 @@ let main = command(
             case let .dataCorrupted(error) = error,
             let underlying = error.underlyingError {
 
-
             if let e = underlying as? ResterError {
                 print("❌  \(e.localizedDescription)")
             } else {

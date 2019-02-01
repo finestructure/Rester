@@ -214,16 +214,6 @@ final class RestfileRequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
-    func test_batch_processing() throws {
-//        let s = """
-//            restfiles:
-//              - env.yml
-//              - nested/basic.yml
-//        """
-//        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
-        XCTFail("implement batch test")
-    }
-
 }
 
 

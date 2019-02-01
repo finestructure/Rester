@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Path
 
 
 public enum ResterError: Error {
@@ -14,7 +13,7 @@ public enum ResterError: Error {
     case undefinedVariable(String)
     case invalidURL(String)
     case noSuchRequest(String)
-    case fileNotFound(Path)
+    case fileNotFound(String)
 
     public var localizedDescription: String {
         switch self {

@@ -83,12 +83,23 @@ class RestfileDecodingTests: XCTestCase {
 
         let s = """
             restfiles:
-              - env.yml
-              - _env.yml
+              - does_not_exist
         """
-        let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
-        let rfs = rest.restfiles
-        XCTAssertEqual(rfs?.count, 3)
+        XCTAssertThrowsError(
+            try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
+        ) { error in
+            XCTAssertNotNil(error as? DecodingError)
+            if
+                let decodingError = error as? DecodingError,
+                case let .dataCorrupted(err) = decodingError,
+                let underlying = err.underlyingError as? ResterError,
+                case let .fileNotFound(path) = underlying {
+
+                XCTAssert(path.ends(with: "does_not_exist"), "wrong path, was: \(path)")
+            } else {
+                XCTFail("expected file not found exception, found: \(error)")
+            }
+        }
     }
 
 }
