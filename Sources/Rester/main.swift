@@ -157,6 +157,9 @@ let main = command(
             print("❌  Error: \(error.localizedDescription)")
         }
         exit(1)
+    } catch let error as ResterError {
+        print("❌  Error: \(error.localizedDescription)")
+        exit(1)
     } catch {
         print("❌  Error: \(error.localizedDescription)")
         exit(1)

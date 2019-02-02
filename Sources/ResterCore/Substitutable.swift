@@ -27,7 +27,7 @@ func substitute(string: String, with variables: [Key: Value]) throws -> String {
     }
 
     if res =~ regex {
-        throw ResterError.undefinedVariable("Undefined variable: \(res)")
+        throw ResterError.undefinedVariable(res)
     }
     return res
 }
