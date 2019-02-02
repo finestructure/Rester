@@ -33,12 +33,12 @@ extension Restfile: Decodable {
 
 
 extension Restfile {
-    init(path: Path) throws {
+    public init(path: Path, workDir: Path = Path.cwd) throws {
         if !path.exists {
             throw ResterError.fileNotFound(path.string)
         }
         let s = try String(contentsOf: path)
-        self = try YAMLDecoder().decode(Restfile.self, from: s)
+        self = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
     }
 }
 

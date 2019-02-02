@@ -103,9 +103,7 @@ let main = command(
             debugPrint("Working directory: \(workDir)\n")
         }
 
-        let yml = try String(contentsOf: restfilePath)
-
-        let restfile = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
+        let restfile = try Restfile(path: restfilePath, workDir: workDir)
 
         if verbose {
             let vars = restfile.aggregatedVariables
