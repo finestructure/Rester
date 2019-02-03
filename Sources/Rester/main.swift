@@ -103,10 +103,10 @@ let main = command(
             debugPrint("Working directory: \(workDir)\n")
         }
 
-        let restfile = try Restfile(path: restfilePath, workDir: workDir)
+        let rester = try Rester(path: restfilePath, workDir: workDir)
 
         if verbose {
-            let vars = restfile.aggregatedVariables
+            let vars = rester.aggregatedVariables
             if vars.count > 0 {
                 debugPrint("Defined variables:")
                 for v in vars.keys {
@@ -116,7 +116,7 @@ let main = command(
             }
         }
 
-        guard restfile.requestCount > 0 else {
+        guard rester.requestCount > 0 else {
             print("⚠️  no requests defined in \(filename.bold)!")
             exit(0)
         }
@@ -124,7 +124,7 @@ let main = command(
         var results = [Bool]()
         var chain = Promise()
 
-        for req in try restfile.expandedRequests() {
+        for req in rester {
             chain = chain.then {
                 try launch(request: req, verbose: verbose).map { results.append($0) }
             }
