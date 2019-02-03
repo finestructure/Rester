@@ -20,7 +20,11 @@ public struct Rester {
             throw ResterError.fileNotFound(path.string)
         }
         let s = try String(contentsOf: path)
-        let r = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
+        try self.init(yml: s)
+    }
+
+    init(yml: String, workDir: Path = Path.cwd) throws {
+        let r = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
 
         let aggregatedVariables = aggregate(variables: r.variables, from: r.restfiles)
         let aggregatedRequests = aggregate(requests: r.requests, from: r.restfiles)

@@ -9,14 +9,6 @@ public struct Restfile {
     public let variables: [Key: Value]?
     let requests: [Request]?
     let restfiles: [Restfile]?
-
-    lazy var aggregatedVariables: [Key: Value] = {
-        return aggregate(variables: variables, from: restfiles)
-    }()
-
-    lazy var aggregatedRequests: [Request] = {
-        return aggregate(requests: requests, from: restfiles)
-    }()
 }
 
 

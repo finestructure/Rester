@@ -17,6 +17,7 @@ extension Restfile {
     public mutating func expandedRequest(_ requestName: String) throws -> Request {
         guard let req = requests?[requestName]
             else { throw ResterError.noSuchRequest(requestName) }
+        let aggregatedVariables = aggregate(variables: variables, from: restfiles)
         return try req.substitute(variables: aggregatedVariables)
     }
 }
