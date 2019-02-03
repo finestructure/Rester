@@ -9,6 +9,14 @@ public struct Restfile {
     public let variables: [Key: Value]?
     let requests: [Request]?
     let restfiles: [Restfile]?
+
+    lazy var aggregatedVariables: [Key: Value] = {
+        return aggregate(variables: variables, from: restfiles)
+    }()
+
+    lazy var aggregatedRequests: [Request] = {
+        return aggregate(requests: requests, from: restfiles)
+    }()
 }
 
 
@@ -43,44 +51,27 @@ extension Restfile {
 }
 
 
-extension Restfile {
-    public var requestCount: Int {
-        return aggregatedRequests.count
-    }
+func aggregate(variables: [Key: Value]?, from restfiles: [Restfile]?) -> [Key: Value] {
+    let topLevelVariables = variables ?? [:]
 
-    public var aggregatedVariables: [Key: Value] {
-        let topLevelVariables = variables ?? [:]
-
-        if let otherVariableDicts = restfiles?.compactMap({ $0.variables }) {
-            return otherVariableDicts.reduce(topLevelVariables) { aggregate, next in
-                aggregate.merging(next) { (_, new) in
-                    return new  // later keys override earlier ones
-                }
+    if let otherVariableDicts = restfiles?.compactMap({ $0.variables }) {
+        return otherVariableDicts.reduce(topLevelVariables) { aggregate, next in
+            aggregate.merging(next) { (_, new) in
+                return new  // later keys override earlier ones
             }
         }
-
-        return topLevelVariables
     }
 
-    var aggregatedRequests: [Request] {
-        let topLevelRequests = requests ?? []
+    return topLevelVariables
+}
 
-        if let otherRequests = restfiles?.compactMap({ $0.requests }) {
-            return otherRequests.reduce(topLevelRequests, +)
-        }
 
-        return topLevelRequests
+func aggregate(requests: [Request]?, from restfiles: [Restfile]?) -> [Request] {
+    let topLevelRequests = requests ?? []
+
+    if let otherRequests = restfiles?.compactMap({ $0.requests }) {
+        return otherRequests.reduce(topLevelRequests, +)
     }
 
-    public func expandedRequests() throws -> [Request] {
-        return try aggregatedRequests.compactMap {
-            try $0.substitute(variables: aggregatedVariables)
-        }
-    }
-
-    public func expandedRequest(_ requestName: String) throws -> Request {
-        guard let req = aggregatedRequests[requestName]
-            else { throw ResterError.noSuchRequest(requestName) }
-        return try req.substitute(variables: aggregatedVariables)
-    }
+    return topLevelRequests
 }

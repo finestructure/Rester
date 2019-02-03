@@ -13,6 +13,15 @@ extension String {
 }
 
 
+extension Restfile {
+    public mutating func expandedRequest(_ requestName: String) throws -> Request {
+        guard let req = requests?[requestName]
+            else { throw ResterError.noSuchRequest(requestName) }
+        return try req.substitute(variables: aggregatedVariables)
+    }
+}
+
+
 final class RestfileRequestTests: XCTestCase {
 
     func test_request_execute() throws {
@@ -26,11 +35,11 @@ final class RestfileRequestTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var r = try YAMLDecoder().decode(Restfile.self, from: s)
 
         let expectation = self.expectation(description: #function)
 
-        _ = try rester.expandedRequest("basic").execute()
+        _ = try r.expandedRequest("basic").execute()
             .map {
                 XCTAssertEqual($0.response.statusCode, 200)
                 // httpbin returns the request data back to us:
@@ -46,11 +55,11 @@ final class RestfileRequestTests: XCTestCase {
 
     func test_validate_status() throws {
         let s = try readFixture("httpbin.yml")!
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var r = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("status-success").test()
+            _ = try r.expandedRequest("status-success").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.valid)
                     expectation.fulfill()
@@ -60,7 +69,7 @@ final class RestfileRequestTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("status-failure").test()
+            _ = try r.expandedRequest("status-failure").test()
                 .map { result in
                     XCTAssertEqual(result, .init(invalid: "status invalid: (200) is not equal to (500)"))
                     expectation.fulfill()
@@ -71,7 +80,7 @@ final class RestfileRequestTests: XCTestCase {
 
     func test_validate_json() throws {
         let s = try readFixture("httpbin.yml")!
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -106,7 +115,7 @@ final class RestfileRequestTests: XCTestCase {
 
     func test_validate_json_regex() throws {
         let s = try readFixture("httpbin.yml")!
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -204,7 +213,7 @@ final class RestfileRequestTests: XCTestCase {
                     json:
                       foo: bar
             """
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
         _ = try rester.expandedRequest("post").test()
             .map {
@@ -230,7 +239,7 @@ final class RestfileRequestTests: XCTestCase {
                     form:
                       foo: bar
             """
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
         _ = try rester.expandedRequest("post").test()
             .map {
