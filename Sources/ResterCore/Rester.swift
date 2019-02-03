@@ -20,7 +20,7 @@ public struct Rester {
             throw ResterError.fileNotFound(path.string)
         }
         let s = try String(contentsOf: path)
-        try self.init(yml: s)
+        try self.init(yml: s, workDir: workDir)
     }
 
     init(yml: String, workDir: Path = Path.cwd) throws {
