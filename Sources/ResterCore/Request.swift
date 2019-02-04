@@ -13,7 +13,7 @@ import Regex
 
 
 public struct Request: Decodable {
-    typealias Name = String
+    public typealias Name = String
 
     struct Details: Decodable {
         let url: String

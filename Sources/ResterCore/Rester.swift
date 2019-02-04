@@ -7,6 +7,7 @@
 
 import Foundation
 import Path
+import PromiseKit
 import Yams
 
 
@@ -41,12 +42,25 @@ public struct Rester {
 
 extension Rester {
     public var requestCount: Int { return expandedRequests.count }
-    
-    subscript(requestName: String) -> Request? {
-        return expandedRequests[requestName]
-    }
 }
 
+
+extension Rester {
+    public func test(before: @escaping (Request.Name) -> (), after: @escaping (Request.Name, ValidationResult) -> ()) -> Promise<[ValidationResult]> {
+        var results = [ValidationResult]()
+        var chain = Promise()
+        for req in expandedRequests {
+            chain = chain.then { _ -> Promise<Void> in
+                before(req.name)
+                return try req.test().map { result in
+                    after(req.name, result)
+                    results.append(result)
+                }
+            }
+        }
+        return chain.map { results }
+    }
+}
 
 extension Rester: Sequence {
     public func makeIterator() -> Rester.Iterator {

@@ -45,31 +45,6 @@ func wait(timeout: TimeInterval, condition: () -> Bool) {
 }
 
 
-func launch(request: Request, verbose: Bool = false) throws -> Promise<Bool> {
-    print("🎬  \(request.name.blue) started ...\n")
-    return try request.test()
-        .map {
-            switch $0 {
-            case .valid:
-                print("✅  \(request.name.blue) \("PASSED".green.bold)\n")
-                return true
-            case let .invalid(message, response: response):
-                if verbose {
-                    if let response = response {
-                        debugPrint("Response was:")
-                        debugPrint("\(response)")
-                    } else {
-                        debugPrint("Response was nil")
-                    }
-                    print("")
-                }
-                print("❌  \(request.name.blue) \("FAILED".red.bold) : \(message.red)\n")
-                return false
-            }
-    }
-}
-
-
 func getWorkDir(input: String) -> Path? {
     guard !input.isEmpty else { return nil }
 
@@ -121,27 +96,42 @@ let main = command(
             exit(0)
         }
 
-        var results = [Bool]()
-        var chain = Promise()
-
-        for req in rester {
-            chain = chain.then {
-                try launch(request: req, verbose: verbose).map { results.append($0) }
+        let results = rester.test(
+            before: { name in
+                print("🎬  \(name.blue) started ...\n")
+        }, after: { name, result in
+            switch result {
+            case .valid:
+                print("✅  \(name.blue) \("PASSED".green.bold)\n")
+            case let .invalid(message, response: response):
+                if verbose {
+                    if let response = response {
+                        debugPrint("Response was:")
+                        debugPrint("\(response)")
+                    } else {
+                        debugPrint("Response was nil")
+                    }
+                    print("")
+                }
+                print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+            }
+        })
+            .done { results in
+            let failureCount = results.filter({
+                switch $0 {
+                case .valid: return false
+                default: return true
+                }
+            }).count
+            let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
+            print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
+            if failureCount > 0 {
+                exit(1)
             }
         }
 
-        var done = false
-        _ = chain.done {
-            done = true
-        }
-        wait(timeout: 10) { done }
+        wait(timeout: TimeInterval(rester.requestCount * 5)) { results.isFulfilled }
 
-        let failureCount = results.filter { !$0 }.count
-        let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
-        print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
-        if failureCount > 0 {
-            exit(1)
-        }
 
     } catch let error as DecodingError {
         if
