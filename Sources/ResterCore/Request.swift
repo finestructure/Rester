@@ -70,6 +70,9 @@ extension Request {
                 }
             }
         }
+        headers.forEach {
+            urlRequest.addValue($0.value.substitutionDescription, forHTTPHeaderField: $0.key)
+        }
 
         return URLSession.shared.dataTask(.promise, with: urlRequest)
             .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
