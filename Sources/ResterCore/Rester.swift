@@ -13,8 +13,8 @@ import Yams
 
 public struct Rester {
     let restfile: Restfile
-    public var aggregatedVariables: [Key: Value]
-    var expandedRequests: [Request]
+    public var allVariables: [Key: Value]
+    let allRequests: [Request]
 
     public init(path: Path, workDir: Path = Path.cwd) throws {
         if !path.exists {
@@ -27,21 +27,16 @@ public struct Rester {
     init(yml: String, workDir: Path = Path.cwd) throws {
         let r = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
 
-        let aggregatedVariables = aggregate(variables: r.variables, from: r.restfiles)
-        let aggregatedRequests = aggregate(requests: r.requests, from: r.restfiles)
+        allVariables = aggregate(variables: r.variables, from: r.restfiles)
+        allRequests = aggregate(requests: r.requests, from: r.restfiles)
 
         restfile = r
-
-        expandedRequests = try aggregatedRequests.compactMap {
-            try $0.substitute(variables: aggregatedVariables)
-        }
-        self.aggregatedVariables = aggregatedVariables
     }
 }
 
 
 extension Rester {
-    public var requestCount: Int { return expandedRequests.count }
+    public var requestCount: Int { return allRequests.count }
 }
 
 
@@ -49,44 +44,18 @@ extension Rester {
     public func test<T>(before: @escaping (Request.Name) -> (), after: @escaping (Request.Name, ValidationResult) -> T) -> Promise<[T]> {
         var results = [T]()
         var chain = Promise()
-        for req in expandedRequests {
+        for req in allRequests {
             chain = chain.then { _ -> Promise<Void> in
                 before(req.name)
-                return try req.test().map { result in
-                    let res = after(req.name, result)
-                    results.append(res)
+                return try req
+                    .substitute(variables: self.allVariables)
+                    .test()
+                    .map { result in
+                        let res = after(req.name, result)
+                        results.append(res)
                 }
             }
         }
         return chain.map { results }
-    }
-}
-
-extension Rester: Sequence {
-    public func makeIterator() -> Rester.Iterator {
-        return Iterator(self)
-    }
-}
-
-
-extension Rester {
-    public struct Iterator: IteratorProtocol {
-        public typealias Element = Request
-
-        let requests: [Request]
-        var currentIndex = 0
-
-        init(_ rester: Rester) {
-            self.requests = rester.expandedRequests
-        }
-
-        public mutating func next() -> Request? {
-            guard currentIndex < requests.count else {
-                return nil
-            }
-            let req = requests[currentIndex]
-            currentIndex += 1
-            return req
-        }
     }
 }

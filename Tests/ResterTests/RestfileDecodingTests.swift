@@ -91,9 +91,9 @@ class RestfileDecodingTests: XCTestCase {
         do {
             // TODO: more to ResterTests
             let r = try Rester(yml: s, workDir: workDir)
-            XCTAssertEqual(r.expandedRequests.count, 2)
-            XCTAssertEqual(r.aggregatedVariables, ["API_URL": "https://httpbin.org"])
-            XCTAssertEqual(r.expandedRequests.map { $0.name }, ["basic", "basic2"])
+            XCTAssertEqual(r.allRequests.count, 2)
+            XCTAssertEqual(r.allVariables, ["API_URL": "https://httpbin.org"])
+            XCTAssertEqual(r.allRequests.map { $0.name }, ["basic", "basic2"])
         }
     }
 

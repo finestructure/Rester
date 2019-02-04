@@ -31,7 +31,7 @@ let main = command(
         let rester = try Rester(path: restfilePath, workDir: workDir)
 
         if verbose {
-            let vars = rester.aggregatedVariables
+            let vars = rester.allVariables
             if vars.count > 0 {
                 debugPrint("Defined variables:")
                 for v in vars.keys {
