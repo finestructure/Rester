@@ -43,14 +43,29 @@ extension Rester {
 extension Rester {
     public func test<T>(before: @escaping (Request.Name) -> (), after: @escaping (Request.Name, ValidationResult) -> T) -> Promise<[T]> {
         var results = [T]()
+        var jsonResponses = [Key: Value]()
         var chain = Promise()
         for req in allRequests {
+            // FIXME: handle throws
             chain = chain.then { _ -> Promise<Void> in
                 before(req.name)
+                let variables = self.allVariables.merging(jsonResponses, uniquingKeysWith: {_, new in new} )
                 return try req
-                    .substitute(variables: self.allVariables)
-                    .test()
-                    .map { result in
+                    .substitute(variables: variables)
+                    .execute()
+                    .map { response -> ValidationResult in
+                        // FIXME: this is a bit of a hack
+                        // deal with double json decoding
+                        // and untangle this mess
+                        if let data = try? JSONDecoder().decode([Key: Value].self, from: response.data) {
+                            for item in data {
+                                // TODO: deal with nesting
+                                let key = "\(req.name).json.\(item.key)"
+                                jsonResponses[key] = try item.value.substitute(variables: self.allVariables)
+                            }
+                        }
+                        return req.validate(response)
+                    }.map { result in
                         let res = after(req.name, result)
                         results.append(res)
                 }

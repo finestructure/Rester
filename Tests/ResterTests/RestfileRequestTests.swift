@@ -277,7 +277,7 @@ final class RestfileRequestTests: XCTestCase {
               user_me:
                 url: ${api_url}/v1/user/me
                 headers:
-                  Authorization: ${login.json.access_token}
+                  Authorization: Bearer ${login.json.access_token}
                 validation:
                   status: 200
             """
