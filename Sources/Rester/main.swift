@@ -46,13 +46,13 @@ let main = command(
             exit(0)
         }
 
-        let results = rester.test(
-            before: { name in
-                print("🎬  \(name.blue) started ...\n")
-        }, after: { name, result in
+        let results = rester.test(before: { name in
+            print("🎬  \(name.blue) started ...\n")
+        }, after: { name, result -> Bool in
             switch result {
             case .valid:
                 print("✅  \(name.blue) \("PASSED".green.bold)\n")
+                return true
             case let .invalid(message, response: response):
                 if verbose {
                     if let response = response {
@@ -64,20 +64,16 @@ let main = command(
                     print("")
                 }
                 print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+                return false
             }
         })
             .done { results in
-            let failureCount = results.filter({
-                switch $0 {
-                case .valid: return false
-                default: return true
+                let failureCount = results.filter { !$0 }.count
+                let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
+                print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
+                if failureCount > 0 {
+                    exit(1)
                 }
-            }).count
-            let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
-            print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
-            if failureCount > 0 {
-                exit(1)
-            }
         }
 
         wait(timeout: TimeInterval(rester.requestCount * 5)) { results.isFulfilled }

@@ -46,15 +46,15 @@ extension Rester {
 
 
 extension Rester {
-    public func test(before: @escaping (Request.Name) -> (), after: @escaping (Request.Name, ValidationResult) -> ()) -> Promise<[ValidationResult]> {
-        var results = [ValidationResult]()
+    public func test<T>(before: @escaping (Request.Name) -> (), after: @escaping (Request.Name, ValidationResult) -> T) -> Promise<[T]> {
+        var results = [T]()
         var chain = Promise()
         for req in expandedRequests {
             chain = chain.then { _ -> Promise<Void> in
                 before(req.name)
                 return try req.test().map { result in
-                    after(req.name, result)
-                    results.append(result)
+                    let res = after(req.name, result)
+                    results.append(res)
                 }
             }
         }
