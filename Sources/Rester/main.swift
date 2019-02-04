@@ -7,18 +7,6 @@ import ResterCore
 import Yams
 
 
-func getWorkDir(input: String) -> Path? {
-    guard !input.isEmpty else { return nil }
-
-    if let path = Path(input) {
-        return path
-    }
-
-    // take is as relative path
-    return Path.cwd/input
-}
-
-
 func debugPrint(_ msg: String) {
     print(msg.lightWhite.italic)
 }
