@@ -15,11 +15,13 @@ import Regex
 public struct Request: Decodable {
     public typealias Name = String
     public typealias Headers = [Key: Value]
+    public typealias QueryParameters = [Key: Value]
 
     struct Details: Decodable {
         let url: String
         let method: Method?
         let headers: Headers?
+        let query: QueryParameters?
         let body: Body?
         let validation: Validation?
     }
@@ -27,9 +29,12 @@ public struct Request: Decodable {
     public let name: String
     let details: Details
 
-    public var url: String { return details.url }
+    public var url: String {
+        return details.url + (query.isEmpty ? "" : "?" + query.formUrlEncoded)
+    }
     public var method: Method { return details.method ?? .get }
     public var headers: Headers { return details.headers ?? [:] }
+    public var query: QueryParameters { return details.query ?? [:] }
     public var body: Body? { return details.body }
     public var validation: Validation? { return details.validation }
 }
@@ -39,8 +44,15 @@ extension Request: Substitutable {
     func substitute(variables: [Key: Value]) throws -> Request {
         let _url = try ResterCore.substitute(string: url, with: variables)
         let _headers = try headers.substitute(variables: variables)
+        let _query = try query.substitute(variables: variables)
         let _body = try body?.substitute(variables: variables)
-        let _details = Details(url: _url, method: method, headers: _headers, body: _body, validation: validation)
+        let _details = Details(
+            url: _url,
+            method: method,
+            headers: _headers,
+            query: _query,
+            body: _body,
+            validation: validation)
         return Request(name: name, details: _details)
     }
 }
