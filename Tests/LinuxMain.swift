@@ -7,6 +7,12 @@ import XCTest
 @testable import ResterTests
 
 // swiftlint:disable trailing_comma
+extension RequestTests {
+  static var allTests: [(String, (RequestTests) -> () throws -> Void)] = [
+      ("test_parse_headers", test_parse_headers),
+      ("test_request_execute_with_headers", test_request_execute_with_headers),
+  ]
+}
 extension RestfileDecodingTests {
   static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
@@ -29,6 +35,7 @@ extension RestfileRequestTests {
       ("test_launch_binary", test_launch_binary),
       ("test_post_request_json", test_post_request_json),
       ("test_post_request_form", test_post_request_form),
+      ("test_response_variable", test_response_variable),
   ]
 }
 extension SubstitutableTests {
@@ -56,6 +63,7 @@ extension ValueTests {
 }
 
 XCTMain([
+  testCase(RequestTests.allTests),
   testCase(RestfileDecodingTests.allTests),
   testCase(RestfileRequestTests.allTests),
   testCase(SubstitutableTests.allTests),

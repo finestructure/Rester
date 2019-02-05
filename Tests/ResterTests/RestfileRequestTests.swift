@@ -13,6 +13,16 @@ extension String {
 }
 
 
+extension Restfile {
+    public mutating func expandedRequest(_ requestName: String) throws -> Request {
+        guard let req = requests?[requestName]
+            else { throw ResterError.noSuchRequest(requestName) }
+        let aggregatedVariables = aggregate(variables: variables, from: restfiles)
+        return try req.substitute(variables: aggregatedVariables)
+    }
+}
+
+
 final class RestfileRequestTests: XCTestCase {
 
     func test_request_execute() throws {
@@ -26,11 +36,11 @@ final class RestfileRequestTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var r = try YAMLDecoder().decode(Restfile.self, from: s)
 
         let expectation = self.expectation(description: #function)
 
-        _ = try rester.expandedRequest("basic").execute()
+        _ = try r.expandedRequest("basic").execute()
             .map {
                 XCTAssertEqual($0.response.statusCode, 200)
                 // httpbin returns the request data back to us:
@@ -46,11 +56,11 @@ final class RestfileRequestTests: XCTestCase {
 
     func test_validate_status() throws {
         let s = try readFixture("httpbin.yml")!
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var r = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("status-success").test()
+            _ = try r.expandedRequest("status-success").test()
                 .map { result in
                     XCTAssertEqual(result, ValidationResult.valid)
                     expectation.fulfill()
@@ -60,7 +70,7 @@ final class RestfileRequestTests: XCTestCase {
 
         do {
             let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("status-failure").test()
+            _ = try r.expandedRequest("status-failure").test()
                 .map { result in
                     XCTAssertEqual(result, .init(invalid: "status invalid: (200) is not equal to (500)"))
                     expectation.fulfill()
@@ -71,7 +81,7 @@ final class RestfileRequestTests: XCTestCase {
 
     func test_validate_json() throws {
         let s = try readFixture("httpbin.yml")!
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -106,7 +116,7 @@ final class RestfileRequestTests: XCTestCase {
 
     func test_validate_json_regex() throws {
         let s = try readFixture("httpbin.yml")!
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
             let expectation = self.expectation(description: #function)
@@ -204,7 +214,7 @@ final class RestfileRequestTests: XCTestCase {
                     json:
                       foo: bar
             """
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
         _ = try rester.expandedRequest("post").test()
             .map {
@@ -230,11 +240,56 @@ final class RestfileRequestTests: XCTestCase {
                     form:
                       foo: bar
             """
-        let rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
         _ = try rester.expandedRequest("post").test()
             .map {
                 XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    // TODO: move to ResterTests
+    func test_response_variable() throws {
+        let s = """
+            variables:
+              api_url: https://dev.vbox.space/api
+              ios_client_id: 48e148ed-fa59-43c6-ac98-f8a8700fff5c
+              email_username: innogy.vbox.test
+              email_domain: gmail.com
+              password: dev-junction-ripen-upsilon-oakwood
+            requests:
+              login:
+                url: ${api_url}/oauth2/token
+                method: POST
+                body:
+                  form:
+                    grant_type: password
+                    scope: read:user write:user
+                    client_id: ${ios_client_id}
+                    username: ${email_username}@${email_domain}
+                    password: ${password}
+                validation:
+                  status: 200
+                  json:
+                    access_token: .regex(.{30})
+              user_me:
+                url: ${api_url}/v1/user/me
+                headers:
+                  Authorization: Bearer ${login.json.access_token}
+                validation:
+                  status: 200
+            """
+        let r = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = r.test(before: {_ in }, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].name, "login")
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].name, "user_me")
+                XCTAssertEqual(results[1].result, .valid)
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 5)
