@@ -50,4 +50,41 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_parse_query() throws {
+        let s = """
+            url: https://foo.bar
+            query:
+              q1: value
+              q2: 2
+        """
+        let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(r.query, ["q1": "value", "q2": 2])
+    }
+
+    func test_request_execute_with_query() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            method: GET
+            query:
+              q: value
+        """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "basic", details: d)
+
+        let expectation = self.expectation(description: #function)
+
+        _ = try r.execute()
+            .map {
+                XCTAssertEqual($0.response.statusCode, 200)
+                // httpbin returns the request parameters back to us:
+                // { "args": { ... } }
+                struct Result: Codable { let args: Request.QueryParameters }
+                let res = try JSONDecoder().decode(Result.self, from: $0.data)
+                XCTAssertEqual(res.args["q"], "value")
+                expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 5)
+    }
+
 }

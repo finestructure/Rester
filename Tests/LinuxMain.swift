@@ -11,6 +11,8 @@ extension RequestTests {
   static var allTests: [(String, (RequestTests) -> () throws -> Void)] = [
       ("test_parse_headers", test_parse_headers),
       ("test_request_execute_with_headers", test_request_execute_with_headers),
+      ("test_parse_query", test_parse_query),
+      ("test_request_execute_with_query", test_request_execute_with_query),
   ]
 }
 extension RestfileDecodingTests {
