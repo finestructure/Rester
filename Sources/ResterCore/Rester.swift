@@ -46,7 +46,6 @@ extension Rester {
         var jsonResponses = [Key: Value]()
         var chain = Promise()
         for req in allRequests {
-            // FIXME: handle throws
             chain = chain.then { _ -> Promise<Void> in
                 before(req.name)
                 let variables = self.allVariables.merging(jsonResponses, uniquingKeysWith: {_, new in new} )

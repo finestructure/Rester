@@ -17,7 +17,8 @@ let main = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)")
 ) { filename, verbose, wdir in
-    do {
+
+    errorHandling {
         print("🚀  Resting \(filename.bold) ...\n")
 
         let restfilePath = Path(filename) ?? Path.cwd/filename
@@ -66,39 +67,20 @@ let main = command(
                 print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
                 return false
             }
-        })
-            .done { results in
-                let failureCount = results.filter { !$0 }.count
-                let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
-                print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
-                if failureCount > 0 {
-                    exit(1)
-                }
+        }).done { results in
+            let failureCount = results.filter { !$0 }.count
+            let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
+            print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
+            if failureCount > 0 {
+                exit(1)
+            }
         }
 
         wait(timeout: TimeInterval(rester.requestCount * 5)) { results.isFulfilled }
 
-
-    } catch let error as DecodingError {
-        if
-            case let .dataCorrupted(error) = error,
-            let underlying = error.underlyingError {
-
-            if let e = underlying as? ResterError {
-                print("❌  \(e.localizedDescription)")
-            } else {
-                print("❌  Error: \(underlying.localizedDescription)")
-            }
-        } else {
-            print("❌  Error: \(error.localizedDescription)")
+        if let error = results.error {
+            throw error
         }
-        exit(1)
-    } catch let error as ResterError {
-        print("❌  Error: \(error.localizedDescription)")
-        exit(1)
-    } catch {
-        print("❌  Error: \(error.localizedDescription)")
-        exit(1)
     }
 }
 
