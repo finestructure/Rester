@@ -29,26 +29,23 @@ public struct Request: Decodable {
     public let name: String
     let details: Details
 
-    public var url: String {
-        // FIXME
-        //        var components = URLComponents(string: "https://api.mywebserver.com/v1/board")!
-        //        components.queryItems = ["title": "New York Highlights"].map { (key, value) in
-        //            URLQueryItem(name: key, value: value)
-        //        }
-        // -> components.url
-        return details.url + (query.isEmpty ? "" : "?" + query.formUrlEncoded)
-    }
     public var method: Method { return details.method ?? .get }
     public var headers: Headers { return details.headers ?? [:] }
     public var query: QueryParameters { return details.query ?? [:] }
     public var body: Body? { return details.body }
     public var validation: Validation? { return details.validation }
+
+    var url: URL? {
+        var components = URLComponents(string: details.url)
+        components?.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value.substitutionDescription) }
+        return components?.url
+    }
 }
 
 
 extension Request: Substitutable {
     func substitute(variables: [Key: Value]) throws -> Request {
-        let _url = try ResterCore.substitute(string: url, with: variables)
+        let _url = try ResterCore.substitute(string: details.url, with: variables)
         let _headers = try headers.substitute(variables: variables)
         let _query = try query.substitute(variables: variables)
         let _body = try body?.substitute(variables: variables)
@@ -66,7 +63,7 @@ extension Request: Substitutable {
 
 extension Request {
     public func execute(debug: Bool = false) throws -> Promise<Response> {
-        guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
+        guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         if method == .post {

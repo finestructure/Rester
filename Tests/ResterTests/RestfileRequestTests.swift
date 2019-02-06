@@ -300,12 +300,10 @@ final class RestfileRequestTests: XCTestCase {
         let s = """
             variables:
               api_url: https://dev.vbox.space/api
-              android_client_id: 184c0f1a-9be6-4fb3-b88f-597748809a0f
               ios_client_id: 48e148ed-fa59-43c6-ac98-f8a8700fff5c
               email_username: innogy.vbox.test
               email_domain: gmail.com
               password: dev-junction-ripen-upsilon-oakwood
-
             requests:
               login:
                 url: ${api_url}/oauth2/token
@@ -319,6 +317,8 @@ final class RestfileRequestTests: XCTestCase {
                     password: ${password}
                 validation:
                   status: 200
+                  json:
+                    access_token: .regex(.{30})
 
               provider_list:
                 url: ${api_url}/v1/provider
