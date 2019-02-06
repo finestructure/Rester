@@ -101,7 +101,7 @@ extension Request {
             return .invalid("status invalid: \(msg)", response: response)
         }
 
-        if let json = validation?.json {
+        if let jsonMatcher = validation?.json {
             // assume Dictionary response
             // TODO: handle Array response
             guard let data = try? JSONDecoder().decode([Key: Value].self, from: response.data)
@@ -109,9 +109,7 @@ extension Request {
                     return .invalid("failed to decode JSON object from response", response: response)
             }
 
-            // TODO: make json a Matcher to begin with
-            let matcher = Matcher.contains(json)
-            if case let .invalid(msg, _) = matcher.validate(Value.dictionary(data)) {
+            if case let .invalid(msg, _) = jsonMatcher.validate(Value.dictionary(data)) {
                 return .invalid("json invalid: \(msg)", response: response)
             }
         }

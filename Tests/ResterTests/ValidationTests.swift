@@ -12,6 +12,18 @@ import Regex
 import Yams
 
 
+extension Matcher {
+    var contains: [Key: Matcher]? {
+        switch self {
+        case .contains(let dict):
+            return dict
+        default:
+            return nil
+        }
+    }
+}
+
+
 class ValidationTests: XCTestCase {
 
     func test_convertMatcher() throws {
@@ -47,10 +59,12 @@ class ValidationTests: XCTestCase {
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
         XCTAssertEqual(t.validation.status, .equals(.int(200)))
-        XCTAssertEqual(t.validation.json?["int"], .equals(.int(42)))
-        XCTAssertEqual(t.validation.json?["string"], .equals(.string("foo")))
-        XCTAssertEqual(t.validation.json?["regex"], .regex(".*".r!))
-        XCTAssertEqual(t.validation.json?["object"], .contains(["foo": .equals("bar")]))
+        let containing = t.validation.json?.contains
+        XCTAssertNotNil(containing)
+        XCTAssertEqual(containing?["int"], .equals(.int(42)))
+        XCTAssertEqual(containing?["string"], .equals(.string("foo")))
+        XCTAssertEqual(containing?["regex"], .regex(".*".r!))
+        XCTAssertEqual(containing?["object"], .contains(["foo": .equals("bar")]))
     }
 
     func test_validate() throws {
@@ -69,4 +83,21 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "extra": "value"]), .valid)
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "mixed_type": 1]), .valid)
     }
+
+    func test_parse_json_array() throws {
+        struct Test: Decodable {
+            let validation: Validation
+        }
+        let s = """
+        validation:
+          status: 200
+          json:
+            - value1
+            - 42
+            - foo: bar
+        """
+        let t = try YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertEqual(t.validation.json, .equals(.array(["value1", 42, ["foo": "bar"]])))
+    }
+
 }

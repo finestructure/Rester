@@ -51,6 +51,7 @@ extension ValidationTests {
       ("test_convertMatcher", test_convertMatcher),
       ("test_parse_Validation", test_parse_Validation),
       ("test_validate", test_validate),
+      ("test_parse_json_array", test_parse_json_array),
   ]
 }
 extension ValueTests {
