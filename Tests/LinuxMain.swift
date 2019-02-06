@@ -62,6 +62,7 @@ extension ValueTests {
       ("test_encodeBasicTypes", test_encodeBasicTypes),
       ("test_null_json", test_null_json),
       ("test_encode_null", test_encode_null),
+      ("test_bool_json", test_bool_json),
       ("test_decodeComplexResponse", test_decodeComplexResponse),
       ("test_formUrlEncoded", test_formUrlEncoded),
   ]

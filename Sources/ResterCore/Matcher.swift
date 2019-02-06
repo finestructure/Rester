@@ -19,7 +19,7 @@ enum Matcher {
 extension Matcher {
     init(value: Value) throws {
         switch value {
-        case .int, .double, .array, .null:
+        case .bool, .int, .double, .array, .null:
             self = .equals(value)
         case .string(let string):
             self = try Matcher.parse(string: string)

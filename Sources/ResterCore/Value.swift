@@ -12,6 +12,7 @@ public typealias Key = String
 
 
 public enum Value: Equatable {
+    case bool(Bool)
     case int(Int)
     case string(String)
     case double(Double)
@@ -49,6 +50,11 @@ extension Value: Codable {
             return
         }
 
+        if let value = try? container.decode(Bool.self) {
+            self = .bool(value)
+            return
+        }
+
         if let value = try? container.decode(Double.self) {
             self = .double(value)
             return
@@ -73,6 +79,8 @@ extension Value: Codable {
         switch self {
         case .string(let v):
             try container.encode(v)
+        case .bool(let v):
+            try container.encode(v)
         case .int(let v):
             try container.encode(v)
         case .double(let v):
@@ -91,6 +99,8 @@ extension Value: Codable {
 extension Value: CustomStringConvertible {
     public var description: String {
         switch self {
+        case .bool(let v):
+            return v ? "true" : "false"
         case .int(let v):
             return v.description
         case .string(let v):
@@ -111,6 +121,8 @@ extension Value: CustomStringConvertible {
 extension Value {
     public var substitutionDescription: String {
         switch self {
+        case .bool(let v):
+            return v.description
         case .int(let v):
             return v.description
         case .string(let v):
@@ -150,9 +162,18 @@ extension Value: ExpressibleByDictionaryLiteral {
 }
 
 
+extension Value: ExpressibleByBooleanLiteral {
+    public init(booleanLiteral value: Bool) {
+        self = .bool(value)
+    }
+}
+
+
 extension Value: URLEncoding {
     var urlEncoded: String? {
         switch self {
+        case .bool(let v):
+            return v.description
         case .int(let v):
             return String(v).urlEncoded
         case .string(let v):

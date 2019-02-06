@@ -344,8 +344,7 @@ final class RestfileRequestTests: XCTestCase {
                 XCTAssertEqual(results[1].result, .valid)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 500)
+        waitForExpectations(timeout: 5)
     }
+
 }
-
-
