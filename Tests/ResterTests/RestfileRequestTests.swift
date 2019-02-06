@@ -160,6 +160,7 @@ final class RestfileRequestTests: XCTestCase {
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
+    // TODO: move test
     func test_launch_binary() throws {
         // Some of the APIs that we use below are available in macOS 10.13 and above.
         guard #available(macOS 10.13, *) else {
@@ -297,16 +298,53 @@ final class RestfileRequestTests: XCTestCase {
 
     func test_validate_json_array() throws {
         let s = """
-        """
-        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+            variables:
+              api_url: https://dev.vbox.space/api
+              android_client_id: 184c0f1a-9be6-4fb3-b88f-597748809a0f
+              ios_client_id: 48e148ed-fa59-43c6-ac98-f8a8700fff5c
+              email_username: innogy.vbox.test
+              email_domain: gmail.com
+              password: dev-junction-ripen-upsilon-oakwood
 
+            requests:
+              login:
+                url: ${api_url}/oauth2/token
+                method: POST
+                body:
+                  form:
+                    grant_type: password
+                    scope: read:user write:user
+                    client_id: ${ios_client_id}
+                    username: ${email_username}@${email_domain}
+                    password: ${password}
+                validation:
+                  status: 200
+
+              provider_list:
+                url: ${api_url}/v1/provider
+                headers:
+                  Authorization: Bearer ${login.json.access_token}
+                query:
+                  sort_by: name
+                  provider_type: preset
+                validation:
+                  status: 200
+                  json:
+                    0:
+                      name: 1&1 Internet
+        """
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = try rester.expandedRequest("json-success").test()
-            .map {
-                XCTAssertEqual($0, ValidationResult.valid)
+        _ = r.test(before: {_ in }, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].name, "login")
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].name, "provider_list")
+                XCTAssertEqual(results[1].result, .valid)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 5)
+        waitForExpectations(timeout: 500)
     }
 }
 

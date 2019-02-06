@@ -108,15 +108,18 @@ extension Request {
         }
 
         if let jsonMatcher = validation?.json {
-            // assume Dictionary response
-            // TODO: handle Array response
-            guard let data = try? JSONDecoder().decode([Key: Value].self, from: response.data)
-                else {
-                    return .invalid("failed to decode JSON object from response", response: response)
-            }
-
-            if case let .invalid(msg, _) = jsonMatcher.validate(Value.dictionary(data)) {
-                return .invalid("json invalid: \(msg)", response: response)
+            if let data = try? JSONDecoder().decode([Key: Value].self, from: response.data) {
+                // handle dictionary response
+                if case let .invalid(msg, _) = jsonMatcher.validate(Value.dictionary(data)) {
+                    return .invalid("json invalid: \(msg)", response: response)
+                }
+            } else if let data = try? JSONDecoder().decode([Value].self, from: response.data) {
+                // handle array response
+                if case let .invalid(msg, _) = jsonMatcher.validate(Value.array(data)) {
+                    return .invalid("json invalid: \(msg)", response: response)
+                }
+            } else {
+                return .invalid("failed to decode JSON object from response", response: response)
             }
         }
         return .valid
