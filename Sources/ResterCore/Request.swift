@@ -30,6 +30,12 @@ public struct Request: Decodable {
     let details: Details
 
     public var url: String {
+        // FIXME
+        //        var components = URLComponents(string: "https://api.mywebserver.com/v1/board")!
+        //        components.queryItems = ["title": "New York Highlights"].map { (key, value) in
+        //            URLQueryItem(name: key, value: value)
+        //        }
+        // -> components.url
         return details.url + (query.isEmpty ? "" : "?" + query.formUrlEncoded)
     }
     public var method: Method { return details.method ?? .get }

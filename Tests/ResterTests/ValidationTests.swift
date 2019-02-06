@@ -92,12 +92,44 @@ class ValidationTests: XCTestCase {
         validation:
           status: 200
           json:
-            - value1
-            - 42
-            - foo: bar
+            0:
+              foo: bar
+            1: value1
+            -1: 42
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertEqual(t.validation.json, .equals(.array(["value1", 42, ["foo": "bar"]])))
+        XCTAssertEqual(t.validation.json,
+                       .contains([
+                        "0": .contains(["foo": .equals("bar")]),
+                        "1": .equals("value1"),
+                        "-1": .equals(42)
+                        ])
+        )
+    }
+
+    func test_validate_json_array() throws {
+        do {  // test success
+            let matcher: Matcher = .contains([
+                "0": .contains(["foo": .equals("bar")]),
+                "1": .equals("value1"),
+                "-1": .equals(42)
+                ])
+            let response: Value = .array([
+                ["foo": "bar", "baz": 42],
+                "value1",
+                "random",
+                42
+                ])
+            XCTAssertEqual(matcher.validate(response), .valid)
+        }
+        do {  // test failure
+            let matcher: Matcher = .contains([
+                "0": .contains(["foo": .equals("bar")]),
+                ])
+            let response: Value = .array([["nope": "-"]])
+            XCTAssertEqual(matcher.validate(response),
+                           .invalid("index \'0\' validation error: key \'foo\' not found in \'[\"nope\": \"-\"]\'", response: nil))
+        }
     }
 
 }

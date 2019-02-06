@@ -60,6 +60,21 @@ extension Matcher {
                 }
             }
             return .valid
+        case let (.contains(expected), .array(array)):
+            for (key, exp) in expected {
+                guard let index = Int(key) else {
+                    return .invalid("key '\(key)' not convertible into index", response: nil)
+                }
+                let value = (
+                    index >= 0
+                    ? array[index]
+                    : array[array.index(array.endIndex, offsetBy: index)]  // from end
+                )
+                if case let .invalid(msg, resp) = exp.validate(value) {
+                    return .invalid("index '\(index)' validation error: \(msg)", response: resp)
+                }
+            }
+            return .valid
         default:
             return .invalid("to be implemented", response: nil)
         }

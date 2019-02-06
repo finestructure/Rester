@@ -295,6 +295,19 @@ final class RestfileRequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_validate_json_array() throws {
+        let s = """
+        """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("json-success").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
 }
 
 

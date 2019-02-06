@@ -38,6 +38,7 @@ extension RestfileRequestTests {
       ("test_post_request_json", test_post_request_json),
       ("test_post_request_form", test_post_request_form),
       ("test_response_variable", test_response_variable),
+      ("test_validate_json_array", test_validate_json_array),
   ]
 }
 extension SubstitutableTests {
@@ -52,6 +53,7 @@ extension ValidationTests {
       ("test_parse_Validation", test_parse_Validation),
       ("test_validate", test_validate),
       ("test_parse_json_array", test_parse_json_array),
+      ("test_validate_json_array", test_validate_json_array),
   ]
 }
 extension ValueTests {
