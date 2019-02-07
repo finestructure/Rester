@@ -14,8 +14,8 @@ import Regex
 
 public struct Request: Decodable {
     public typealias Name = String
-    public typealias Headers = [Key: Value]
-    public typealias QueryParameters = [Key: Value]
+    typealias Headers = [Key: Value]
+    typealias QueryParameters = [Key: Value]
 
     struct Details: Decodable {
         let url: String
@@ -26,14 +26,18 @@ public struct Request: Decodable {
         let validation: Validation?
     }
 
-    public let name: String
+    let name: Name
     let details: Details
+}
 
-    public var method: Method { return details.method ?? .get }
-    public var headers: Headers { return details.headers ?? [:] }
-    public var query: QueryParameters { return details.query ?? [:] }
-    public var body: Body? { return details.body }
-    public var validation: Validation? { return details.validation }
+
+// convenience accessors
+extension Request {
+    var method: Method { return details.method ?? .get }
+    var headers: Headers { return details.headers ?? [:] }
+    var query: QueryParameters { return details.query ?? [:] }
+    var body: Body? { return details.body }
+    var validation: Validation? { return details.validation }
 
     var url: URL? {
         var components = URLComponents(string: details.url)
