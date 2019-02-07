@@ -37,8 +37,6 @@ extension RestfileRequestTests {
       ("test_launch_binary", test_launch_binary),
       ("test_post_request_json", test_post_request_json),
       ("test_post_request_form", test_post_request_form),
-      ("test_response_variable", test_response_variable),
-      ("test_validate_json_array", test_validate_json_array),
   ]
 }
 extension SubstitutableTests {

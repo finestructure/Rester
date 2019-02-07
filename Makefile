@@ -7,10 +7,10 @@ xcodeproj:
 	swift package generate-xcodeproj
 
 docker-build:
-	docker build --tag rester .
+	docker build --tag rester -f Dockerfile.base .
 
 test-linux: docker-build
-	docker run --rm rester
+	docker run --rm rester swift test
 
 test-macos:
 	set -o pipefail && \
