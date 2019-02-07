@@ -19,7 +19,7 @@ enum Matcher {
 extension Matcher {
     init(value: Value) throws {
         switch value {
-        case .int, .double, .array, .null:
+        case .bool, .int, .double, .array, .null:
             self = .equals(value)
         case .string(let string):
             self = try Matcher.parse(string: string)
@@ -57,6 +57,21 @@ extension Matcher {
                 guard let val = dict[key] else { return .invalid("key '\(key)' not found in '\(dict)'", response: nil) }
                 if case let .invalid(msg, resp) = exp.validate(val) {
                     return .invalid("key '\(key)' validation error: \(msg)", response: resp)
+                }
+            }
+            return .valid
+        case let (.contains(expected), .array(array)):
+            for (key, exp) in expected {
+                guard let index = Int(key) else {
+                    return .invalid("key '\(key)' not convertible into index", response: nil)
+                }
+                let value = (
+                    index >= 0
+                    ? array[index]
+                    : array[array.index(array.endIndex, offsetBy: index)]  // from end
+                )
+                if case let .invalid(msg, resp) = exp.validate(value) {
+                    return .invalid("index '\(index)' validation error: \(msg)", response: resp)
                 }
             }
             return .valid

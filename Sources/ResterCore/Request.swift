@@ -14,8 +14,8 @@ import Regex
 
 public struct Request: Decodable {
     public typealias Name = String
-    public typealias Headers = [Key: Value]
-    public typealias QueryParameters = [Key: Value]
+    typealias Headers = [Key: Value]
+    typealias QueryParameters = [Key: Value]
 
     struct Details: Decodable {
         let url: String
@@ -26,23 +26,30 @@ public struct Request: Decodable {
         let validation: Validation?
     }
 
-    public let name: String
+    let name: Name
     let details: Details
+}
 
-    public var url: String {
-        return details.url + (query.isEmpty ? "" : "?" + query.formUrlEncoded)
+
+// convenience accessors
+extension Request {
+    var method: Method { return details.method ?? .get }
+    var headers: Headers { return details.headers ?? [:] }
+    var query: QueryParameters { return details.query ?? [:] }
+    var body: Body? { return details.body }
+    var validation: Validation? { return details.validation }
+
+    var url: URL? {
+        var components = URLComponents(string: details.url)
+        components?.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value.substitutionDescription) }
+        return components?.url
     }
-    public var method: Method { return details.method ?? .get }
-    public var headers: Headers { return details.headers ?? [:] }
-    public var query: QueryParameters { return details.query ?? [:] }
-    public var body: Body? { return details.body }
-    public var validation: Validation? { return details.validation }
 }
 
 
 extension Request: Substitutable {
     func substitute(variables: [Key: Value]) throws -> Request {
-        let _url = try ResterCore.substitute(string: url, with: variables)
+        let _url = try ResterCore.substitute(string: details.url, with: variables)
         let _headers = try headers.substitute(variables: variables)
         let _query = try query.substitute(variables: variables)
         let _body = try body?.substitute(variables: variables)
@@ -60,7 +67,7 @@ extension Request: Substitutable {
 
 extension Request {
     public func execute(debug: Bool = false) throws -> Promise<Response> {
-        guard let url = URL(string: url) else { throw ResterError.invalidURL(self.url) }
+        guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         if method == .post {
@@ -101,18 +108,19 @@ extension Request {
             return .invalid("status invalid: \(msg)", response: response)
         }
 
-        if let json = validation?.json {
-            // assume Dictionary response
-            // TODO: handle Array response
-            guard let data = try? JSONDecoder().decode([Key: Value].self, from: response.data)
-                else {
-                    return .invalid("failed to decode JSON object from response", response: response)
-            }
-
-            // TODO: make json a Matcher to begin with
-            let matcher = Matcher.contains(json)
-            if case let .invalid(msg, _) = matcher.validate(Value.dictionary(data)) {
-                return .invalid("json invalid: \(msg)", response: response)
+        if let jsonMatcher = validation?.json {
+            if let data = try? JSONDecoder().decode([Key: Value].self, from: response.data) {
+                // handle dictionary response
+                if case let .invalid(msg, _) = jsonMatcher.validate(Value.dictionary(data)) {
+                    return .invalid("json invalid: \(msg)", response: response)
+                }
+            } else if let data = try? JSONDecoder().decode([Value].self, from: response.data) {
+                // handle array response
+                if case let .invalid(msg, _) = jsonMatcher.validate(Value.array(data)) {
+                    return .invalid("json invalid: \(msg)", response: response)
+                }
+            } else {
+                return .invalid("failed to decode JSON object from response", response: response)
             }
         }
         return .valid

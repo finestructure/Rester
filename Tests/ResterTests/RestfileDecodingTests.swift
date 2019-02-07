@@ -34,7 +34,7 @@ class RestfileDecodingTests: XCTestCase {
         let requests = rest.requests!
         let req = try requests["basic"]!.substitute(variables: variables)
         XCTAssertEqual(variables["API_URL"]!, .string("https://httpbin.org"))
-        XCTAssertEqual(req.url, "https://httpbin.org/anything")
+        XCTAssertEqual(req.details.url, "https://httpbin.org/anything")
     }
 
     func test_parse_body_json() throws {
@@ -158,7 +158,7 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(variables["password"], "29%x)(+&id28xY%f42cq")
 
         let req = try requests["login"]?.substitute(variables: variables)
-        XCTAssertEqual(req?.url, "https://httpbin.org/anything")
+        XCTAssertEqual(req?.details.url, "https://httpbin.org/anything")
 
         let expandedBody = try req?.body?.substitute(variables: variables)
         XCTAssertEqual(expandedBody?.form?["grant_type"], "password")

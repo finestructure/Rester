@@ -10,14 +10,11 @@ import Foundation
 
 public struct Validation: Decodable {
     let status: Matcher?
-    // TODO: Change this as follows?
-    //   let json: Matcher?
-    // where Matcher is .contains([Key: Matcher])
-    let json: [Key: Matcher]?
+    let json: Matcher?
 
     private struct Detail: Decodable {
         let status: Value?
-        let json: [Key: Value]?
+        let json: Value?
     }
 
     public init(from decoder: Decoder) throws {
@@ -25,7 +22,7 @@ public struct Validation: Decodable {
         let details = try container.decode(Detail.self)
 
         status = try details.status.map { try Matcher(value: $0) }
-        json = try details.json?.mapValues { try Matcher(value: $0) }
+        json = try details.json.map { try Matcher(value: $0) }
     }
 }
 

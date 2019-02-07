@@ -133,6 +133,23 @@ class ValueTests: XCTestCase {
         XCTAssertEqual(t, Test(null: .null))
     }
 
+    func test_bool_json() throws {
+        let d = """
+            {
+                "flag1": true,
+                "flag2": false
+            }
+            """.data(using: .utf8)!
+        struct Test: Decodable {
+            let flag1: Value
+            let flag2: Value
+        }
+        let res = try? JSONDecoder().decode(Test.self, from: d)
+        XCTAssertNotNil(res)
+        XCTAssertEqual(res?.flag1, true)
+        XCTAssertEqual(res?.flag2, false)
+    }
+
     func test_decodeComplexResponse() throws {
         do {
             let d = """

@@ -37,7 +37,6 @@ extension RestfileRequestTests {
       ("test_launch_binary", test_launch_binary),
       ("test_post_request_json", test_post_request_json),
       ("test_post_request_form", test_post_request_form),
-      ("test_response_variable", test_response_variable),
   ]
 }
 extension SubstitutableTests {
@@ -51,6 +50,8 @@ extension ValidationTests {
       ("test_convertMatcher", test_convertMatcher),
       ("test_parse_Validation", test_parse_Validation),
       ("test_validate", test_validate),
+      ("test_parse_json_array", test_parse_json_array),
+      ("test_validate_json_array", test_validate_json_array),
   ]
 }
 extension ValueTests {
@@ -59,6 +60,7 @@ extension ValueTests {
       ("test_encodeBasicTypes", test_encodeBasicTypes),
       ("test_null_json", test_null_json),
       ("test_encode_null", test_encode_null),
+      ("test_bool_json", test_bool_json),
       ("test_decodeComplexResponse", test_decodeComplexResponse),
       ("test_formUrlEncoded", test_formUrlEncoded),
   ]
