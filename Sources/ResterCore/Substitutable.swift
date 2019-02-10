@@ -21,8 +21,8 @@ func substitute(string: String, with variables: [Key: Value]) throws -> String {
         if let value = variables[varName]?.substitutionDescription {
             return value
         } 
-        if let value = Process.environment[varName]? {
-            return Value(value: value)
+        if let value = ProcessInfo.processInfo.environment[varName] {
+            return value
         }
         return nil
     }
