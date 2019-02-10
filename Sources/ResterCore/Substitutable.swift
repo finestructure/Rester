@@ -17,13 +17,14 @@ protocol Substitutable {
 func substitute(string: String, with variables: [Key: Value]) throws -> String {
     let regex = try Regex(pattern: "\\$\\{(.*?)\\}", groupNames: "variable")
     let res = regex.replaceAll(in: string) { match in
-        if
-            let varName = match.group(named: "variable"),
-            let value = variables[varName]?.substitutionDescription {
+        guard let varName = match.group(named: "variable")  else { return nil }
+        if let value = variables[varName]?.substitutionDescription {
             return value
-        } else {
-            return nil
+        } 
+        if let value = Process.environment[varName]? {
+            return Value(value: value)
         }
+        return nil
     }
 
     if res =~ regex {
