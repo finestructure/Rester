@@ -20,7 +20,8 @@ func substitute(string: String, with variables: [Key: Value]) throws -> String {
         guard let varName = match.group(named: "variable")  else { return nil }
         if let value = variables[varName]?.substitutionDescription {
             return value
-        } 
+        }
+        // TODO: make this an injected dependency
         if let value = ProcessInfo.processInfo.environment[varName] {
             return value
         }
