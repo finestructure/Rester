@@ -251,4 +251,34 @@ final class RestfileRequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_substitute_env() throws {
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  form:
+                    user: ${USER}
+                validation:
+                  status: 200
+                  json:
+                    method: POST
+                    form:
+                      user: .regex(.*)
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTAssertEqual(results.count, 1)
+                XCTAssertEqual(results[0].name, "post")
+                XCTAssertEqual(results[0].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.localizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
 }
