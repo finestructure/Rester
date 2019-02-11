@@ -1,6 +1,7 @@
 import XCTest
 
 import AnyCodable
+import LegibleError
 import PromiseKit
 import Yams
 @testable import ResterCore
@@ -275,8 +276,9 @@ final class RestfileRequestTests: XCTestCase {
                 XCTAssertEqual(results[0].name, "post")
                 XCTAssertEqual(results[0].result, .valid)
                 expectation.fulfill()
-            }.catch {
-                XCTFail($0.localizedDescription)
+            }
+            .catch {
+                XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 5)

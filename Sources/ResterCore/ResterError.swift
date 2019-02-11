@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import LegibleError
 
 
-public enum ResterError: Error {
+public enum ResterError: LocalizedError {
     case decodingError(String)
     case undefinedVariable(String)
     case invalidURL(String)
@@ -32,32 +33,8 @@ public enum ResterError: Error {
             return "internal error: \(msg)"
         }
     }
-}
 
-
-public func errorHandling(block: () throws -> ()) {
-    do {
-        try block()
-    } catch let error as DecodingError {
-        if
-            case let .dataCorrupted(error) = error,
-            let underlying = error.underlyingError {
-
-            if let e = underlying as? ResterError {
-                print("❌  \(e.localizedDescription)")
-            } else {
-                print("❌  Error: \(underlying.localizedDescription)")
-            }
-        } else {
-            print("❌  Error: \(error.localizedDescription)")
-        }
-        exit(1)
-    } catch let error as ResterError {
-        // this special casing is required to get ResterError details
-        print("❌  Error: \(error.localizedDescription)")
-        exit(1)
-    } catch {
-        print("❌  Error: \(error.localizedDescription)")
-        exit(1)
+    public var errorDescription: String? {
+        return localizedDescription
     }
 }

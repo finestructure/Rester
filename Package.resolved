@@ -24,8 +24,17 @@
         "repositoryURL": "https://github.com/PromiseKit/Foundation.git",
         "state": {
           "branch": null,
-          "revision": "9e1d760fdc120f1be41ee2bc026b70ce78ea19bb",
-          "version": "3.3.0"
+          "revision": "04b196a1cb3ce65a404724c4e6e87c43c56542a4",
+          "version": "3.3.1"
+        }
+      },
+      {
+        "package": "LegibleError",
+        "repositoryURL": "https://github.com/mxcl/LegibleError.git",
+        "state": {
+          "branch": null,
+          "revision": "c615c01e461e8a3495ba4ea75f5d671c76820105",
+          "version": "1.0.1"
         }
       },
       {
@@ -33,8 +42,8 @@
         "repositoryURL": "https://github.com/mxcl/Path.swift.git",
         "state": {
           "branch": null,
-          "revision": "c432f710eb946fff28053cdc8602036f22d83b54",
-          "version": "0.10.0"
+          "revision": "6c84754ad8642ff4e952c90e382180bc02b7aad0",
+          "version": "0.13.0"
         }
       },
       {
@@ -42,8 +51,8 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
           "branch": null,
-          "revision": "be6666f4f6170746edb9493b4bc82a810d46d779",
-          "version": "6.8.2"
+          "revision": "db3b2aaf0b26299c1828e0a302adf1a5523f4af5",
+          "version": "6.8.3"
         }
       },
       {
