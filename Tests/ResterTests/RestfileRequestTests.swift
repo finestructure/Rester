@@ -1,6 +1,7 @@
 import XCTest
 
 import AnyCodable
+import LegibleError
 import PromiseKit
 import Yams
 @testable import ResterCore
@@ -251,4 +252,36 @@ final class RestfileRequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_substitute_env() throws {
+        Current.environment = ["TEST_ID": "foo"]
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  form:
+                    user: ${TEST_ID}
+                validation:
+                  status: 200
+                  json:
+                    method: POST
+                    form:
+                      user: foo
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTAssertEqual(results.count, 1)
+                XCTAssertEqual(results[0].name, "post")
+                XCTAssertEqual(results[0].result, .valid)
+                expectation.fulfill()
+            }
+            .catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
 }
