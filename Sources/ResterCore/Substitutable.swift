@@ -21,8 +21,7 @@ func substitute(string: String, with variables: [Key: Value]) throws -> String {
         if let value = variables[varName]?.substitutionDescription {
             return value
         }
-        // TODO: make this an injected dependency
-        if let value = ProcessInfo.processInfo.environment[varName] {
+        if let value = Current.environment[varName] {
             return value
         }
         return nil

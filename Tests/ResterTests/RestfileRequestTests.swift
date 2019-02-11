@@ -253,6 +253,7 @@ final class RestfileRequestTests: XCTestCase {
     }
 
     func test_substitute_env() throws {
+        Current.environment = ["TEST_ID": "foo"]
         let s = """
             requests:
               post:
@@ -260,13 +261,13 @@ final class RestfileRequestTests: XCTestCase {
                 method: POST
                 body:
                   form:
-                    user: ${USER}
+                    user: ${TEST_ID}
                 validation:
                   status: 200
                   json:
                     method: POST
                     form:
-                      user: .regex(.*)
+                      user: foo
             """
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
