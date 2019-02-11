@@ -187,6 +187,10 @@ class ValueTests: XCTestCase {
             XCTAssertEqual(d.formUrlEncoded, "data=test%2Ftest=42")
         }
         do {
+            let d: [Key: Value] = ["email": "innogy.vbox.test+smoke-test@gmail.com"]
+            XCTAssertEqual(d.formUrlEncoded, "email=innogy.vbox.test%2Bsmoke-test%40gmail.com")
+        }
+        do {
             let d: [Key: Value] = ["a": "1", "b": 2]
             XCTAssert(["a=1&b=2", "b=2&a=1"].contains(d.formUrlEncoded), "was: \(d.formUrlEncoded)")
         }

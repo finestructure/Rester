@@ -15,7 +15,8 @@ protocol URLEncoding {
 
 extension String: URLEncoding {
     var urlEncoded: String? {
-        return addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+        let allowed = CharacterSet.urlHostAllowed.subtracting(CharacterSet(charactersIn: "+"))
+        return addingPercentEncoding(withAllowedCharacters: allowed)
     }
 }
 
