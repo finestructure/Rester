@@ -53,13 +53,14 @@ extension Request: Substitutable {
         let _headers = try headers.substitute(variables: variables)
         let _query = try query.substitute(variables: variables)
         let _body = try body?.substitute(variables: variables)
+        let _validation = try validation?.substitute(variables: variables)
         let _details = Details(
             url: _url,
             method: method,
             headers: _headers,
             query: _query,
             body: _body,
-            validation: validation)
+            validation: _validation)
         return Request(name: name, details: _details)
     }
 }

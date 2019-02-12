@@ -54,6 +54,8 @@ extension ValidationTests {
       ("test_validate", test_validate),
       ("test_parse_json_array", test_parse_json_array),
       ("test_validate_json_array", test_validate_json_array),
+      ("test_Matcher_substitute", test_Matcher_substitute),
+      ("test_Validation_substitute", test_Validation_substitute),
   ]
 }
 extension ValueTests {

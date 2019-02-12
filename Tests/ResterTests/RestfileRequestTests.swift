@@ -261,13 +261,15 @@ final class RestfileRequestTests: XCTestCase {
                 method: POST
                 body:
                   form:
-                    user: ${TEST_ID}
+                    value1: v1 ${TEST_ID}
+                    value2: v2 ${TEST_ID}
                 validation:
                   status: 200
                   json:
                     method: POST
                     form:
-                      user: foo
+                      value1: v1 foo
+                      value2: v2 ${TEST_ID}
             """
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)

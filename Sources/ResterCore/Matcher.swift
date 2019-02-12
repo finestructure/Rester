@@ -118,3 +118,17 @@ extension Matcher {
     }
 }
 
+
+extension Matcher: Substitutable {
+    func substitute(variables: [Key : Value]) throws -> Matcher {
+        switch self {
+        case let .equals(value):
+            return try .equals(value.substitute(variables: variables))
+        case let .contains(value):
+            let resolved = try value.mapValues { try $0.substitute(variables: variables) }
+            return .contains(resolved)
+        default:
+            return self
+        }
+    }
+}

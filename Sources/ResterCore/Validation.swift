@@ -24,5 +24,18 @@ public struct Validation: Decodable {
         status = try details.status.map { try Matcher(value: $0) }
         json = try details.json.map { try Matcher(value: $0) }
     }
+
+    init(status: Matcher?, json: Matcher?) {
+        self.status = status
+        self.json = json
+    }
 }
 
+
+extension Validation: Substitutable {
+    func substitute(variables: [Key : Value]) throws -> Validation {
+        let _status = try status?.substitute(variables: variables)
+        let _json = try json?.substitute(variables: variables)
+        return Validation(status: _status, json: _json)
+    }
+}

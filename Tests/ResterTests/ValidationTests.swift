@@ -132,4 +132,24 @@ class ValidationTests: XCTestCase {
         }
     }
 
+    func test_Matcher_substitute() throws {
+        let vars: [Key: Value] = ["test": "resolved"]
+        XCTAssertEqual(try Matcher(value: "${test}").substitute(variables: vars),
+                       .equals("resolved"))
+        XCTAssertEqual(try Matcher(value: ["data": "${test}"]).substitute(variables: vars),
+                       .contains(["data": .equals("resolved")]))
+    }
+
+    func test_Validation_substitute() throws {
+        let validation = Validation(status: nil, json: .contains(["data": .equals("${test}")]))
+
+        XCTAssertEqual(validation.json,
+                       .contains(["data": .equals("${test}")]))
+
+        let vars: [Key: Value] = ["test": "resolved"]
+        let resolved = try validation.substitute(variables: vars)
+        XCTAssertEqual(resolved.json,
+                       .contains(["data": .equals("resolved")]))
+    }
+
 }

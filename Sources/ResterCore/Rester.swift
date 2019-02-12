@@ -49,8 +49,8 @@ extension Rester {
             chain = chain.then { _ -> Promise<Void> in
                 before(req.name)
                 let variables = self.allVariables.merging(jsonResponses, uniquingKeysWith: {_, new in new} )
-                return try req
-                    .substitute(variables: variables)
+                let resolved = try req.substitute(variables: variables)
+                return try resolved
                     .execute()
                     .map { response -> ValidationResult in
                         // FIXME: this is a bit of a hack
@@ -61,7 +61,7 @@ extension Rester {
                         } else if let data = try? JSONDecoder().decode([Value].self, from: response.data) {
                             jsonResponses[req.name] = .array(data)
                         }
-                        return req.validate(response)
+                        return resolved.validate(response)
                     }.map { result in
                         let res = after(req.name, result)
                         results.append(res)
