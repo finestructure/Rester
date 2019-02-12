@@ -196,4 +196,34 @@ class ValueTests: XCTestCase {
         }
     }
 
+    func test_key_lookup() throws {
+        do {
+            let v: Value = .dictionary(["foo": "bar"])
+            XCTAssertEqual(v["foo"], "bar")
+        }
+        do {
+            let v: Value = .array(["a", "b", 42])
+            XCTAssertEqual(v[0], "a")
+            XCTAssertEqual(v[2], 42)
+        }
+    }
+
+    func test_key_lookup_nested() throws {
+        let d: Value = .dictionary(["foo": "bar"])
+        let a: Value = .array(["a", 42, d])
+        let v: Value = .dictionary(["obj": a])
+        XCTAssertEqual(v["obj.0"], "a")
+        XCTAssertEqual(v["obj.1"], 42)
+        XCTAssertEqual(v["obj.2"], d)
+        XCTAssertEqual(v["obj.2.foo"], "bar")
+    }
+
+    func test_key_substitution() throws {
+        let d: Value = .dictionary(["foo": "bar"])
+        let a: Value = .array(["a", 42, d])
+        let response: [Request.Name: Value] = ["request": a]
+        let value: Value = "${request.2.foo}"
+        XCTAssertEqual(try value.substitute(variables: response), "bar")
+    }
+
 }

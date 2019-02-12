@@ -64,6 +64,9 @@ extension ValueTests {
       ("test_bool_json", test_bool_json),
       ("test_decodeComplexResponse", test_decodeComplexResponse),
       ("test_formUrlEncoded", test_formUrlEncoded),
+      ("test_key_lookup", test_key_lookup),
+      ("test_key_lookup_nested", test_key_lookup_nested),
+      ("test_key_substitution", test_key_substitution),
   ]
 }
 

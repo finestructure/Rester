@@ -57,11 +57,9 @@ extension Rester {
                         // deal with double json decoding
                         // and untangle this mess
                         if let data = try? JSONDecoder().decode([Key: Value].self, from: response.data) {
-                            for item in data {
-                                // TODO: deal with nesting
-                                let key = "\(req.name).json.\(item.key)"
-                                jsonResponses[key] = try item.value.substitute(variables: self.allVariables)
-                            }
+                            jsonResponses[req.name] = .dictionary(data)
+                        } else if let data = try? JSONDecoder().decode([Value].self, from: response.data) {
+                            jsonResponses[req.name] = .array(data)
                         }
                         return req.validate(response)
                     }.map { result in

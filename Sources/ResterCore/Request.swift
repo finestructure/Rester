@@ -41,7 +41,7 @@ extension Request {
 
     var url: URL? {
         var components = URLComponents(string: details.url)
-        components?.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value.substitutionDescription) }
+        components?.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value.string) }
         return components?.url
     }
 }
@@ -90,7 +90,7 @@ extension Request {
             }
         }
         headers.forEach {
-            urlRequest.addValue($0.value.substitutionDescription, forHTTPHeaderField: $0.key)
+            urlRequest.addValue($0.value.string, forHTTPHeaderField: $0.key)
         }
 
         return URLSession.shared.dataTask(.promise, with: urlRequest)

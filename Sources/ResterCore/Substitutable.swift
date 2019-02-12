@@ -17,9 +17,10 @@ protocol Substitutable {
 func substitute(string: String, with variables: [Key: Value]) throws -> String {
     let regex = try Regex(pattern: "\\$\\{(.*?)\\}", groupNames: "variable")
     let res = regex.replaceAll(in: string) { match in
-        guard let varName = match.group(named: "variable")  else { return nil }
-        if let value = variables[varName]?.substitutionDescription {
-            return value
+        guard let varName = match.group(named: "variable") else { return nil }
+        // use Value.subscript for key path lookups: value["foo.0.baz"]
+        if let value = Value.dictionary(variables)[varName] {
+            return value.string
         }
         if let value = Current.environment[varName] {
             return value

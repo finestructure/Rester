@@ -119,7 +119,7 @@ extension Value: CustomStringConvertible {
 
 
 extension Value {
-    public var substitutionDescription: String {
+    public var string: String {
         switch self {
         case .bool(let v):
             return v.description
@@ -198,6 +198,38 @@ extension Value: Substitutable {
             return try .string(ResterCore.substitute(string: string, with: variables))
         default:
             return self
+        }
+    }
+}
+
+
+extension Value {
+    subscript(key: String) -> Value? {
+        let keyPaths = key.split(separator: ".")
+        guard let firstSubstring = keyPaths.first else { return nil }
+        let firstKeyPath = String(firstSubstring)
+        let remainder = keyPaths.dropFirst().joined(separator: ".")
+
+        let nested: Value?
+
+        switch (self, Int(firstKeyPath)) {
+        case let (.dictionary(d), nil):
+            nested = d[firstKeyPath]
+        case let (.array(a), .some(index)):
+            nested = a[index]
+        default:
+            return nil
+        }
+
+        return remainder.isEmpty ? nested : nested?[remainder]
+    }
+
+    subscript(index: Int) -> Value? {
+        switch self {
+        case .array(let v):
+            return v[index]
+        default:
+            return nil
         }
     }
 }
