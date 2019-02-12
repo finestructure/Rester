@@ -63,6 +63,7 @@ extension Rester {
                                 jsonResponses[key] = try item.value.substitute(variables: self.allVariables)
                             }
                         }
+                        // TODO: decode array response
                         return req.validate(response)
                     }.map { result in
                         let res = after(req.name, result)
