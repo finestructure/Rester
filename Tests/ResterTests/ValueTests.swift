@@ -218,4 +218,12 @@ class ValueTests: XCTestCase {
         XCTAssertEqual(v["obj.2.foo"], "bar")
     }
 
+    func test_key_substitution() throws {
+        let d: Value = .dictionary(["foo": "bar"])
+        let a: Value = .array(["a", 42, d])
+        let response: [Request.Name: Value] = ["request": a]
+        let value: Value = "${request.2.foo}"
+        XCTAssertEqual(try value.substitute(variables: response), "bar")
+    }
+
 }

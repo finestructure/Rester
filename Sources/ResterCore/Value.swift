@@ -119,7 +119,7 @@ extension Value: CustomStringConvertible {
 
 
 extension Value {
-    public var substitutionDescription: String {
+    public var string: String {
         switch self {
         case .bool(let v):
             return v.description
