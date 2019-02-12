@@ -284,4 +284,31 @@ final class RestfileRequestTests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
+
+    func test_put_request_json() throws {
+        let s = """
+            requests:
+              put:
+                url: https://httpbin.org/anything
+                method: PUT
+                body:
+                  json:
+                    foo: bar
+                validation:
+                  status: 200
+                  json:
+                    method: PUT
+                    json:
+                      foo: bar
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("put").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
 }

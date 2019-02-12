@@ -70,7 +70,7 @@ extension Request {
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
-        if method == .post {
+        if [.post, .put].contains(method) {
             if
                 let body = body?.json,
                 let postData = try? JSONEncoder().encode(body) {

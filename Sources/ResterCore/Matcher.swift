@@ -76,7 +76,7 @@ extension Matcher {
             }
             return .valid
         default:
-            return .invalid("to be implemented", response: nil)
+            return .invalid("failed to validate value '\(value)' with '\(self)'", response: nil)
         }
     }
 }
