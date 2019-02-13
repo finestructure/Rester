@@ -313,4 +313,27 @@ final class RestfileRequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_validate_headers() throws {
+        let s = """
+            requests:
+              header-request:
+                url: https://httpbin.org/anything
+                validation:
+                  status: 200
+                  headers:
+                    Content-Type: application/json
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("header-request").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
 }

@@ -109,6 +109,12 @@ extension Request {
             return .invalid("status invalid: \(msg)", response: response)
         }
 
+        if
+            let headers = validation?.headers,
+            case let .invalid(msg, _) = headers.validate(Value.dictionary(response.headers)) {
+            return .invalid("status invalid: \(msg)", response: response)
+        }
+
         if let jsonMatcher = validation?.json {
             if let data = try? JSONDecoder().decode([Key: Value].self, from: response.data) {
                 // handle dictionary response
