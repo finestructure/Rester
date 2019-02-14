@@ -24,6 +24,7 @@ public struct Request: Decodable {
         let query: QueryParameters?
         let body: Body?
         let validation: Validation?
+        let delay: Value?
     }
 
     let name: Name
@@ -38,6 +39,21 @@ extension Request {
     var query: QueryParameters { return details.query ?? [:] }
     var body: Body? { return details.body }
     var validation: Validation? { return details.validation }
+    var delay: TimeInterval {
+        guard let value = details.delay else { return 0 }
+        switch value {
+        case let .int(value):
+            return TimeInterval(value)
+        case let .double(value):
+            return value
+        case let .string(value):
+            if let v = Int(value) { return TimeInterval(v) }
+            else if let v = Double(value) { return v }
+            else { return 0 }
+        default:
+            return 0
+        }
+    }
 
     var url: URL? {
         var components = URLComponents(string: details.url)
@@ -54,13 +70,15 @@ extension Request: Substitutable {
         let _query = try query.substitute(variables: variables)
         let _body = try body?.substitute(variables: variables)
         let _validation = try validation?.substitute(variables: variables)
+        let _delay = try details.delay?.substitute(variables: variables)
         let _details = Details(
             url: _url,
             method: method,
             headers: _headers,
             query: _query,
             body: _body,
-            validation: _validation)
+            validation: _validation,
+            delay: _delay)
         return Request(name: name, details: _details)
     }
 }
@@ -94,8 +112,10 @@ extension Request {
             urlRequest.addValue($0.value.string, forHTTPHeaderField: $0.key)
         }
 
-        return URLSession.shared.dataTask(.promise, with: urlRequest)
-            .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
+        return after(seconds: delay)
+            .then {
+                URLSession.shared.dataTask(.promise, with: urlRequest)
+            }.map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
     }
 
     public func test() throws -> Promise<ValidationResult> {
