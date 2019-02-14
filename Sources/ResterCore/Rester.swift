@@ -48,7 +48,7 @@ extension Rester {
         for req in allRequests {
             chain = chain.then { _ -> Promise<Void> in
                 before(req.name)
-                let variables = self.allVariables.merging(jsonResponses, uniquingKeysWith: {_, new in new} )
+                let variables = self.allVariables.merging(jsonResponses, strategy: .lastWins)
                 let resolved = try req.substitute(variables: variables)
                 return try resolved
                     .execute()

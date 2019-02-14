@@ -48,9 +48,7 @@ func aggregate(variables: [Key: Value]?, from restfiles: [Restfile]?) -> [Key: V
 
     if let otherVariableDicts = restfiles?.compactMap({ $0.variables }) {
         return otherVariableDicts.reduce(topLevelVariables) { aggregate, next in
-            aggregate.merging(next) { (_, new) in
-                return new  // later keys override earlier ones
-            }
+            aggregate.merging(next, strategy: .lastWins)
         }
     }
 
