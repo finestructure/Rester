@@ -40,6 +40,7 @@ extension RestfileRequestTests {
       ("test_substitute_env", test_substitute_env),
       ("test_put_request_json", test_put_request_json),
       ("test_validate_headers", test_validate_headers),
+      ("test_delete_request", test_delete_request),
   ]
 }
 extension SubstitutableTests {

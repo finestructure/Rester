@@ -336,4 +336,26 @@ final class RestfileRequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_delete_request() throws {
+        let s = """
+            requests:
+              delete:
+                url: https://httpbin.org/anything
+                method: DELETE
+                validation:
+                  status: 200
+                  json:
+                    method: DELETE
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("delete").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+
 }
