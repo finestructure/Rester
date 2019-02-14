@@ -361,7 +361,7 @@ final class RestfileRequestTests: XCTestCase {
         let s = """
             requests:
               delay:
-                delay: 5
+                delay: 2
                 url: https://httpbin.org/anything
                 validation:
                   status: 200
@@ -379,7 +379,7 @@ final class RestfileRequestTests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
         let elapsed = Date().timeIntervalSince(start)
-        XCTAssert(elapsed > 5, "elapsed time must be larger than delay, was \(elapsed)")
+        XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
 

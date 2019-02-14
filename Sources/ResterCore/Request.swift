@@ -97,8 +97,10 @@ extension Request {
             urlRequest.addValue($0.value.string, forHTTPHeaderField: $0.key)
         }
 
-        return URLSession.shared.dataTask(.promise, with: urlRequest)
-            .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
+        return after(seconds: delay)
+            .then {
+                URLSession.shared.dataTask(.promise, with: urlRequest)
+            }.map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
     }
 
     public func test() throws -> Promise<ValidationResult> {
