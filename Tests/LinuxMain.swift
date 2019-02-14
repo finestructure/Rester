@@ -13,6 +13,7 @@ extension RequestTests {
       ("test_request_execute_with_headers", test_request_execute_with_headers),
       ("test_parse_query", test_parse_query),
       ("test_request_execute_with_query", test_request_execute_with_query),
+      ("test_parse_delay", test_parse_delay),
   ]
 }
 extension RestfileDecodingTests {
@@ -41,6 +42,7 @@ extension RestfileRequestTests {
       ("test_put_request_json", test_put_request_json),
       ("test_validate_headers", test_validate_headers),
       ("test_delete_request", test_delete_request),
+      ("test_delay_request", test_delay_request),
   ]
 }
 extension SubstitutableTests {

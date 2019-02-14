@@ -24,6 +24,7 @@ public struct Request: Decodable {
         let query: QueryParameters?
         let body: Body?
         let validation: Validation?
+        let delay: Double?
     }
 
     let name: Name
@@ -38,6 +39,7 @@ extension Request {
     var query: QueryParameters { return details.query ?? [:] }
     var body: Body? { return details.body }
     var validation: Validation? { return details.validation }
+    var delay: Double { return details.delay ?? 0 }
 
     var url: URL? {
         var components = URLComponents(string: details.url)
@@ -60,7 +62,8 @@ extension Request: Substitutable {
             headers: _headers,
             query: _query,
             body: _body,
-            validation: _validation)
+            validation: _validation,
+            delay: delay)
         return Request(name: name, details: _details)
     }
 }

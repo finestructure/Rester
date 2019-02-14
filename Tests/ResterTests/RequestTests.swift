@@ -87,4 +87,23 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_parse_delay() throws {
+        do {  // Int
+            let s = """
+                url: https://httpbin.org/anything
+                delay: 5
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.delay, 5)
+        }
+        do {  // Double
+            let s = """
+                url: https://httpbin.org/anything
+                delay: 4.2
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.delay, 4.2)
+        }
+    }
+
 }
