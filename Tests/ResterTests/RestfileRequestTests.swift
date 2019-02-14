@@ -382,5 +382,31 @@ final class RestfileRequestTests: XCTestCase {
         XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
+    func test_delay_request_substitution() throws {
+        Current.environment = ["DELAY": "2"]
+        let s = """
+            requests:
+              delay:
+                delay: ${DELAY}
+                url: https://httpbin.org/anything
+                validation:
+                  status: 200
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        let start = Date()
+        _ = rester.test(before: {_ in}, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTAssertEqual(results.count, 1)
+                XCTAssertEqual(results[0].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
+    }
 
 }

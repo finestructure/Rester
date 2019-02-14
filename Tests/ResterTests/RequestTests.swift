@@ -102,7 +102,38 @@ class RequestTests: XCTestCase {
                 delay: 4.2
             """
             let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.delay, 4.2)
+            XCTAssertEqual(r.delay, .double(4.2))
+        }
+    }
+
+    func test_delay_substitution() throws {
+        // Details decoding keeps string
+        let s = """
+            url: https://httpbin.org/anything
+            delay: ${DELAY}
+        """
+        let details = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(details.delay, .string("${DELAY}"))
+
+        // Request substitution creates valid request.delay: TimeInterval
+        let req = Request(name: "req", details: details)
+
+        do {  // Substitute int value
+            let vars: [Key: Value] = ["DELAY": 2]
+            let resolved = try req.substitute(variables: vars)
+            XCTAssertEqual(resolved.delay, 2)
+        }
+
+        do {  // Substitute double value
+            let vars: [Key: Value] = ["DELAY": .double(2.2)]
+            let resolved = try req.substitute(variables: vars)
+            XCTAssertEqual(resolved.delay, 2.2)
+        }
+
+        do {  // Substitute string value
+            let vars: [Key: Value] = ["DELAY": "2"]
+            let resolved = try req.substitute(variables: vars)
+            XCTAssertEqual(resolved.delay, 2)
         }
     }
 
