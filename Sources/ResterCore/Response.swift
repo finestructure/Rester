@@ -27,4 +27,15 @@ public struct Response: Equatable {
         }
         return Dictionary(uniqueKeysWithValues: res)
     }
+
+    var json: Value? {
+        if let data = try? JSONDecoder().decode([Key: Value].self, from: data) {
+            return .dictionary(data)
+        } else if let data = try? JSONDecoder().decode([Value].self, from: data) {
+            return .array(data)
+        } else {
+            return nil
+        }
+    }
+
 }

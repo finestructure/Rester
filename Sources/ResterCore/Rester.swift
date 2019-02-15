@@ -53,13 +53,8 @@ extension Rester {
                 return try resolved
                     .execute()
                     .map { response -> ValidationResult in
-                        // FIXME: this is a bit of a hack
-                        // deal with double json decoding
-                        // and untangle this mess
-                        if let data = try? JSONDecoder().decode([Key: Value].self, from: response.data) {
-                            jsonResponses[req.name] = .dictionary(data)
-                        } else if let data = try? JSONDecoder().decode([Value].self, from: response.data) {
-                            jsonResponses[req.name] = .array(data)
+                        if let json = response.json {
+                            jsonResponses[req.name] = json
                         }
                         return resolved.validate(response)
                     }.map { result in
