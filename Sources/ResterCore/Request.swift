@@ -126,22 +126,22 @@ extension Request {
         if
             let status = validation?.status,
             case let .invalid(msg, _) = status.validate(Value.int(response.status)) {
-            return .invalid("status invalid: \(msg)", response: response)
+            return .invalid("status invalid: \(msg)", value: response.json)
         }
 
         if
             let headers = validation?.headers,
             case let .invalid(msg, _) = headers.validate(Value.dictionary(response.headers)) {
-            return .invalid("status invalid: \(msg)", response: response)
+            return .invalid("status invalid: \(msg)", value: response.json)
         }
 
         if let jsonMatcher = validation?.json {
             if let json = response.json {
                 if case let .invalid(msg, _) = jsonMatcher.validate(json) {
-                    return .invalid("json invalid: \(msg)", response: response)
+                    return .invalid("json invalid: \(msg)", value: response.json)
                 }
             } else {
-                return .invalid("failed to decode JSON object from response", response: response)
+                return .invalid("failed to decode JSON object from response", value: response.json)
             }
         }
         

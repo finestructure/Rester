@@ -64,7 +64,7 @@ let main = command(
         case .valid:
             print("✅  \(name.blue) \("PASSED".green.bold)\n")
             return true
-        case let .invalid(message, response: response):
+        case let .invalid(message, value: response):
             if verbose {
                 if let response = response {
                     debugPrint("Response was:")

@@ -43,7 +43,7 @@ extension ValidationResult: Equatable {
         switch (lhs, rhs) {
         case (.valid, .valid):
             return true
-        case (.invalid(let x, response: _), .invalid(let y, response: _)):
+        case (.invalid(let x, value: _), .invalid(let y, value: _)):
             return x == y
         default:
             return false
