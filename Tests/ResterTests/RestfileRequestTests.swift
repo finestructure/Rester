@@ -136,7 +136,7 @@ final class RequestExecutionTests: XCTestCase {
                     switch $0 {
                     case .valid:
                         XCTFail("expected failure but received success")
-                    case let .invalid(message, response: _):
+                    case let .invalid(message, value: _):
                         XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
                         XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
                     }

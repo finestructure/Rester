@@ -128,7 +128,7 @@ class ValidationTests: XCTestCase {
                 ])
             let response: Value = .array([["nope": "-"]])
             XCTAssertEqual(matcher.validate(response),
-                           .invalid("index \'0\' validation error: key \'foo\' not found in \'[\"nope\": \"-\"]\'", response: nil))
+                           .init(invalid: "index \'0\' validation error: key \'foo\' not found in \'[\"nope\": \"-\"]\'"))
         }
     }
 

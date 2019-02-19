@@ -47,23 +47,23 @@ extension Matcher {
         case let (.equals(expected), value):
             return expected == value
                 ? .valid
-                : .invalid("(\(value)) is not equal to (\(expected))", response: nil)
+                : .init(invalid: "(\(value)) is not equal to (\(expected))")
         case let (.regex(expected), .string(value)):
             return expected ~= value
                 ? .valid
-                : .invalid("(\(value)) does not match (\(expected.pattern))", response: nil)
+                : .init(invalid: "(\(value)) does not match (\(expected.pattern))")
         case let (.contains(expected), .dictionary(dict)):
             for (key, exp) in expected {
-                guard let val = dict[key] else { return .invalid("key '\(key)' not found in '\(dict)'", response: nil) }
+                guard let val = dict[key] else { return .init(invalid: "key '\(key)' not found in '\(dict)'") }
                 if case let .invalid(msg, resp) = exp.validate(val) {
-                    return .invalid("key '\(key)' validation error: \(msg)", response: resp)
+                    return .invalid("key '\(key)' validation error: \(msg)", value: resp)
                 }
             }
             return .valid
         case let (.contains(expected), .array(array)):
             for (key, exp) in expected {
                 guard let index = Int(key) else {
-                    return .invalid("key '\(key)' not convertible into index", response: nil)
+                    return .init(invalid: "key '\(key)' not convertible into index")
                 }
                 let value = (
                     index >= 0
@@ -71,12 +71,12 @@ extension Matcher {
                     : array[array.index(array.endIndex, offsetBy: index)]  // from end
                 )
                 if case let .invalid(msg, resp) = exp.validate(value) {
-                    return .invalid("index '\(index)' validation error: \(msg)", response: resp)
+                    return .invalid("index '\(index)' validation error: \(msg)", value: resp)
                 }
             }
             return .valid
         default:
-            return .invalid("failed to validate value '\(value)' with '\(self)'", response: nil)
+            return .init(invalid: "failed to validate value '\(value)' with '\(self)'")
         }
     }
 }
