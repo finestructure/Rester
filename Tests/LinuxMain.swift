@@ -37,6 +37,7 @@ extension RequestTests {
       ("test_request_execute_with_query", test_request_execute_with_query),
       ("test_parse_delay", test_parse_delay),
       ("test_delay_substitution", test_delay_substitution),
+      ("test_parse_log", test_parse_log),
   ]
 }
 extension ResterTests {
