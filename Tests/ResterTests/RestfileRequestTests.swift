@@ -16,7 +16,7 @@ extension String {
 
 extension Restfile {
     public mutating func expandedRequest(_ requestName: String) throws -> Request {
-        guard let req = requests?[requestName]
+        guard let req = requests[requestName]
             else { throw ResterError.noSuchRequest(requestName) }
         let aggregatedVariables = aggregate(variables: variables, from: restfiles)
         return try req.substitute(variables: aggregatedVariables)
@@ -157,7 +157,7 @@ final class RequestExecutionTests: XCTestCase {
                 url: http://foo.com
             """
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
-        let names = rester.requests?.map { $0.name }
+        let names = rester.requests.map { $0.name }
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
