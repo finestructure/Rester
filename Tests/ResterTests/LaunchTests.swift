@@ -34,17 +34,25 @@ class LaunchTests: XCTestCase {
         process.waitUntilExit()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
+        let output = String(data: data, encoding: .utf8) ?? "no output"
         let status = process.terminationStatus
 
         XCTAssert(
-            output?.starts(with: "🚀  Resting") ?? false,
-            "output start does not match, was: \(output ?? "")"
-        )
-        XCTAssert(
             status == 0,
-            "exit status not 0, was: \(status), output: \(output ?? "")"
+            "exit status not 0, was: \(status), output: \(output)"
         )
+
+        let expected = """
+            🚀  Resting \(requestFile.string) ...
+
+            🎬  basic started ...
+
+            ✅  basic PASSED
+
+            Executed 1 tests, with 0 failures
+
+            """
+        XCTAssertEqual(output, expected)
     }
 
 }
