@@ -112,10 +112,6 @@ extension Matcher {
     init(_ dict: [Key: Value]) throws {
         try self.init(value: Value.dictionary(dict))
     }
-    init(_ dict: [Key: Matcher]) throws {
-        // TODO: not ideal, better would be to go through main initialiser
-        self = .contains(dict)
-    }
 }
 
 
