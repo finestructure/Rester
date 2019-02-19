@@ -24,7 +24,7 @@ extension Restfile {
 }
 
 
-final class RestfileRequestTests: XCTestCase {
+final class RequestExecutionTests: XCTestCase {
 
     func test_request_execute() throws {
         let s = """
@@ -159,45 +159,6 @@ final class RestfileRequestTests: XCTestCase {
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let names = rester.requests?.map { $0.name }
         XCTAssertEqual(names, ["first", "second", "3rd"])
-    }
-
-    // TODO: move test
-    func test_launch_binary() throws {
-        // Some of the APIs that we use below are available in macOS 10.13 and above.
-        guard #available(macOS 10.13, *) else {
-            return
-        }
-
-        let binary = productsDirectory.appendingPathComponent("rester")
-        let requestFile = path(for: "basic.yml")!
-
-        let process = Process()
-        process.executableURL = binary
-        process.arguments = [requestFile.string]
-
-        let pipe = Pipe()
-        process.standardOutput = pipe
-
-        #if os(Linux)
-        process.launch()
-        #else
-        try process.run()
-        #endif
-        
-        process.waitUntilExit()
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
-        let status = process.terminationStatus
-
-        XCTAssert(
-            output?.starts(with: "🚀  Resting") ?? false,
-            "output start does not match, was: \(output ?? "")"
-        )
-        XCTAssert(
-            status == 0,
-            "exit status not 0, was: \(status), output: \(output ?? "")"
-        )
     }
 
     func test_post_request_json() throws {

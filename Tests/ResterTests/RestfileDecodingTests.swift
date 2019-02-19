@@ -78,23 +78,13 @@ class RestfileDecodingTests: XCTestCase {
               - nested/basic.yml
               - nested/basic2.yml
         """
-        do {
-            let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
-            let rfs = rest.restfiles
-            XCTAssertEqual(rfs?.count, 3)
-            XCTAssertEqual(rfs?.first?.variables, ["API_URL": "https://httpbin.org"])
-            XCTAssertEqual(rfs?.last?.requests?.map { $0.name }, ["basic2"])
 
-            XCTAssertNil(rest.requests, "top level file has no requests")
-        }
-
-        do {
-            // TODO: more to ResterTests
-            let r = try Rester(yml: s, workDir: workDir)
-            XCTAssertEqual(r.allRequests.count, 2)
-            XCTAssertEqual(r.allVariables, ["API_URL": "https://httpbin.org"])
-            XCTAssertEqual(r.allRequests.map { $0.name }, ["basic", "basic2"])
-        }
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
+        let rfs = rest.restfiles
+        XCTAssertEqual(rfs?.count, 3)
+        XCTAssertEqual(rfs?.first?.variables, ["API_URL": "https://httpbin.org"])
+        XCTAssertEqual(rfs?.last?.requests?.map { $0.name }, ["basic2"])
+        XCTAssertNil(rest.requests, "top level file has no requests")
     }
 
     func test_parse_restfiles_invalid_path() throws {
