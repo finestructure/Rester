@@ -50,3 +50,24 @@ extension ValidationResult: Equatable {
         }
     }
 }
+
+
+class TestConsole: Console {
+    var labels = [String]()
+    var values = [Any]()
+    var verbose: String = ""
+    var error: String = ""
+
+    func display(label: String, value: Any) {
+        labels.append(label)
+        values.append(value)
+    }
+
+    func display(verbose message: String) {
+        self.verbose.append(message + "\n")
+    }
+
+    func display(error: Error) {
+        self.error.append(error.legibleLocalizedDescription + "\n")
+    }
+}

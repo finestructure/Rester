@@ -27,6 +27,7 @@ extension RequestExecutionTests {
       ("test_delete_request", test_delete_request),
       ("test_delay_request", test_delay_request),
       ("test_delay_request_substitution", test_delay_request_substitution),
+      ("test_log_request", test_log_request),
   ]
 }
 extension RequestTests {
