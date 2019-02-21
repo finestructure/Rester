@@ -5,23 +5,22 @@ import Yams
 
 
 public struct Restfile {
-    // TODO: make these non-optional
-    public let variables: [Key: Value]?
-    let requests: [Request]?
-    let restfiles: [Restfile]?
+    public let variables: [Key: Value]
+    let requests: [Request]
+    let restfiles: [Restfile]
 }
 
 
 extension Restfile: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        variables = try? container.decode([Key: Value].self, forKey: .variables)
+        variables = (try? container.decode([Key: Value].self, forKey: .variables)) ?? [:]
 
         let req = try? container.decode(OrderedDict<Request.Name, Request.Details>.self, forKey: .requests)
-        requests = req?.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) }
+        requests = req?.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) } ?? []
 
         let paths = try? container.decode([Path].self, forKey: .restfiles)
-        restfiles = try paths?.map { try Restfile(path: $0) }
+        restfiles = try paths?.map { try Restfile(path: $0) } ?? []
     }
 
     enum CodingKeys: CodingKey {

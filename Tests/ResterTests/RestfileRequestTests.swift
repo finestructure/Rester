@@ -16,7 +16,7 @@ extension String {
 
 extension Restfile {
     public mutating func expandedRequest(_ requestName: String) throws -> Request {
-        guard let req = requests?[requestName]
+        guard let req = requests[requestName]
             else { throw ResterError.noSuchRequest(requestName) }
         let aggregatedVariables = aggregate(variables: variables, from: restfiles)
         return try req.substitute(variables: aggregatedVariables)
@@ -24,7 +24,7 @@ extension Restfile {
 }
 
 
-final class RestfileRequestTests: XCTestCase {
+final class RequestExecutionTests: XCTestCase {
 
     func test_request_execute() throws {
         let s = """
@@ -136,7 +136,7 @@ final class RestfileRequestTests: XCTestCase {
                     switch $0 {
                     case .valid:
                         XCTFail("expected failure but received success")
-                    case let .invalid(message, response: _):
+                    case let .invalid(message, value: _):
                         XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
                         XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
                     }
@@ -157,47 +157,8 @@ final class RestfileRequestTests: XCTestCase {
                 url: http://foo.com
             """
         let rester = try YAMLDecoder().decode(Restfile.self, from: s)
-        let names = rester.requests?.map { $0.name }
+        let names = rester.requests.map { $0.name }
         XCTAssertEqual(names, ["first", "second", "3rd"])
-    }
-
-    // TODO: move test
-    func test_launch_binary() throws {
-        // Some of the APIs that we use below are available in macOS 10.13 and above.
-        guard #available(macOS 10.13, *) else {
-            return
-        }
-
-        let binary = productsDirectory.appendingPathComponent("rester")
-        let requestFile = path(for: "basic.yml")!
-
-        let process = Process()
-        process.executableURL = binary
-        process.arguments = [requestFile.string]
-
-        let pipe = Pipe()
-        process.standardOutput = pipe
-
-        #if os(Linux)
-        process.launch()
-        #else
-        try process.run()
-        #endif
-        
-        process.waitUntilExit()
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
-        let status = process.terminationStatus
-
-        XCTAssert(
-            output?.starts(with: "🚀  Resting") ?? false,
-            "output start does not match, was: \(output ?? "")"
-        )
-        XCTAssert(
-            status == 0,
-            "exit status not 0, was: \(status), output: \(output ?? "")"
-        )
     }
 
     func test_post_request_json() throws {
@@ -409,4 +370,57 @@ final class RestfileRequestTests: XCTestCase {
         XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
+    func test_log_request() throws {
+        let console = TestConsole()
+        Current.console = console
+        let s = """
+            requests:
+              log:
+                url: https://httpbin.org/anything
+                log: true
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("log").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                // confirm the console receives output
+                XCTAssertEqual(console.labels, ["Status", "Headers", "JSON"])
+                XCTAssertEqual(console.values[0] as? Int, 200)
+                XCTAssert("\(console.values[1])".contains("\"Content-Type\": \"application/json\""))
+                XCTAssert("\(console.values[2])".contains("\"method\": \"GET\""))
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_log_request_json_keypath() throws {
+        let console = TestConsole()
+        Current.console = console
+        let s = """
+            requests:
+              log:
+                url: https://httpbin.org/anything
+                log:
+                  - json.headers.Host
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("log").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                // confirm the console receives output
+                // we're expecting the value pulled from the key path `headers.Host` in the json response
+                XCTAssertEqual(console.labels, ["JSON"])
+                XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 500)
+    }
 }

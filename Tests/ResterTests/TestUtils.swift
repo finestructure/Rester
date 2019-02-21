@@ -43,10 +43,31 @@ extension ValidationResult: Equatable {
         switch (lhs, rhs) {
         case (.valid, .valid):
             return true
-        case (.invalid(let x, response: _), .invalid(let y, response: _)):
+        case (.invalid(let x, value: _), .invalid(let y, value: _)):
             return x == y
         default:
             return false
         }
+    }
+}
+
+
+class TestConsole: Console {
+    var labels = [String]()
+    var values = [Any]()
+    var verbose: String = ""
+    var error: String = ""
+
+    func display(label: String, value: Any) {
+        labels.append(label)
+        values.append(value)
+    }
+
+    func display(verbose message: String) {
+        self.verbose.append(message + "\n")
+    }
+
+    func display(error: Error) {
+        self.error.append(error.legibleLocalizedDescription + "\n")
     }
 }

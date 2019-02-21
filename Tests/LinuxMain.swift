@@ -7,6 +7,30 @@ import XCTest
 @testable import ResterTests
 
 // swiftlint:disable trailing_comma
+extension LaunchTests {
+  static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
+      ("test_launch_binary", test_launch_binary),
+  ]
+}
+extension RequestExecutionTests {
+  static var allTests: [(String, (RequestExecutionTests) -> () throws -> Void)] = [
+      ("test_request_execute", test_request_execute),
+      ("test_validate_status", test_validate_status),
+      ("test_validate_json", test_validate_json),
+      ("test_validate_json_regex", test_validate_json_regex),
+      ("test_request_order", test_request_order),
+      ("test_post_request_json", test_post_request_json),
+      ("test_post_request_form", test_post_request_form),
+      ("test_substitute_env", test_substitute_env),
+      ("test_put_request_json", test_put_request_json),
+      ("test_validate_headers", test_validate_headers),
+      ("test_delete_request", test_delete_request),
+      ("test_delay_request", test_delay_request),
+      ("test_delay_request_substitution", test_delay_request_substitution),
+      ("test_log_request", test_log_request),
+      ("test_log_request_json_keypath", test_log_request_json_keypath),
+  ]
+}
 extension RequestTests {
   static var allTests: [(String, (RequestTests) -> () throws -> Void)] = [
       ("test_parse_headers", test_parse_headers),
@@ -15,6 +39,13 @@ extension RequestTests {
       ("test_request_execute_with_query", test_request_execute_with_query),
       ("test_parse_delay", test_parse_delay),
       ("test_delay_substitution", test_delay_substitution),
+      ("test_parse_log", test_parse_log),
+      ("test_parse_log_keypath", test_parse_log_keypath),
+  ]
+}
+extension ResterTests {
+  static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
+      ("test_init", test_init),
   ]
 }
 extension RestfileDecodingTests {
@@ -27,24 +58,6 @@ extension RestfileDecodingTests {
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
       ("test_parse_complex_form", test_parse_complex_form),
-  ]
-}
-extension RestfileRequestTests {
-  static var allTests: [(String, (RestfileRequestTests) -> () throws -> Void)] = [
-      ("test_request_execute", test_request_execute),
-      ("test_validate_status", test_validate_status),
-      ("test_validate_json", test_validate_json),
-      ("test_validate_json_regex", test_validate_json_regex),
-      ("test_request_order", test_request_order),
-      ("test_launch_binary", test_launch_binary),
-      ("test_post_request_json", test_post_request_json),
-      ("test_post_request_form", test_post_request_form),
-      ("test_substitute_env", test_substitute_env),
-      ("test_put_request_json", test_put_request_json),
-      ("test_validate_headers", test_validate_headers),
-      ("test_delete_request", test_delete_request),
-      ("test_delay_request", test_delay_request),
-      ("test_delay_request_substitution", test_delay_request_substitution),
   ]
 }
 extension SubstitutableTests {
@@ -80,9 +93,11 @@ extension ValueTests {
 }
 
 XCTMain([
+  testCase(LaunchTests.allTests),
+  testCase(RequestExecutionTests.allTests),
   testCase(RequestTests.allTests),
+  testCase(ResterTests.allTests),
   testCase(RestfileDecodingTests.allTests),
-  testCase(RestfileRequestTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),

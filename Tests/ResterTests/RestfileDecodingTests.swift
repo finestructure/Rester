@@ -14,8 +14,8 @@ class RestfileDecodingTests: XCTestCase {
               STRING_VALUE: some string value
             """
         let env = try YAMLDecoder().decode(Restfile.self, from: s)
-        XCTAssertEqual(env.variables!["INT_VALUE"], .int(42))
-        XCTAssertEqual(env.variables!["STRING_VALUE"], .string("some string value"))
+        XCTAssertEqual(env.variables["INT_VALUE"], .int(42))
+        XCTAssertEqual(env.variables["STRING_VALUE"], .string("some string value"))
     }
 
     func test_parse_basic() throws {
@@ -30,8 +30,8 @@ class RestfileDecodingTests: XCTestCase {
                   status: 200
             """
         let rest = try YAMLDecoder().decode(Restfile.self, from: s)
-        let variables = rest.variables!
-        let requests = rest.requests!
+        let variables = rest.variables
+        let requests = rest.requests
         let req = try requests["basic"]!.substitute(variables: variables)
         XCTAssertEqual(variables["API_URL"]!, .string("https://httpbin.org"))
         XCTAssertEqual(req.details.url, "https://httpbin.org/anything")
@@ -66,7 +66,7 @@ class RestfileDecodingTests: XCTestCase {
     func test_Restfile_init() throws {
         let workDir = testDataDirectory()!
         let r = try Restfile(path: workDir/"nested/basic.yml")
-        XCTAssertEqual(r.requests?.map { $0.name }, ["basic"])
+        XCTAssertEqual(r.requests.map { $0.name }, ["basic"])
     }
 
     func test_parse_restfiles_basic() throws {
@@ -78,23 +78,13 @@ class RestfileDecodingTests: XCTestCase {
               - nested/basic.yml
               - nested/basic2.yml
         """
-        do {
-            let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
-            let rfs = rest.restfiles
-            XCTAssertEqual(rfs?.count, 3)
-            XCTAssertEqual(rfs?.first?.variables, ["API_URL": "https://httpbin.org"])
-            XCTAssertEqual(rfs?.last?.requests?.map { $0.name }, ["basic2"])
 
-            XCTAssertNil(rest.requests, "top level file has no requests")
-        }
-
-        do {
-            // TODO: more to ResterTests
-            let r = try Rester(yml: s, workDir: workDir)
-            XCTAssertEqual(r.allRequests.count, 2)
-            XCTAssertEqual(r.allVariables, ["API_URL": "https://httpbin.org"])
-            XCTAssertEqual(r.allRequests.map { $0.name }, ["basic", "basic2"])
-        }
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])
+        let rfs = rest.restfiles
+        XCTAssertEqual(rfs.count, 3)
+        XCTAssertEqual(rfs.first?.variables, ["API_URL": "https://httpbin.org"])
+        XCTAssertEqual(rfs.last?.requests.map { $0.name }, ["basic2"])
+        XCTAssert(rest.requests.isEmpty, "top level file has no requests")
     }
 
     func test_parse_restfiles_invalid_path() throws {
@@ -141,26 +131,18 @@ class RestfileDecodingTests: XCTestCase {
                     username: ${email_username}@${email_domain}
                     password: ${password}
             """
-        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
-        guard let variables = rest.variables else {
-            XCTFail("variables must not be nil")
-            return
-        }
-        guard let requests = rest.requests else {
-            XCTFail("requests must not be nil")
-            return
-        }
+        let rf = try YAMLDecoder().decode(Restfile.self, from: s)
 
-        XCTAssertEqual(variables["api_url"], "https://httpbin.org")
-        XCTAssertEqual(variables["client_id"], "8a8099f9-8149-4039-a3fd-59ad69330038")
-        XCTAssertEqual(variables["email_username"], "foo.bar.baz")
-        XCTAssertEqual(variables["email_domain"], "example.com")
-        XCTAssertEqual(variables["password"], "29%x)(+&id28xY%f42cq")
+        XCTAssertEqual(rf.variables["api_url"], "https://httpbin.org")
+        XCTAssertEqual(rf.variables["client_id"], "8a8099f9-8149-4039-a3fd-59ad69330038")
+        XCTAssertEqual(rf.variables["email_username"], "foo.bar.baz")
+        XCTAssertEqual(rf.variables["email_domain"], "example.com")
+        XCTAssertEqual(rf.variables["password"], "29%x)(+&id28xY%f42cq")
 
-        let req = try requests["login"]?.substitute(variables: variables)
+        let req = try rf.requests["login"]?.substitute(variables: rf.variables)
         XCTAssertEqual(req?.details.url, "https://httpbin.org/anything")
 
-        let expandedBody = try req?.body?.substitute(variables: variables)
+        let expandedBody = try req?.body?.substitute(variables: rf.variables)
         XCTAssertEqual(expandedBody?.form?["grant_type"], "password")
         XCTAssertEqual(expandedBody?.form?["scope"], "read:user write:user")
         XCTAssertEqual(expandedBody?.form?["client_id"], "8a8099f9-8149-4039-a3fd-59ad69330038")
