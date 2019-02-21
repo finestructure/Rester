@@ -12,11 +12,12 @@ import Foundation
 
 struct World {
     var environment = ProcessInfo.processInfo.environment
+    var console: Console = DefaultConsole()
 }
 
 
 #if DEBUG
 var Current = World()
 #else
-let Current = World()
+var Current = World()
 #endif

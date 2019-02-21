@@ -27,6 +27,8 @@ extension RequestExecutionTests {
       ("test_delete_request", test_delete_request),
       ("test_delay_request", test_delay_request),
       ("test_delay_request_substitution", test_delay_request_substitution),
+      ("test_log_request", test_log_request),
+      ("test_log_request_json_keypath", test_log_request_json_keypath),
   ]
 }
 extension RequestTests {
@@ -37,6 +39,8 @@ extension RequestTests {
       ("test_request_execute_with_query", test_request_execute_with_query),
       ("test_parse_delay", test_parse_delay),
       ("test_delay_substitution", test_delay_substitution),
+      ("test_parse_log", test_parse_log),
+      ("test_parse_log_keypath", test_parse_log_keypath),
   ]
 }
 extension ResterTests {

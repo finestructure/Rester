@@ -6,3 +6,4 @@ requests:
     method: GET
     validation:
       status: 200
+    log: true

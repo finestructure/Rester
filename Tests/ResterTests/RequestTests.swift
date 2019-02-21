@@ -137,4 +137,43 @@ class RequestTests: XCTestCase {
         }
     }
 
+    func test_parse_log() throws {
+        do {  // true
+            let s = """
+                url: https://httpbin.org/anything
+                log: true
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, .bool(true))
+        }
+        do {  // array
+            let s = """
+                url: https://httpbin.org/anything
+                log:
+                  - status
+                  - headers
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, .array(["status", "headers"]))
+        }
+        do {  // dict
+            let s = """
+                url: https://httpbin.org/anything
+                log: json
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, "json")
+        }
+    }
+
+    func test_parse_log_keypath() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            log:
+              - json.data.property
+        """
+        let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(r.log, .array(["json.data.property"]))
+    }
+
 }

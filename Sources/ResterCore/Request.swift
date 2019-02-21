@@ -25,6 +25,7 @@ public struct Request: Decodable {
         let body: Body?
         let validation: Validation?
         let delay: Value?
+        let log: Value?
     }
 
     let name: Name
@@ -54,6 +55,7 @@ extension Request {
             return 0
         }
     }
+    var log: Value? { return details.log }
 
     var url: URL? {
         var components = URLComponents(string: details.url)
@@ -78,7 +80,9 @@ extension Request: Substitutable {
             query: _query,
             body: _body,
             validation: _validation,
-            delay: _delay)
+            delay: _delay,
+            log: log
+        )
         return Request(name: name, details: _details)
     }
 }
@@ -115,7 +119,12 @@ extension Request {
         return after(seconds: delay)
             .then {
                 URLSession.shared.dataTask(.promise, with: urlRequest)
-            }.map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
+            }.map { Response(data: $0.data, response: $0.response as! HTTPURLResponse)
+
+            }.map { response in
+                if let value = self.log { print(value: value, of: response) }
+                return response
+        }
     }
 
     public func test() throws -> Promise<ValidationResult> {
@@ -155,3 +164,32 @@ extension Array where Element == Request {
         return first(where: { $0.name == requestName } )
     }
 }
+
+
+func print(value: Value, of response: Response) {
+    switch value {
+    case .bool(true):
+        ["status", "headers", "json"].forEach { print(value: $0, of: response) }
+    case .string("status"):
+        Current.console.display(label: "Status", value: response.status)
+    case .string("headers"):
+        Current.console.display(label: "Headers", value: response.headers)
+    case let .string(string) where string.starts(with: "json."):
+        let keyPath = string.deletingPrefix("json.")
+        if let json = response.json, let value = json[keyPath] {
+            Current.console.display(label: "JSON", value: value)
+        }
+    case .string("json"):
+        if let json = response.json {
+            Current.console.display(label: "JSON", value: json)
+        }
+    case let .array(array) where !array.isEmpty:
+        for item in array {
+            print(value: item, of: response)
+        }
+    default:
+        break
+    }
+}
+
+
