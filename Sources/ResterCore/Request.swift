@@ -169,18 +169,14 @@ extension Array where Element == Request {
 func print(value: Value, of response: Response) {
     switch value {
     case .bool(true):
-        print("Status:", response.status)
-        print("Headers:", response.headers)
-        if let json = response.json {
-            print("Content (json):", json)
-        }
+        ["status", "headers", "json"].forEach { print(value: $0, of: response) }
     case .string("status"):
-        print("Status:", response.status)
+        Current.console.display(label: "Status", value: response.status)
     case .string("headers"):
-        print("Headers:", response.headers)
+        Current.console.display(label: "Headers", value: response.headers)
     case .string("json"):
         if let json = response.json {
-            print("Content (json):", json)
+            Current.console.display(label: "JSON", value: json)
         }
     case let .array(array) where !array.isEmpty:
         for item in array {
@@ -190,3 +186,5 @@ func print(value: Value, of response: Response) {
         break
     }
 }
+
+

@@ -12,6 +12,7 @@ import Foundation
 
 struct World {
     var environment = ProcessInfo.processInfo.environment
+    var console = DefaultConsole()
 }
 
 
