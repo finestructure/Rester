@@ -166,4 +166,14 @@ class RequestTests: XCTestCase {
         }
     }
 
+    func test_parse_log_keypath() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            log:
+              - json.data.property
+        """
+        let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(r.log, .array(["json.data.property"]))
+    }
+
 }

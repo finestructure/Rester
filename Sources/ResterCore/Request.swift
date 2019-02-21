@@ -174,6 +174,11 @@ func print(value: Value, of response: Response) {
         Current.console.display(label: "Status", value: response.status)
     case .string("headers"):
         Current.console.display(label: "Headers", value: response.headers)
+    case let .string(string) where string.starts(with: "json."):
+        let keyPath = string.deletingPrefix("json.")
+        if let json = response.json, let value = json[keyPath] {
+            Current.console.display(label: "JSON", value: value)
+        }
     case .string("json"):
         if let json = response.json {
             Current.console.display(label: "JSON", value: json)

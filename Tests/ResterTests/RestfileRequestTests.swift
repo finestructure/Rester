@@ -396,4 +396,31 @@ final class RequestExecutionTests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
+
+    func test_log_request_json_keypath() throws {
+        let console = TestConsole()
+        Current.console = console
+        let s = """
+            requests:
+              log:
+                url: https://httpbin.org/anything
+                log:
+                  - json.headers.Host
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("log").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                // confirm the console receives output
+                // we're expecting the value pulled from the key path `headers.Host` in the json response
+                XCTAssertEqual(console.labels, ["JSON"])
+                XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 500)
+    }
 }
