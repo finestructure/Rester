@@ -19,5 +19,5 @@ struct World {
 #if DEBUG
 var Current = World()
 #else
-let Current = World()
+var Current = World()
 #endif
