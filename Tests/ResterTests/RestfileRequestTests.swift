@@ -52,7 +52,7 @@ final class RequestExecutionTests: XCTestCase {
                 expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_validate_status() throws {
@@ -66,7 +66,7 @@ final class RequestExecutionTests: XCTestCase {
                     XCTAssertEqual(result, ValidationResult.valid)
                     expectation.fulfill()
             }
-            waitForExpectations(timeout: 10)
+            waitForExpectations(timeout: 5)
         }
 
         do {
@@ -76,7 +76,7 @@ final class RequestExecutionTests: XCTestCase {
                     XCTAssertEqual(result, .init(invalid: "status invalid: (200) is not equal to (500)"))
                     expectation.fulfill()
             }
-            waitForExpectations(timeout: 10)
+            waitForExpectations(timeout: 5)
         }
     }
 
@@ -91,7 +91,7 @@ final class RequestExecutionTests: XCTestCase {
                     XCTAssertEqual($0, ValidationResult.valid)
                     expectation.fulfill()
             }
-            waitForExpectations(timeout: 10)
+            waitForExpectations(timeout: 5)
         }
 
         do {
@@ -101,7 +101,7 @@ final class RequestExecutionTests: XCTestCase {
                     XCTAssertEqual($0, .init(invalid: "json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
                     expectation.fulfill()
             }
-            waitForExpectations(timeout: 10)
+            waitForExpectations(timeout: 5)
         }
 
         do {
@@ -111,7 +111,7 @@ final class RequestExecutionTests: XCTestCase {
                     XCTAssertEqual($0, .init(invalid: "json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
                     expectation.fulfill()
             }
-            waitForExpectations(timeout: 10)
+            waitForExpectations(timeout: 5)
         }
     }
 
@@ -126,7 +126,7 @@ final class RequestExecutionTests: XCTestCase {
                     XCTAssertEqual($0, ValidationResult.valid)
                     expectation.fulfill()
             }
-            waitForExpectations(timeout: 10)
+            waitForExpectations(timeout: 5)
         }
 
         do {
@@ -142,7 +142,7 @@ final class RequestExecutionTests: XCTestCase {
                     }
                     expectation.fulfill()
             }
-            waitForExpectations(timeout: 10)
+            waitForExpectations(timeout: 5)
         }
     }
 
@@ -184,7 +184,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_post_request_form() throws {
@@ -210,7 +210,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_substitute_env() throws {
@@ -245,7 +245,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_put_request_json() throws {
@@ -271,7 +271,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_validate_headers() throws {
@@ -294,7 +294,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_delete_request() throws {
@@ -315,7 +315,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_delay_request() throws {
@@ -338,7 +338,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
         let elapsed = Date().timeIntervalSince(start)
         XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
@@ -365,7 +365,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
         let elapsed = Date().timeIntervalSince(start)
         XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
@@ -394,7 +394,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_log_request_json_keypath() throws {
@@ -496,7 +496,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
 }

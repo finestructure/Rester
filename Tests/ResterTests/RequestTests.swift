@@ -47,7 +47,7 @@ class RequestTests: XCTestCase {
                 expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_parse_query() throws {
@@ -84,7 +84,7 @@ class RequestTests: XCTestCase {
                 expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 5)
     }
 
     func test_parse_delay() throws {
