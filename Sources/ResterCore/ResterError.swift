@@ -7,6 +7,7 @@
 
 import Foundation
 import LegibleError
+import Rainbow
 
 
 public enum ResterError: LocalizedError {
@@ -16,6 +17,7 @@ public enum ResterError: LocalizedError {
     case noSuchRequest(String)
     case fileNotFound(String)
     case internalError(String)
+    case timeout(requestName: String)
 
     public var localizedDescription: String {
         switch self {
@@ -31,6 +33,8 @@ public enum ResterError: LocalizedError {
             return "file not found: \(file)"
         case .internalError(let msg):
             return "internal error: \(msg)"
+        case .timeout(let name):
+            return "request timed out: \(name.blue)"
         }
     }
 

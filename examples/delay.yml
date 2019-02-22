@@ -1,0 +1,19 @@
+variables:
+  API_URL: https://httpbin.org
+requests:
+  # will time out with message: ❌  Error: request timed out: timeout
+  timeout:
+    url: ${API_URL}/delay/10
+    method: GET
+    validation:
+      status: 200
+  passes_1:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      status: 200
+  passes_2:
+    url: ${API_URL}/anything
+    method: GET
+    validation:
+      status: 200

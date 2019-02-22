@@ -414,13 +414,124 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 // confirm the console receives output
                 // we're expecting the value pulled from the key path `headers.Host` in the json response
-                XCTAssertEqual(console.labels, ["JSON"])
+                XCTAssertEqual(console.labels, ["headers.Host"])
                 XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 500)
+        waitForExpectations(timeout: 5)
     }
+
+    func test_response_array_validation() throws {
+        let s = """
+            requests:
+              post-array:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    values:
+                      - a
+                      - 42
+                      - c
+                validation:
+                  status: 200
+                  json:
+                    json:  # what we post is returned as {"json": {"values": ...}}
+                      values:
+                        0: a
+                        1: 42
+                        -1: c
+                        -2: 42
+                        1: .regex(\\d+)
+            """
+        let r = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = r.test(before: {_ in }, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTAssertEqual(results.count, 1)
+                XCTAssertEqual(results[0].name, "post-array")
+                XCTAssertEqual(results[0].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_response_variable() throws {
+        // Tests references a value from a previous request's response
+        let s = """
+            requests:
+              post-array:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    values:
+                      - a
+                      - 42
+                      - c
+              reference:
+                url: https://httpbin.org/anything/${post-array.json.values.1}  # sending 42
+                validation:
+                  status: 200
+                  json:  # url is mirrored back in json response
+                    url: https://httpbin.org/anything/42
+            """
+        let r = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = r.test(before: {_ in }, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].name, "post-array")
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].name, "reference")
+                XCTAssertEqual(results[1].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_timeout_error() throws {
+        let console = TestConsole()
+        Current.console = console
+        let s = """
+            requests:
+              # will time out with message: ❌  Error: request timed out: timeout
+              timeout:
+                url: https://httpbin.org/delay/10
+                method: GET
+                validation:
+                  status: 200
+              passes_1:
+                url: https://httpbin.org/anything
+                method: GET
+                validation:
+                  status: 200
+              passes_2:
+                url: https://httpbin.org/anything
+                method: GET
+                validation:
+                  status: 200
+            """
+        let r = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = r.test(before: {_ in }, after: { (name: $0, result: $1) }, timeout: 0.1)
+            .done { _ in
+                XCTFail("expected timeout to be raised")
+                expectation.fulfill()
+            }.catch {
+                XCTAssertEqual($0.legibleLocalizedDescription, "request timed out: timeout")
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 10)
+    }
+
 }

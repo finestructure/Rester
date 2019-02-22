@@ -226,4 +226,10 @@ class ValueTests: XCTestCase {
         XCTAssertEqual(try value.substitute(variables: response), "bar")
     }
 
+    func test_array_indexing() throws {
+        let a: Value = .array(["a", 42, "z"])
+        XCTAssertEqual(a[0], "a")
+        XCTAssertEqual(a[-1], "z")
+        XCTAssertEqual(a[1], a[-2])
+    }
 }

@@ -215,8 +215,8 @@ extension Value {
         switch (self, Int(firstKeyPath)) {
         case let (.dictionary(d), nil):
             nested = d[firstKeyPath]
-        case let (.array(a), .some(index)):
-            nested = a[index]
+        case let (.array, .some(index)):
+            nested = self[index]
         default:
             return nil
         }
@@ -227,7 +227,9 @@ extension Value {
     subscript(index: Int) -> Value? {
         switch self {
         case .array(let v):
-            return v[index]
+            return index >= 0
+                ? v[index]
+                : v[v.index(v.endIndex, offsetBy: index)]  // from end
         default:
             return nil
         }

@@ -37,6 +37,27 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(req.details.url, "https://httpbin.org/anything")
     }
 
+    func test_parse_request_order() throws {
+        let s = """
+            requests:
+              r_3:
+                url: https://httpbin.org/anything
+              r_2:
+                url: https://httpbin.org/anything
+              r_1:
+                url: https://httpbin.org/anything
+              r_a:
+                url: https://httpbin.org/anything
+              r_b:
+                url: https://httpbin.org/anything
+              r_c:
+                url: https://httpbin.org/anything
+            """
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
+        let names = rest.requests.map { $0.name }
+        XCTAssertEqual(names, ["r_3", "r_2", "r_1", "r_a", "r_b", "r_c"])
+    }
+
     func test_parse_body_json() throws {
         struct Test: Decodable {
             let body: Body

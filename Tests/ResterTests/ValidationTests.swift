@@ -74,14 +74,17 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(try Matcher(200).validate("foo"), .init(invalid: "(\"foo\") is not equal to (200)"))
         XCTAssertEqual(try Matcher(200).validate("200"), .init(invalid: "(\"200\") is not equal to (200)"))
 
-        XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo42"), .valid)
-        XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo"), .init(invalid: "(foo) does not match (\\d\\d)"))
-
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar"]), .valid)
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["nope": "-"]), .init(invalid: "key \'foo\' not found in \'[\"nope\": \"-\"]\'"))
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "-"]), .init(invalid: "key \'foo\' validation error: (\"-\") is not equal to (\"bar\")"))
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "extra": "value"]), .valid)
         XCTAssertEqual(try Matcher(["foo": "bar"]).validate(["foo": "bar", "mixed_type": 1]), .valid)
+    }
+
+    func test_validate_regex() throws {
+        XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo42"), .valid)
+        XCTAssertEqual(try Matcher(".regex(\\d\\d)").validate("foo"), .init(invalid: "(\"foo\") does not match (\\d\\d)"))
+        XCTAssertEqual(try Matcher(".regex(\\d+)").validate("15698703"), .valid)
     }
 
     func test_parse_json_array() throws {
