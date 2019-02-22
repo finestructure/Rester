@@ -76,6 +76,7 @@ extension ValidationTests {
       ("test_convertMatcher", test_convertMatcher),
       ("test_parse_Validation", test_parse_Validation),
       ("test_validate", test_validate),
+      ("test_validate_regex", test_validate_regex),
       ("test_parse_json_array", test_parse_json_array),
       ("test_validate_json_array", test_validate_json_array),
       ("test_Matcher_substitute", test_Matcher_substitute),
@@ -94,6 +95,7 @@ extension ValueTests {
       ("test_key_lookup", test_key_lookup),
       ("test_key_lookup_nested", test_key_lookup_nested),
       ("test_key_substitution", test_key_substitution),
+      ("test_array_indexing", test_array_indexing),
   ]
 }
 

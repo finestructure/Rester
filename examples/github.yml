@@ -7,9 +7,9 @@ requests:
       status: 200
       json:
         0:
-          id: '15698703'
+          id: .regex(\d+)
         -1:
-          id: '15181055'
+          id: 15181055
     log:
       - json.0.id
   latest_release:

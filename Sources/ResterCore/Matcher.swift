@@ -48,8 +48,8 @@ extension Matcher {
             return expected == value
                 ? .valid
                 : .init(invalid: "(\(value)) is not equal to (\(expected))")
-        case let (.regex(expected), .string(value)):
-            return expected ~= value
+        case let (.regex(expected), _):
+            return expected ~= value.string
                 ? .valid
                 : .init(invalid: "(\(value)) does not match (\(expected.pattern))")
         case let (.contains(expected), .dictionary(dict)):
