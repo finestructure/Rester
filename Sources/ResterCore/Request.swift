@@ -13,6 +13,8 @@ import Regex
 
 
 public struct Request: Decodable {
+    public static let defaultTimeout: TimeInterval = 5
+
     public typealias Name = String
     typealias Headers = [Key: Value]
     typealias QueryParameters = [Key: Value]
@@ -89,7 +91,11 @@ extension Request: Substitutable {
 
 
 extension Request {
-    public func execute(debug: Bool = false) throws -> Promise<Response> {
+    public func execute(
+        timeout: TimeInterval = Request.defaultTimeout,
+        debug: Bool = false
+        ) throws -> Promise<Response> {
+
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
@@ -116,11 +122,23 @@ extension Request {
             urlRequest.addValue($0.value.string, forHTTPHeaderField: $0.key)
         }
 
-        return after(seconds: delay)
-            .then {
-                URLSession.shared.dataTask(.promise, with: urlRequest)
-            }.map { Response(data: $0.data, response: $0.response as! HTTPURLResponse)
+        let request = after(seconds: delay)
+            .then { URLSession.shared.dataTask(.promise, with: urlRequest) }
+            .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
+            .map { Result<Response>.fulfilled($0) }
 
+        let timeout: Promise<Result<Response>> = after(seconds: delay + timeout).map { _ in
+            .rejected(ResterError.timeout(requestName: self.name))
+        }
+
+        return race(request, timeout)
+            .map { winner -> Response in
+                switch winner {
+                case .fulfilled(let result):
+                    return result
+                case .rejected(let error):
+                    throw error
+                }
             }.map { response in
                 if let value = self.log { print(value: value, of: response) }
                 return response
