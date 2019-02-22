@@ -1,0 +1,20 @@
+variables:
+  BASE_URL: https://api.github.com/repos/finestructure/Rester
+requests:
+  releases:
+    url: ${BASE_URL}/releases
+    validation:
+      status: 200
+      json:
+        0:
+          id: '15698703'
+        -1:
+          id: '15181055'
+    log:
+      - json.0.id
+  latest_release:
+    url: ${BASE_URL}/releases/${releases.0.id}
+    validation:
+      status: 200
+    log:
+      - json

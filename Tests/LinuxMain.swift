@@ -7,6 +7,11 @@ import XCTest
 @testable import ResterTests
 
 // swiftlint:disable trailing_comma
+extension GithubTests {
+  static var allTests: [(String, (GithubTests) -> () throws -> Void)] = [
+      ("test_response_variable", test_response_variable),
+  ]
+}
 extension LaunchTests {
   static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
       ("test_launch_binary", test_launch_binary),
@@ -93,6 +98,7 @@ extension ValueTests {
 }
 
 XCTMain([
+  testCase(GithubTests.allTests),
   testCase(LaunchTests.allTests),
   testCase(RequestExecutionTests.allTests),
   testCase(RequestTests.allTests),
