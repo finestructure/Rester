@@ -37,7 +37,7 @@ class GithubTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 5)
+        waitForExpectations(timeout: 10)
     }
 
     func test_negative_index() throws {
@@ -63,7 +63,7 @@ class GithubTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 5)
+        waitForExpectations(timeout: 10)
     }
 
     func test_response_variable() throws {
