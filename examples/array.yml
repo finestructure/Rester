@@ -1,0 +1,30 @@
+requests:
+  post-array:
+    url: https://httpbin.org/anything
+    method: POST
+    body:
+      json:
+        values:
+          - a
+          - 42
+          - c
+    validation:
+      status: 200
+      json:
+        json:  # what we post is returned as {"json": {"values": ...}}
+          values:
+            0: a
+            1: 42
+            -1: c
+            -2: 42
+    log:
+      - json
+
+  reference:
+    url: https://httpbin.org/anything/${post-array.json.values.1}  # sending 42
+    validation:
+      status: 200
+      json:  # url is mirrored back in json response
+        url: https://httpbin.org/anything/42
+    log:
+      - json
