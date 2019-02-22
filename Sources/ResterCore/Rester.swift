@@ -41,7 +41,12 @@ extension Rester {
 
 
 extension Rester {
-    public func test<T>(before: @escaping (Request.Name) -> (), after: @escaping (Request.Name, ValidationResult) -> T) -> Promise<[T]> {
+    public func test<T>(
+        before: @escaping (Request.Name) -> (),
+        after: @escaping (Request.Name, ValidationResult) -> T,
+        timeout: TimeInterval = Request.defaultTimeout
+        ) -> Promise<[T]> {
+
         var results = [T]()
         var jsonResponses = [Key: Value]()
         var chain = Promise()
@@ -51,7 +56,7 @@ extension Rester {
                 let variables = self.allVariables.merging(jsonResponses, strategy: .lastWins)
                 let resolved = try req.substitute(variables: variables)
                 return try resolved
-                    .execute()
+                    .execute(timeout: timeout)
                     .map { response -> ValidationResult in
                         if let json = response.json {
                             jsonResponses[req.name] = json
