@@ -9,6 +9,8 @@ import XCTest
 // swiftlint:disable trailing_comma
 extension GithubTests {
   static var allTests: [(String, (GithubTests) -> () throws -> Void)] = [
+      ("test_response_array_validation", test_response_array_validation),
+      ("test_negative_index", test_negative_index),
       ("test_response_variable", test_response_variable),
   ]
 }
