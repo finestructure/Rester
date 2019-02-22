@@ -177,7 +177,7 @@ func print(value: Value, of response: Response) {
     case let .string(string) where string.starts(with: "json."):
         let keyPath = string.deletingPrefix("json.")
         if let json = response.json, let value = json[keyPath] {
-            Current.console.display(label: "JSON", value: value)
+            Current.console.display(label: keyPath, value: value)
         }
     case .string("json"):
         if let json = response.json {

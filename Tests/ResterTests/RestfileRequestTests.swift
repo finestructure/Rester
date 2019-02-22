@@ -414,7 +414,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 // confirm the console receives output
                 // we're expecting the value pulled from the key path `headers.Host` in the json response
-                XCTAssertEqual(console.labels, ["JSON"])
+                XCTAssertEqual(console.labels, ["headers.Host"])
                 XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
                 expectation.fulfill()
             }.catch {
