@@ -7,6 +7,13 @@ import XCTest
 @testable import ResterTests
 
 // swiftlint:disable trailing_comma
+extension GithubTests {
+  static var allTests: [(String, (GithubTests) -> () throws -> Void)] = [
+      ("test_response_array_validation", test_response_array_validation),
+      ("test_negative_index", test_negative_index),
+      ("test_response_variable", test_response_variable),
+  ]
+}
 extension LaunchTests {
   static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
       ("test_launch_binary", test_launch_binary),
@@ -52,6 +59,7 @@ extension RestfileDecodingTests {
   static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
+      ("test_parse_request_order", test_parse_request_order),
       ("test_parse_body_json", test_parse_body_json),
       ("test_parse_body_form", test_parse_body_form),
       ("test_Restfile_init", test_Restfile_init),
@@ -71,6 +79,7 @@ extension ValidationTests {
       ("test_convertMatcher", test_convertMatcher),
       ("test_parse_Validation", test_parse_Validation),
       ("test_validate", test_validate),
+      ("test_validate_regex", test_validate_regex),
       ("test_parse_json_array", test_parse_json_array),
       ("test_validate_json_array", test_validate_json_array),
       ("test_Matcher_substitute", test_Matcher_substitute),
@@ -89,10 +98,12 @@ extension ValueTests {
       ("test_key_lookup", test_key_lookup),
       ("test_key_lookup_nested", test_key_lookup_nested),
       ("test_key_substitution", test_key_substitution),
+      ("test_array_indexing", test_array_indexing),
   ]
 }
 
 XCTMain([
+  testCase(GithubTests.allTests),
   testCase(LaunchTests.allTests),
   testCase(RequestExecutionTests.allTests),
   testCase(RequestTests.allTests),
