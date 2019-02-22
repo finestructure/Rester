@@ -90,9 +90,9 @@ let main = command(
         exit(1)
     }
 
-    wait(timeout: TimeInterval(rester.requestCount * 5)) { results.isFulfilled }
+    wait(timeout: Request.timeout * TimeInterval(rester.requestCount)) { results.isFulfilled }
     if !results.isFulfilled {
-        print("❌  Error: request timed out\n")
+        print("❌  Error: Rester timed out\n")
         exit(1)
     }
 
