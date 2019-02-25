@@ -25,3 +25,9 @@ test-all: test-linux test-macos
 
 magic:
 	sourcery   --templates ./.sourcery   --sources Tests   --args testimports='@testable import '"ResterTests"   --output Tests/LinuxMain.swift
+
+release-macos:
+	swift build --static-swift-stdlib -c release
+
+release-linux: docker-build
+	docker run --rm -v $(PWD):/host -w /host rester swift build --static-swift-stdlib -c release
