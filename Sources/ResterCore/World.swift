@@ -16,8 +16,4 @@ struct World {
 }
 
 
-#if DEBUG
 var Current = World()
-#else
-var Current = World()
-#endif

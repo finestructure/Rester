@@ -122,6 +122,10 @@ extension Request {
             urlRequest.addValue($0.value.string, forHTTPHeaderField: $0.key)
         }
 
+        if delay > 0 {
+            Current.console.display(verbose: "Delaying for \(delay)s")
+        }
+
         let request = after(seconds: delay)
             .then { URLSession.shared.dataTask(.promise, with: urlRequest) }
             .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }

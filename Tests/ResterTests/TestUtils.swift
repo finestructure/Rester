@@ -55,7 +55,7 @@ extension ValidationResult: Equatable {
 class TestConsole: Console {
     var labels = [String]()
     var values = [Any]()
-    var verbose: String = ""
+    var verbose = [String]()
     var error: String = ""
 
     func display(label: String, value: Any) {
@@ -64,7 +64,7 @@ class TestConsole: Console {
     }
 
     func display(verbose message: String) {
-        self.verbose.append(message + "\n")
+        self.verbose.append(message)
     }
 
     func display(error: Error) {
