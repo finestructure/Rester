@@ -319,6 +319,8 @@ final class RequestExecutionTests: XCTestCase {
     }
 
     func test_delay_request() throws {
+        let console = TestConsole()
+        Current.console = console
         let s = """
             requests:
               delay:
@@ -333,6 +335,7 @@ final class RequestExecutionTests: XCTestCase {
         _ = try rester.expandedRequest("delay").test()
             .map {
                 XCTAssertEqual($0, ValidationResult.valid)
+                XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -345,6 +348,8 @@ final class RequestExecutionTests: XCTestCase {
 
     func test_delay_request_substitution() throws {
         Current.environment = ["DELAY": "2"]
+        let console = TestConsole()
+        Current.console = console
         let s = """
             requests:
               delay:
@@ -360,6 +365,7 @@ final class RequestExecutionTests: XCTestCase {
             .done { results in
                 XCTAssertEqual(results.count, 1)
                 XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
