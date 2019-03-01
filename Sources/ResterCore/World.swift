@@ -10,10 +10,10 @@
 import Foundation
 
 
-struct World {
-    var environment = ProcessInfo.processInfo.environment
-    var console: Console = DefaultConsole()
+public struct World {
+    public var environment = ProcessInfo.processInfo.environment
+    public var console: Console = DefaultConsole()
 }
 
 
-var Current = World()
+public var Current = World()
