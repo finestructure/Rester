@@ -10,6 +10,7 @@ import XCTest
 extension LaunchTests {
   static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
       ("test_launch_binary", test_launch_binary),
+      ("test_launch_binary_verbose", test_launch_binary_verbose),
   ]
 }
 extension RequestExecutionTests {
