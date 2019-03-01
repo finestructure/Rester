@@ -10,13 +10,5 @@ import Foundation
 
 public enum ValidationResult {
     case valid
-    case invalid(_ message: String, value: Value?)
-}
-
-
-extension ValidationResult {
-    // TODO: remove once enums support default values https://github.com/apple/swift/pull/21381
-    init(invalid message: String, value: Value? = nil) {
-        self = .invalid(message, value: value)
-    }
+    case invalid(_ message: String)
 }

@@ -162,23 +162,23 @@ extension Request {
     public func validate(_ response: Response) -> ValidationResult {
         if
             let status = validation?.status,
-            case let .invalid(msg, _) = status.validate(Value.int(response.status)) {
-            return .invalid("status invalid: \(msg)", value: response.json)
+            case let .invalid(msg) = status.validate(Value.int(response.status)) {
+            return .invalid("status invalid: \(msg)")
         }
 
         if
             let headers = validation?.headers,
-            case let .invalid(msg, _) = headers.validate(Value.dictionary(response.headers)) {
-            return .invalid("status invalid: \(msg)", value: response.json)
+            case let .invalid(msg) = headers.validate(Value.dictionary(response.headers)) {
+            return .invalid("status invalid: \(msg)")
         }
 
         if let jsonMatcher = validation?.json {
             if let json = response.json {
-                if case let .invalid(msg, _) = jsonMatcher.validate(json) {
-                    return .invalid("json invalid: \(msg)", value: response.json)
+                if case let .invalid(msg) = jsonMatcher.validate(json) {
+                    return .invalid("json invalid: \(msg)")
                 }
             } else {
-                return .invalid("failed to decode JSON object from response", value: response.json)
+                return .invalid("failed to decode JSON object from response")
             }
         }
         

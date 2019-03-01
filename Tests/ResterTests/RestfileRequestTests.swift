@@ -73,7 +73,7 @@ final class RequestExecutionTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try r.expandedRequest("status-failure").test()
                 .map { result in
-                    XCTAssertEqual(result, .init(invalid: "status invalid: (200) is not equal to (500)"))
+                    XCTAssertEqual(result, .invalid("status invalid: (200) is not equal to (500)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -98,7 +98,7 @@ final class RequestExecutionTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure").test()
                 .map {
-                    XCTAssertEqual($0, .init(invalid: "json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
+                    XCTAssertEqual($0, .invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -108,7 +108,7 @@ final class RequestExecutionTests: XCTestCase {
             let expectation = self.expectation(description: #function)
             _ = try rester.expandedRequest("json-failure-type").test()
                 .map {
-                    XCTAssertEqual($0, .init(invalid: "json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
+                    XCTAssertEqual($0, .invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
                     expectation.fulfill()
             }
             waitForExpectations(timeout: 5)
@@ -136,7 +136,7 @@ final class RequestExecutionTests: XCTestCase {
                     switch $0 {
                     case .valid:
                         XCTFail("expected failure but received success")
-                    case let .invalid(message, value: _):
+                    case let .invalid(message):
                         XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
                         XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
                     }
