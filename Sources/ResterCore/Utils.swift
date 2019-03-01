@@ -57,3 +57,11 @@ public func getWorkDir(input: String) -> Path? {
     // take is as relative path
     return Path.cwd/input
 }
+
+
+public func format(_ timeInterval: TimeInterval) -> String? {
+    let formatter = NumberFormatter()
+    formatter.positiveFormat = "###0.###"
+    formatter.roundingMode = .halfUp
+    return formatter.string(from: NSNumber(value: timeInterval))
+}

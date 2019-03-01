@@ -65,20 +65,16 @@ let main = command(
     // TODO: clean up this call (delegate protocol instead?)
     let results = rester.test(before: { name in
         print("🎬  \(name.blue) started ...\n")
-    }, after: { name, result -> Bool in
+    }, after: { name, response, result -> Bool in
         switch result {
         case .valid:
-            print("✅  \(name.blue) \("PASSED".green.bold)\n")
+            let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
+            print("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
             return true
-        case let .invalid(message, value: response):
+        case let .invalid(message):
             if verbose {
-                if let response = response {
-                    debugPrint("Response was:")
-                    debugPrint("\(response)")
-                } else {
-                    debugPrint("Response was nil")
-                }
-                print("")
+                debugPrint("Response was:")
+                debugPrint("\(response)\n")
             }
             print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
             return false

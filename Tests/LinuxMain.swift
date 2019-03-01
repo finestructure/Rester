@@ -9,6 +9,7 @@ import XCTest
 // swiftlint:disable trailing_comma
 extension LaunchTests {
   static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
+      ("test_mask_time", test_mask_time),
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
   ]

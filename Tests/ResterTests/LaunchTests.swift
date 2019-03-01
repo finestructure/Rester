@@ -6,11 +6,24 @@
 //
 
 import XCTest
+import Regex
+
 
 @testable import ResterCore
 
 
+func maskTime(_ string: String) throws -> String {
+    let regex = try Regex(pattern: "\\(\\d+\\.\\d+s\\)")
+    return regex.replaceAll(in: string, with: "(X.XXXs)")
+}
+
+
 class LaunchTests: XCTestCase {
+
+    func test_mask_time() throws {
+        let s = "basic PASSED (0.01s)"
+        XCTAssertEqual(try maskTime(s), "basic PASSED (X.XXXs)")
+    }
 
     func test_launch_binary() throws {
         // Some of the APIs that we use below are available in macOS 10.13 and above.
@@ -37,7 +50,7 @@ class LaunchTests: XCTestCase {
         process.waitUntilExit()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8) ?? "no output"
+        let output = try maskTime(String(data: data, encoding: .utf8) ?? "no output")
         let status = process.terminationStatus
 
         XCTAssert(
@@ -50,7 +63,7 @@ class LaunchTests: XCTestCase {
 
             🎬  basic started ...
 
-            ✅  basic PASSED
+            ✅  basic PASSED (X.XXXs)
 
             Executed 1 tests, with 0 failures
 
@@ -85,7 +98,7 @@ class LaunchTests: XCTestCase {
         process.waitUntilExit()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8) ?? "no output"
+        let output = try maskTime(String(data: data, encoding: .utf8) ?? "no output")
         let status = process.terminationStatus
 
         XCTAssert(
@@ -106,7 +119,7 @@ class LaunchTests: XCTestCase {
 
         🎬  basic started ...
 
-        ✅  basic PASSED
+        ✅  basic PASSED (X.XXXs)
 
         Executed 1 tests, with 0 failures
 
