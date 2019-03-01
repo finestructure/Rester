@@ -43,7 +43,7 @@ extension ValidationResult: Equatable {
         switch (lhs, rhs) {
         case (.valid, .valid):
             return true
-        case (.invalid(let x, value: _), .invalid(let y, value: _)):
+        case (.invalid(let x), .invalid(let y)):
             return x == y
         default:
             return false
@@ -69,5 +69,21 @@ class TestConsole: Console {
 
     func display(error: Error) {
         self.error.append(error.legibleLocalizedDescription + "\n")
+    }
+}
+
+
+struct PlainConsole: Console {
+    mutating func display(label: String, value: Any) {
+        let msg = "\(label):" + " \(value)"
+        print(msg, terminator: "\n\n")
+    }
+
+    mutating func display(verbose message: String) {
+        print(message)
+    }
+
+    mutating func display(error: Error) {
+        print("❌  Error: \(error.legibleLocalizedDescription)")
     }
 }

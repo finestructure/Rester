@@ -43,7 +43,7 @@ extension Rester {
 extension Rester {
     public func test<T>(
         before: @escaping (Request.Name) -> (),
-        after: @escaping (Request.Name, ValidationResult) -> T,
+        after: @escaping (Request.Name, Response, ValidationResult) -> T,
         timeout: TimeInterval = Request.defaultTimeout
         ) -> Promise<[T]> {
 
@@ -57,13 +57,13 @@ extension Rester {
                 let resolved = try req.substitute(variables: variables)
                 return try resolved
                     .execute(timeout: timeout)
-                    .map { response -> ValidationResult in
+                    .map { response -> (Response, ValidationResult) in
                         if let json = response.json {
                             jsonResponses[req.name] = json
                         }
-                        return resolved.validate(response)
-                    }.map { result in
-                        let res = after(req.name, result)
+                        return (response, resolved.validate(response))
+                    }.map { response, result in
+                        let res = after(req.name, response, result)
                         results.append(res)
                 }
             }

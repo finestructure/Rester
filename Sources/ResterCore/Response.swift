@@ -9,6 +9,7 @@ import Foundation
 
 
 public struct Response: Equatable {
+    public let elapsed: TimeInterval
     let data: Data
     let response: HTTPURLResponse
 

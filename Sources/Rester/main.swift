@@ -21,8 +21,9 @@ func display(_ error: Error) {
 let main = command(
     Argument<String>("filename", description: "A Restfile"),
     Flag("verbose", flag: "v", description: "Verbose output"),
-    Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)")
-) { filename, verbose, wdir in
+    Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
+    Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout")
+) { filename, verbose, wdir, timeout in
 
     print("🚀  Resting \(filename.bold) ...\n")
 
@@ -32,6 +33,10 @@ let main = command(
     if verbose {
         debugPrint("Restfile path: \(restfilePath)")
         debugPrint("Working directory: \(workDir)\n")
+    }
+
+    if timeout != Request.defaultTimeout {
+        Current.console.display(verbose: "Request timeout: \(timeout)s\n")
     }
 
     let rester: Rester
@@ -57,33 +62,32 @@ let main = command(
         exit(0)
     }
 
+    // TODO: clean up this call (delegate protocol instead?)
     let results = rester.test(before: { name in
         print("🎬  \(name.blue) started ...\n")
-    }, after: { name, result -> Bool in
+    }, after: { name, response, result -> Bool in
         switch result {
         case .valid:
-            print("✅  \(name.blue) \("PASSED".green.bold)\n")
+            let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
+            print("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
             return true
-        case let .invalid(message, value: response):
+        case let .invalid(message):
             if verbose {
-                if let response = response {
-                    debugPrint("Response was:")
-                    debugPrint("\(response)")
-                } else {
-                    debugPrint("Response was nil")
-                }
-                print("")
+                debugPrint("Response was:")
+                debugPrint("\(response)\n")
             }
             print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
             return false
         }
-    }).done { results in
-        let failureCount = results.filter { !$0 }.count
-        let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
-        print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
-        if failureCount > 0 {
-            exit(1)
-        }
+    },
+       timeout: timeout
+        ).done { results in
+            let failureCount = results.filter { !$0 }.count
+            let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
+            print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
+            if failureCount > 0 {
+                exit(1)
+            }
     }
     _ = results.catch { error in
         display(error)

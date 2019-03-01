@@ -47,33 +47,33 @@ extension Matcher {
         case let (.equals(expected), value):
             return expected == value
                 ? .valid
-                : .init(invalid: "(\(value)) is not equal to (\(expected))")
+                : .invalid("(\(value)) is not equal to (\(expected))")
         case let (.regex(expected), _):
             return expected ~= value.string
                 ? .valid
-                : .init(invalid: "(\(value)) does not match (\(expected.pattern))")
+                : .invalid("(\(value)) does not match (\(expected.pattern))")
         case let (.contains(expected), .dictionary(dict)):
             for (key, exp) in expected {
-                guard let val = dict[key] else { return .init(invalid: "key '\(key)' not found in '\(dict)'") }
-                if case let .invalid(msg, resp) = exp.validate(val) {
-                    return .invalid("key '\(key)' validation error: \(msg)", value: resp)
+                guard let val = dict[key] else { return .invalid("key '\(key)' not found in '\(dict)'") }
+                if case let .invalid(msg) = exp.validate(val) {
+                    return .invalid("key '\(key)' validation error: \(msg)")
                 }
             }
             return .valid
         case let (.contains(expected), .array):
             for (key, exp) in expected {
                 guard let index = Int(key) else {
-                    return .init(invalid: "key '\(key)' not convertible into index")
+                    return .invalid("key '\(key)' not convertible into index")
                 }
                 if
                     let element = value[index],
-                    case let .invalid(msg, resp) = exp.validate(element) {
-                    return .invalid("index '\(index)' validation error: \(msg)", value: resp)
+                    case let .invalid(msg) = exp.validate(element) {
+                    return .invalid("index '\(index)' validation error: \(msg)")
                 }
             }
             return .valid
         default:
-            return .init(invalid: "failed to validate value '\(value)' with '\(self)'")
+            return .invalid("failed to validate value '\(value)' with '\(self)'")
         }
     }
 }
