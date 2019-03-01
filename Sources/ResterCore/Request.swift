@@ -127,9 +127,15 @@ extension Request {
         }
 
         let request = after(seconds: delay)
-            .then { URLSession.shared.dataTask(.promise, with: urlRequest) }
-            .map { Response(data: $0.data, response: $0.response as! HTTPURLResponse) }
-            .map { Result<Response>.fulfilled($0) }
+            .then {
+                URLSession.shared.dataTask(.promise, with: urlRequest).map { (start: Date(), response: $0)}
+            }.map {
+                Response(
+                    elapsed: Date().timeIntervalSince($0.start),
+                    data: $0.response.data,
+                    response: $0.response.response as! HTTPURLResponse
+                )
+            }.map { Result<Response>.fulfilled($0) }
 
         let timeout: Promise<Result<Response>> = after(seconds: delay + timeout).map { _ in
             .rejected(ResterError.timeout(requestName: self.name))
