@@ -7,6 +7,9 @@
 
 import XCTest
 
+@testable import ResterCore
+
+
 class LaunchTests: XCTestCase {
 
     func test_launch_binary() throws {
@@ -61,12 +64,14 @@ class LaunchTests: XCTestCase {
             return
         }
 
+        Current.console = PlainConsole()
+
         let binary = productsDirectory.appendingPathComponent("rester")
         let requestFile = path(for: "basic.yml")!
 
         let process = Process()
         process.executableURL = binary
-        process.arguments = [requestFile.string, "-v"]
+        process.arguments = [requestFile.string, "-v", "-t", "7"]
 
         let pipe = Pipe()
         process.standardOutput = pipe
@@ -93,6 +98,8 @@ class LaunchTests: XCTestCase {
 
         Restfile path: \(requestFile.string)
         Working directory: \(testDataDirectory()!)
+
+        Request timeout: 7.0s
 
         Defined variables:
           - API_URL

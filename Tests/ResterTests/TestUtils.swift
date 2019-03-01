@@ -71,3 +71,19 @@ class TestConsole: Console {
         self.error.append(error.legibleLocalizedDescription + "\n")
     }
 }
+
+
+struct PlainConsole: Console {
+    mutating func display(label: String, value: Any) {
+        let msg = "\(label):" + " \(value)"
+        print(msg, terminator: "\n\n")
+    }
+
+    mutating func display(verbose message: String) {
+        print(message)
+    }
+
+    mutating func display(error: Error) {
+        print("❌  Error: \(error.legibleLocalizedDescription)")
+    }
+}
