@@ -13,7 +13,7 @@ import Regex
 
 
 func maskTime(_ string: String) throws -> String {
-    let regex = try Regex(pattern: "\\(\\d+\\.\\d+s\\)")
+    let regex = try Regex(pattern: "\\(\\d+\\.?\\d*s\\)")
     return regex.replaceAll(in: string, with: "(X.XXXs)")
 }
 
@@ -21,8 +21,8 @@ func maskTime(_ string: String) throws -> String {
 class LaunchTests: XCTestCase {
 
     func test_mask_time() throws {
-        let s = "basic PASSED (0.01s)"
-        XCTAssertEqual(try maskTime(s), "basic PASSED (X.XXXs)")
+        XCTAssertEqual(try maskTime("basic PASSED (0.01s)"), "basic PASSED (X.XXXs)")
+        XCTAssertEqual(try maskTime("basic PASSED (0s)"), "basic PASSED (X.XXXs)")
     }
 
     func test_launch_binary() throws {
