@@ -1,6 +1,7 @@
 import XCTest
 
 import Path
+import ValueCodable
 import Yams
 @testable import ResterCore
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ValueCodable
 
 
 protocol URLEncoding {
@@ -46,7 +47,7 @@ extension Parameter: URLEncoding {
 }
 
 
-extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
+extension Dictionary where Key == ValueCodable.Key, Value == ValueCodable.Value {
     var formUrlEncoded: String {
         return compactMap { Parameter(key: $0.key.urlEncoded, value: $0.value)}
             .compactMap { $0.urlEncoded }

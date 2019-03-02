@@ -86,9 +86,9 @@
         "package": "ValueCodable",
         "repositoryURL": "https://github.com/finestructure/ValueCodable",
         "state": {
-          "branch": null,
-          "revision": "70b2dae5198d43c8d5b2b0cfe4f6ad095ccdd558",
-          "version": "0.0.1"
+          "branch": "develop",
+          "revision": "c9e9f3801ffb3a4c73346669a43315435d4cb4d1",
+          "version": null
         }
       },
       {

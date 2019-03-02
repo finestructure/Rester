@@ -8,6 +8,7 @@
 import XCTest
 
 @testable import ResterCore
+import ValueCodable
 
 
 class SubstitutableTests: XCTestCase {

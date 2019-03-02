@@ -86,17 +86,8 @@ extension ValidationTests {
 }
 extension ValueTests {
   static var allTests: [(String, (ValueTests) -> () throws -> Void)] = [
-      ("test_decodeBasicTypes", test_decodeBasicTypes),
-      ("test_encodeBasicTypes", test_encodeBasicTypes),
-      ("test_null_json", test_null_json),
-      ("test_encode_null", test_encode_null),
-      ("test_bool_json", test_bool_json),
-      ("test_decodeComplexResponse", test_decodeComplexResponse),
       ("test_formUrlEncoded", test_formUrlEncoded),
-      ("test_key_lookup", test_key_lookup),
-      ("test_key_lookup_nested", test_key_lookup_nested),
       ("test_key_substitution", test_key_substitution),
-      ("test_array_indexing", test_array_indexing),
   ]
 }
 

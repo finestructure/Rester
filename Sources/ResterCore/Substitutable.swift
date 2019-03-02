@@ -7,6 +7,7 @@
 
 import Foundation
 import Regex
+import ValueCodable
 
 
 protocol Substitutable {
@@ -35,7 +36,7 @@ func substitute(string: String, with variables: [Key: Value]) throws -> String {
 }
 
 
-extension Dictionary: Substitutable where Key == ResterCore.Key, Value == ResterCore.Value {
+extension Dictionary: Substitutable where Key == ValueCodable.Key, Value == ValueCodable.Value {
     func substitute(variables: [Key : Value]) throws -> Dictionary<Key, Value> {
         // TODO: consider transforming keys (but be aware that uniqueKeysWithValues
         // below will then trap at runtime if substituted keys are not unique)

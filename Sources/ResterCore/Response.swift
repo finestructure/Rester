@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ValueCodable
 
 
 public struct Response: Equatable {

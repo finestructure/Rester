@@ -9,6 +9,7 @@ import XCTest
 @testable import ResterCore
 
 import Regex
+import ValueCodable
 import Yams
 
 
