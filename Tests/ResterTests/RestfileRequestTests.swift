@@ -1,6 +1,5 @@
 import XCTest
 
-import AnyCodable
 import LegibleError
 import PromiseKit
 import Rainbow

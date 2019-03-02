@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "AnyCodable",
-        "repositoryURL": "https://github.com/asensei/AnyCodable.git",
-        "state": {
-          "branch": null,
-          "revision": "fe013cd7393768e6ed993e907ae4a2c751f742cb",
-          "version": "1.2.0"
-        }
-      },
-      {
         "package": "Commander",
         "repositoryURL": "https://github.com/kylef/Commander.git",
         "state": {
