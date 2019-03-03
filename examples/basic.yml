@@ -1,0 +1,5 @@
+requests:
+  basic:
+    url: https://httpbin.org/anything
+    validation:
+      status: 200
