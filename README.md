@@ -5,6 +5,7 @@
 Rester is a command line tool to test (REST) APIs. It processes a request description like the following:
 
 ```
+# basic.yml
 requests:
   basic:
     url: https://httpbin.org/anything
