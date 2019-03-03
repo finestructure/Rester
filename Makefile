@@ -12,7 +12,7 @@ docker-build:
 test-linux: docker-build
 	docker run --rm rester swift test
 
-test-macos:
+test-macos: xcodeproj
 	set -o pipefail && \
 	xcodebuild test \
 		-scheme Rester \

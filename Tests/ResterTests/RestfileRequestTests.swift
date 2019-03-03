@@ -1,8 +1,8 @@
 import XCTest
 
-import AnyCodable
 import LegibleError
 import PromiseKit
+import Rainbow
 import Yams
 @testable import ResterCore
 
@@ -534,7 +534,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTFail("expected timeout to be raised")
                 expectation.fulfill()
             }.catch {
-                XCTAssertEqual($0.legibleLocalizedDescription, "request timed out: timeout")
+                XCTAssertEqual($0.legibleLocalizedDescription, "request timed out: \("timeout".blue)")
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 10)

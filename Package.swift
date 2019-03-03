@@ -9,8 +9,9 @@ let package = Package(
         .executable(name: "rester", targets: ["Rester"])
     ],
     dependencies: [
-        .package(url: "https://github.com/asensei/AnyCodable.git", from: "1.2.0"),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.0.0"),
+        // .package(url: "https://github.com/finestructure/ValueCodable", from: "0.0.1"),
+        .package(url: "https://github.com/finestructure/ValueCodable", .branch("develop")),
         .package(url: "https://github.com/jpsim/Yams.git", from: "1.0.0"),
         .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
         .package(url: "https://github.com/mxcl/LegibleError.git", from: "1.0.0"),
@@ -25,7 +26,7 @@ let package = Package(
             dependencies: ["Commander", "Rainbow", "ResterCore"]),
         .target(
             name: "ResterCore",
-            dependencies: ["AnyCodable", "LegibleError", "PMKFoundation", "Path", "PromiseKit", "Rainbow", "Regex", "Yams"]),
+            dependencies: ["LegibleError", "PMKFoundation", "Path", "PromiseKit", "Rainbow", "Regex", "ValueCodable", "Yams"]),
         .testTarget(
             name: "ResterTests",
             dependencies: ["ResterCore"]),
