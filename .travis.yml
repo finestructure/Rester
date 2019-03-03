@@ -52,8 +52,12 @@ jobs:
         IMG=finestructure/rester:$VERSION
         docker build --pull -t $IMG -f Dockerfile.app --build-arg VERSION=$VERSION .
 
-        #push
+        # push IMG
         docker push $IMG
+
+        # tag and push latest
+        docker tag $IMG finestructure/rester:latest
+        docker push finestructure/rester:latest
 
     - stage: test
       name: swift test
