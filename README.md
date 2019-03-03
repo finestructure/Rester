@@ -97,7 +97,7 @@ Executed 2 tests, with 0 failures
 The easiest way to run `rester` is via docker:
 
 ```
-docker run --rm -it -v $PWD:/host -w /host finestructure/rester:0.0.6 examples/github.yml
+docker run --rm -it -v $PWD:/host -w /host finestructure/rester examples/github.yml
 ```
 
 ## Installing `rester`
