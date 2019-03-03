@@ -9,7 +9,6 @@ import Foundation
 import PMKFoundation
 import PromiseKit
 import Regex
-import ValueCodable
 
 
 public struct Request: Decodable {

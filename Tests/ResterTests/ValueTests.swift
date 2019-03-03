@@ -8,7 +8,6 @@
 import XCTest
 @testable import ResterCore
 
-import ValueCodable
 import Yams
 
 

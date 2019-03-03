@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ValueCodable
 
 
 enum MergeStrategy {
@@ -27,7 +26,7 @@ extension Dictionary {
 }
 
 
-extension Dictionary: Substitutable where Key == ValueCodable.Key, Value == ValueCodable.Value {
+extension Dictionary: Substitutable where Key == ResterCore.Key, Value == ResterCore.Value {
     func substitute(variables: [Key : Value]) throws -> Dictionary<Key, Value> {
         // TODO: consider transforming keys (but be aware that uniqueKeysWithValues
         // below will then trap at runtime if substituted keys are not unique)

@@ -3,7 +3,6 @@ import XCTest
 import LegibleError
 import PromiseKit
 import Rainbow
-import ValueCodable
 import Yams
 @testable import ResterCore
 

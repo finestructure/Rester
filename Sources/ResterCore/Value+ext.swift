@@ -8,6 +8,10 @@
 import ValueCodable
 
 
+public typealias Key = ValueCodable.Key
+public typealias Value = ValueCodable.Value
+
+
 extension Value: URLEncoding {
     var urlEncoded: String? {
         switch self {
