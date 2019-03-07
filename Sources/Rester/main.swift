@@ -62,10 +62,11 @@ let main = command(
         exit(0)
     }
 
-    // TODO: clean up this call (delegate protocol instead?)
-    let results = rester.test(before: { name in
+    func before(name: Request.Name) {
         print("🎬  \(name.blue) started ...\n")
-    }, after: { name, response, result -> Bool in
+    }
+
+    func after(name: Request.Name, response: Response, result: ValidationResult) -> Bool {
         switch result {
         case .valid:
             let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
@@ -79,26 +80,24 @@ let main = command(
             print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
             return false
         }
-    },
-       timeout: timeout
-        ).done { results in
+    }
+
+    rester.test(before: before, after: after, timeout: timeout)
+        .done { results in
             let failureCount = results.filter { !$0 }.count
             let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
             print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
             if failureCount > 0 {
                 exit(1)
+            } else {
+                exit(0)
             }
-    }
-    _ = results.catch { error in
-        display(error)
-        exit(1)
+        }.catch { error in
+            display(error)
+            exit(1)
     }
 
-    wait(timeout: Request.defaultTimeout * TimeInterval(rester.requestCount)) { results.isFulfilled }
-    if !results.isFulfilled {
-        print("❌  Error: Rester timed out\n")
-        exit(1)
-    }
+    RunLoop.main.run()
 
 }
 
