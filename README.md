@@ -60,10 +60,10 @@ requests:
           id: .regex(\d+)
     log:
       # log the id to the console
-      - json.0.id
+      - json[0].id
   latest_release:
     # use the release id to request release details
-    url: ${BASE_URL}/releases/${releases.0.id}
+    url: ${BASE_URL}/releases/${releases[0].id}
     validation:
       status: 200
     log:
@@ -79,7 +79,7 @@ $ rester examples/github.yml
 
 🎬  releases started ...
 
-0.id: 15863504
+[0].id: 15863504
 
 ✅  releases PASSED (0.012s)
 
