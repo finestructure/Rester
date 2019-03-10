@@ -176,4 +176,23 @@ class RequestTests: XCTestCase {
         XCTAssertEqual(r.log, .array(["json.data.property"]))
     }
 
+    func test_request_execute_elapsed() throws {
+        let s = """
+            url: https://httpbin.org/delay/1
+        """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "basic", details: d)
+
+        let expectation = self.expectation(description: #function)
+
+        _ = try r.execute()
+            .map {
+                XCTAssertEqual($0.response.statusCode, 200)
+                XCTAssert($0.elapsed >= 1.0, "elapsed must be >= 1.0, was: \($0.elapsed)")
+                expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 5)
+    }
+
 }

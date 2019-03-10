@@ -126,8 +126,9 @@ extension Request {
         }
 
         let request = after(seconds: delay)
-            .then {
-                URLSession.shared.dataTask(.promise, with: urlRequest).map { (start: Date(), response: $0)}
+            .then { () -> Promise<(start: Date, response: (data: Data, response: URLResponse))> in
+                let start = Date()
+                return URLSession.shared.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
             }.map {
                 Response(
                     elapsed: Date().timeIntervalSince($0.start),
