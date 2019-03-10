@@ -14,16 +14,23 @@ func debugPrint(_ msg: String) {
 
 
 func display(_ error: Error) {
-    print("❌  Error: \(error.legibleLocalizedDescription)")
+    if
+        let decodingError = error as? DecodingError,
+        case let .dataCorrupted(err) = decodingError,
+        let underlying = err.underlyingError as? ResterError {
+        print("❌  Restfile syntax error: \(underlying.legibleLocalizedDescription)")
+    } else {
+        print("❌  Error: \(error.legibleLocalizedDescription)")
+    }
 }
 
 
 let main = command(
-    Argument<String>("filename", description: "A Restfile"),
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
-    Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout")
-) { filename, verbose, wdir, timeout in
+    Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout"),
+    Argument<String>("filename", description: "A Restfile")
+) { verbose, wdir, timeout, filename in
 
     print("🚀  Resting \(filename.bold) ...\n")
 
@@ -43,6 +50,7 @@ let main = command(
     do {
         rester = try Rester(path: restfilePath, workDir: workDir)
     } catch {
+        display(error)
         exit(1)
     }
 

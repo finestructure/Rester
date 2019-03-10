@@ -18,6 +18,8 @@ public enum ResterError: LocalizedError {
     case fileNotFound(String)
     case internalError(String)
     case timeout(requestName: String)
+    case keyNotFound(String)
+    case unexpectedKeyFound(String)
 
     public var localizedDescription: String {
         switch self {
@@ -35,6 +37,10 @@ public enum ResterError: LocalizedError {
             return "internal error: \(msg)"
         case .timeout(let name):
             return "request timed out: \(name.blue)"
+        case .keyNotFound(let key):
+            return "key not found: \(key.red)"
+        case .unexpectedKeyFound(let key):
+            return "unexpected key found: \(key.red)"
         }
     }
 

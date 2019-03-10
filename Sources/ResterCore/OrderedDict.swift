@@ -15,27 +15,13 @@ public struct OrderedDict<Key: Hashable & Decodable, Value: Decodable> {
 
 extension OrderedDict: Decodable {
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
+        let container = try decoder.container(keyedBy: StringCodingKeys.self)
         self.items = try container.decodeOrdered(Request.Details.self) as! [[Key : Value]]
     }
 }
 
 
-struct OrderedCodingKeys: CodingKey {
-    var intValue: Int?
-    var stringValue: String
-
-    init?(intValue: Int) {
-        return nil
-    }
-
-    init?(stringValue: String){
-        self.stringValue = stringValue
-    }
-}
-
-
-extension KeyedDecodingContainer where Key == OrderedCodingKeys {
+extension KeyedDecodingContainer where Key == StringCodingKeys {
     func decodeOrdered<T: Decodable>(_ type: T.Type) throws -> [[String: T]] {
         var data = [[String: T]]()
 

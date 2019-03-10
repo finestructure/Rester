@@ -1,0 +1,4 @@
+requests:
+  basic:
+    invalid_key:
+      url: https://httpbin.org/anything
