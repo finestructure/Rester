@@ -37,6 +37,23 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(req.details.url, "https://httpbin.org/anything")
     }
 
+    func test_parse_malformed() throws {
+        let s = """
+            requests:
+              basic:
+                request:  # this key is unexpected
+                  url: https://httpbin.org/anything  # as is this indentation
+                method: GET
+                validation:
+                  status: 200
+            """
+        XCTAssertThrowsError(
+            try YAMLDecoder().decode(Restfile.self, from: s),
+            "decoding must throw") { error in
+                XCTAssert(error.legibleLocalizedDescription.contains("key not found: url"))
+        }
+    }
+
     func test_parse_request_order() throws {
         let s = """
             requests:

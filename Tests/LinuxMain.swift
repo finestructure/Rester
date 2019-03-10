@@ -59,6 +59,7 @@ extension RestfileDecodingTests {
   static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
+      ("test_parse_malformed", test_parse_malformed),
       ("test_parse_request_order", test_parse_request_order),
       ("test_parse_body_json", test_parse_body_json),
       ("test_parse_body_form", test_parse_body_form),
