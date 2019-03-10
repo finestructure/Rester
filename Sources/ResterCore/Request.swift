@@ -6,9 +6,8 @@
 //
 
 import Foundation
-import PromiseKit
 import PMKFoundation
-import AnyCodable
+import PromiseKit
 import Regex
 
 
@@ -127,8 +126,9 @@ extension Request {
         }
 
         let request = after(seconds: delay)
-            .then {
-                URLSession.shared.dataTask(.promise, with: urlRequest).map { (start: Date(), response: $0)}
+            .then { () -> Promise<(start: Date, response: (data: Data, response: URLResponse))> in
+                let start = Date()
+                return URLSession.shared.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
             }.map {
                 Response(
                     elapsed: Date().timeIntervalSince($0.start),
@@ -202,10 +202,13 @@ func print(value: Value, of response: Response) {
         Current.console.display(label: "Status", value: response.status)
     case .string("headers"):
         Current.console.display(label: "Headers", value: response.headers)
-    case let .string(string) where string.starts(with: "json."):
-        let keyPath = string.deletingPrefix("json.")
-        if let json = response.json, let value = json[keyPath] {
-            Current.console.display(label: keyPath, value: value)
+    case let .string(keyPath) where keyPath.starts(with: "json."),
+         let .string(keyPath) where keyPath.starts(with: "json["):
+        guard let json = response.json else { return }
+        let res = Value.dictionary(["json": json])
+        if let value = res[keyPath] {
+            let displayKeyPath = keyPath.deletingPrefix("json").deletingPrefix(".")
+            Current.console.display(label: displayKeyPath, value: value)
         }
     case .string("json"):
         if let json = response.json {

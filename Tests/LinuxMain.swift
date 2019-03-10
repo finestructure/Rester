@@ -32,6 +32,7 @@ extension RequestExecutionTests {
       ("test_log_request", test_log_request),
       ("test_log_request_json_keypath", test_log_request_json_keypath),
       ("test_response_array_validation", test_response_array_validation),
+      ("test_response_variable_legacy", test_response_variable_legacy),
       ("test_response_variable", test_response_variable),
       ("test_timeout_error", test_timeout_error),
   ]
@@ -46,6 +47,7 @@ extension RequestTests {
       ("test_delay_substitution", test_delay_substitution),
       ("test_parse_log", test_parse_log),
       ("test_parse_log_keypath", test_parse_log_keypath),
+      ("test_request_execute_elapsed", test_request_execute_elapsed),
   ]
 }
 extension ResterTests {
@@ -86,17 +88,8 @@ extension ValidationTests {
 }
 extension ValueTests {
   static var allTests: [(String, (ValueTests) -> () throws -> Void)] = [
-      ("test_decodeBasicTypes", test_decodeBasicTypes),
-      ("test_encodeBasicTypes", test_encodeBasicTypes),
-      ("test_null_json", test_null_json),
-      ("test_encode_null", test_encode_null),
-      ("test_bool_json", test_bool_json),
-      ("test_decodeComplexResponse", test_decodeComplexResponse),
       ("test_formUrlEncoded", test_formUrlEncoded),
-      ("test_key_lookup", test_key_lookup),
-      ("test_key_lookup_nested", test_key_lookup_nested),
       ("test_key_substitution", test_key_substitution),
-      ("test_array_indexing", test_array_indexing),
   ]
 }
 

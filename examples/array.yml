@@ -21,7 +21,7 @@ requests:
       - json
 
   reference:
-    url: https://httpbin.org/anything/${post-array.json.values.1}  # sending 42
+    url: https://httpbin.org/anything/${post-array.json.values[1]}  # sending 42
     validation:
       status: 200
       json:  # url is mirrored back in json response

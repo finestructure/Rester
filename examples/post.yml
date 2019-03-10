@@ -2,7 +2,7 @@ requests:
   post_example:
     url: https://httpbin.org/anything
     method: POST
-    data:
+    body:
       json:
         foo: bar
     validation:
