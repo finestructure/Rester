@@ -21,20 +21,6 @@ extension OrderedDict: Decodable {
 }
 
 
-struct StringCodingKeys: CodingKey {
-    var intValue: Int?
-    var stringValue: String
-
-    init?(intValue: Int) {
-        return nil
-    }
-
-    init?(stringValue: String){
-        self.stringValue = stringValue
-    }
-}
-
-
 extension KeyedDecodingContainer where Key == StringCodingKeys {
     func decodeOrdered<T: Decodable>(_ type: T.Type) throws -> [[String: T]] {
         var data = [[String: T]]()
