@@ -21,7 +21,7 @@ extension Restfile: Decodable {
                 let req = try container.decode(OrderedDict<Request.Name, Request.Details>.self, forKey: .requests)
                 requests = req.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) }
             } catch let DecodingError.keyNotFound(key, _) {
-                throw ResterError.decodingError("key not found: \(key.stringValue)")
+                throw ResterError.keyNotFound(key.stringValue)
             }
         } else {
             requests = []

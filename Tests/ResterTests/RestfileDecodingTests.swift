@@ -43,14 +43,19 @@ class RestfileDecodingTests: XCTestCase {
               basic:
                 request:  # this key is unexpected
                   url: https://httpbin.org/anything  # as is this indentation
-                method: GET
-                validation:
-                  status: 200
             """
-        XCTAssertThrowsError(
-            try YAMLDecoder().decode(Restfile.self, from: s),
-            "decoding must throw") { error in
-                XCTAssert(error.legibleLocalizedDescription.contains("key not found: url"))
+        XCTAssertThrowsError(try YAMLDecoder().decode(Restfile.self, from: s)) { error in
+            XCTAssertNotNil(error as? DecodingError)
+            if
+                let decodingError = error as? DecodingError,
+                case let .dataCorrupted(err) = decodingError,
+                let underlying = err.underlyingError as? ResterError,
+                case let .keyNotFound(key) = underlying {
+
+                XCTAssertEqual(key, "url")
+            } else {
+                XCTFail("expected .keyNotFound exception, found: \(error)")
+            }
         }
     }
 
@@ -144,7 +149,7 @@ class RestfileDecodingTests: XCTestCase {
 
                 XCTAssert(path.ends(with: "does_not_exist"), "wrong path, was: \(path)")
             } else {
-                XCTFail("expected file not found exception, found: \(error)")
+                XCTFail("expected .fileNotFound exception, found: \(error)")
             }
         }
     }
