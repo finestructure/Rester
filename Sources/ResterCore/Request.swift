@@ -201,10 +201,13 @@ func print(value: Value, of response: Response) {
         Current.console.display(label: "Status", value: response.status)
     case .string("headers"):
         Current.console.display(label: "Headers", value: response.headers)
-    case let .string(string) where string.starts(with: "json."):
-        let keyPath = string.deletingPrefix("json.")
-        if let json = response.json, let value = json[keyPath] {
-            Current.console.display(label: keyPath, value: value)
+    case let .string(keyPath) where keyPath.starts(with: "json."),
+         let .string(keyPath) where keyPath.starts(with: "json["):
+        guard let json = response.json else { return }
+        let res = Value.dictionary(["json": json])
+        if let value = res[keyPath] {
+            let displayKeyPath = keyPath.deletingPrefix("json").deletingPrefix(".")
+            Current.console.display(label: displayKeyPath, value: value)
         }
     case .string("json"):
         if let json = response.json {

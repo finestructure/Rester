@@ -468,8 +468,9 @@ final class RequestExecutionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
-    func test_response_variable() throws {
+    func test_response_variable_legacy() throws {
         // Tests references a value from a previous request's response
+        // (legacy syntax .1 to reference array element at index 1)
         let s = """
             requests:
               post-array:
@@ -483,6 +484,44 @@ final class RequestExecutionTests: XCTestCase {
                       - c
               reference:
                 url: https://httpbin.org/anything/${post-array.json.values.1}  # sending 42
+                validation:
+                  status: 200
+                  json:  # url is mirrored back in json response
+                    url: https://httpbin.org/anything/42
+            """
+        let r = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].name, "post-array")
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].name, "reference")
+                XCTAssertEqual(results[1].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_response_variable() throws {
+        // Tests references a value from a previous request's response
+        // (using syntax [1] to reference array element at index 1)
+        let s = """
+            requests:
+              post-array:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    values:
+                      - a
+                      - 42
+                      - c
+              reference:
+                url: https://httpbin.org/anything/${post-array.json.values[1]}  # sending 42
                 validation:
                   status: 200
                   json:  # url is mirrored back in json response

@@ -32,6 +32,7 @@ extension RequestExecutionTests {
       ("test_log_request", test_log_request),
       ("test_log_request_json_keypath", test_log_request_json_keypath),
       ("test_response_array_validation", test_response_array_validation),
+      ("test_response_variable_legacy", test_response_variable_legacy),
       ("test_response_variable", test_response_variable),
       ("test_timeout_error", test_timeout_error),
   ]

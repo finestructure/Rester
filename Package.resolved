@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mxcl/Path.swift.git",
         "state": {
           "branch": null,
-          "revision": "e915bc0cfb5bcee9d48adfdb9e8208d07291c0e8",
-          "version": "0.16.0"
+          "revision": "7e774b6cf56f3f516df373718bf8fc2b7a9b373c",
+          "version": "0.16.1"
         }
       },
       {
@@ -77,9 +77,9 @@
         "package": "ValueCodable",
         "repositoryURL": "https://github.com/finestructure/ValueCodable",
         "state": {
-          "branch": "develop",
-          "revision": "c9e9f3801ffb3a4c73346669a43315435d4cb4d1",
-          "version": null
+          "branch": null,
+          "revision": "2df2a7ec953022236397c372658718e71a1442df",
+          "version": "0.0.2"
         }
       },
       {

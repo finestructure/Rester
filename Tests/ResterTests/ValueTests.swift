@@ -36,8 +36,14 @@ class ValueTests: XCTestCase {
         let d: Value = .dictionary(["foo": "bar"])
         let a: Value = .array(["a", 42, d])
         let response: [Request.Name: Value] = ["request": a]
-        let value: Value = "${request.2.foo}"
-        XCTAssertEqual(try value.substitute(variables: response), "bar")
+        do { // legacy indexing syntax
+            let value: Value = "${request.2.foo}"
+            XCTAssertEqual(try value.substitute(variables: response), "bar")
+        }
+        do { // recommended indexing syntax
+            let value: Value = "${request[2].foo}"
+            XCTAssertEqual(try value.substitute(variables: response), "bar")
+        }
     }
 
 }
