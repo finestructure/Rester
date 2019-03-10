@@ -12,6 +12,7 @@ extension LaunchTests {
       ("test_mask_time", test_mask_time),
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
+      ("test_launch_binary_malformed", test_launch_binary_malformed),
   ]
 }
 extension RequestExecutionTests {
@@ -59,6 +60,8 @@ extension RestfileDecodingTests {
   static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
+      ("test_parse_malformed_request", test_parse_malformed_request),
+      ("test_parse_malformed_validation", test_parse_malformed_validation),
       ("test_parse_request_order", test_parse_request_order),
       ("test_parse_body_json", test_parse_body_json),
       ("test_parse_body_form", test_parse_body_form),

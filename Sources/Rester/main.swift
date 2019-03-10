@@ -14,7 +14,14 @@ func debugPrint(_ msg: String) {
 
 
 func display(_ error: Error) {
-    print("❌  Error: \(error.legibleLocalizedDescription)")
+    if
+        let decodingError = error as? DecodingError,
+        case let .dataCorrupted(err) = decodingError,
+        let underlying = err.underlyingError as? ResterError {
+        print("❌  Restfile syntax error: \(underlying.legibleLocalizedDescription)")
+    } else {
+        print("❌  Error: \(error.legibleLocalizedDescription)")
+    }
 }
 
 
@@ -43,6 +50,7 @@ let main = command(
     do {
         rester = try Rester(path: restfilePath, workDir: workDir)
     } catch {
+        display(error)
         exit(1)
     }
 

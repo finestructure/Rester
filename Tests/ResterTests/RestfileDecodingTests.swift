@@ -37,6 +37,51 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(req.details.url, "https://httpbin.org/anything")
     }
 
+    func test_parse_malformed_request() throws {
+        let s = """
+            requests:
+              basic:
+                request:  # this key is unexpected
+                  url: https://httpbin.org/anything  # as is this indentation
+            """
+        XCTAssertThrowsError(try YAMLDecoder().decode(Restfile.self, from: s)) { error in
+            XCTAssertNotNil(error as? DecodingError)
+            if
+                let decodingError = error as? DecodingError,
+                case let .dataCorrupted(err) = decodingError,
+                let underlying = err.underlyingError as? ResterError,
+                case let .keyNotFound(key) = underlying {
+
+                XCTAssertEqual(key, "url")
+            } else {
+                XCTFail("expected .keyNotFound exception, found: \(error)")
+            }
+        }
+    }
+
+    func test_parse_malformed_validation() throws {
+        let s = """
+            requests:
+              basic:
+                url: https://httpbin.org/anything
+                validation:
+                  statuc: 200  # mistyped attribute
+            """
+        XCTAssertThrowsError(try YAMLDecoder().decode(Restfile.self, from: s)) { error in
+            XCTAssertNotNil(error as? DecodingError)
+            if
+                let decodingError = error as? DecodingError,
+                case let .dataCorrupted(err) = decodingError,
+                let underlying = err.underlyingError as? ResterError,
+                case let .unexpectedKeyFound(key) = underlying {
+
+                XCTAssertEqual(key, "statuc")
+            } else {
+                XCTFail("expected .unexpectedKeyFound exception, found: \(error)")
+            }
+        }
+    }
+
     func test_parse_request_order() throws {
         let s = """
             requests:
@@ -127,7 +172,7 @@ class RestfileDecodingTests: XCTestCase {
 
                 XCTAssert(path.ends(with: "does_not_exist"), "wrong path, was: \(path)")
             } else {
-                XCTFail("expected file not found exception, found: \(error)")
+                XCTFail("expected .fileNotFound exception, found: \(error)")
             }
         }
     }
