@@ -12,6 +12,7 @@ extension LaunchTests {
       ("test_mask_time", test_mask_time),
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
+      ("test_launch_binary_malformed", test_launch_binary_malformed),
   ]
 }
 extension RequestExecutionTests {
