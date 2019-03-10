@@ -47,6 +47,7 @@ extension RequestTests {
       ("test_delay_substitution", test_delay_substitution),
       ("test_parse_log", test_parse_log),
       ("test_parse_log_keypath", test_parse_log_keypath),
+      ("test_request_execute_elapsed", test_request_execute_elapsed),
   ]
 }
 extension ResterTests {
