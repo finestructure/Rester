@@ -19,11 +19,11 @@ func display(_ error: Error) {
 
 
 let main = command(
-    Argument<String>("filename", description: "A Restfile"),
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
-    Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout")
-) { filename, verbose, wdir, timeout in
+    Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout"),
+    Argument<String>("filename", description: "A Restfile")
+) { verbose, wdir, timeout, filename in
 
     print("🚀  Resting \(filename.bold) ...\n")
 
