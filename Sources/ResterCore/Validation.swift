@@ -31,7 +31,7 @@ public struct Validation: Decodable {
         do {
             // check no unexpected keys are present so we don't silently skip
             // validations that have mistyped keys
-            let container = try decoder.container(keyedBy: OrderedCodingKeys.self)
+            let container = try decoder.container(keyedBy: StringCodingKeys.self)
             let expectedKeys = Detail.CodingKeys.allCases.map { $0.stringValue }
             for key in container.allKeys {
                 if !expectedKeys.contains(key.stringValue) {
