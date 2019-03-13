@@ -22,8 +22,9 @@ extension RequestExecutionTests {
       ("test_validate_json", test_validate_json),
       ("test_validate_json_regex", test_validate_json_regex),
       ("test_request_order", test_request_order),
-      ("test_post_request_json", test_post_request_json),
-      ("test_post_request_form", test_post_request_form),
+      ("test_post_json", test_post_json),
+      ("test_post_form", test_post_form),
+      ("test_post_multipart", test_post_multipart),
       ("test_substitute_env", test_substitute_env),
       ("test_put_request_json", test_put_request_json),
       ("test_validate_headers", test_validate_headers),
@@ -93,6 +94,7 @@ extension ValidationTests {
 extension ValueTests {
   static var allTests: [(String, (ValueTests) -> () throws -> Void)] = [
       ("test_formUrlEncoded", test_formUrlEncoded),
+      ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
   ]
 }

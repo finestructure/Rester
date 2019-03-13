@@ -99,12 +99,12 @@ extension Request {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
         if [.post, .put].contains(method) {
-            if
+            if  // json
                 let body = body?.json,
                 let postData = try? JSONEncoder().encode(body) {
                 urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
                 urlRequest.httpBody = postData
-            } else if
+            } else if  // form
                 let body = body?.form?.formUrlEncoded,
                 let postData = body.data(using: .utf8) {
                 urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -115,6 +115,13 @@ extension Request {
                     print("Body:")
                     dump(body)
                 }
+            } else if  // multipart
+                let body = body?.multipart {
+                urlRequest.addValue(
+                    "multipart/form-data; charset=utf-8; boundary=__X_RESTER_BOUNDARY__",
+                    forHTTPHeaderField: "Content-Type"
+                )
+                urlRequest.httpBody = body.multipartEncoded.data(using: .utf8)
             }
         }
         headers.forEach {

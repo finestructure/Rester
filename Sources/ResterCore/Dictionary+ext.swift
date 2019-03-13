@@ -34,3 +34,23 @@ extension Dictionary: Substitutable where Key == ResterCore.Key, Value == Rester
         return Dictionary(uniqueKeysWithValues: substituted)
     }
 }
+
+
+extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
+    var formUrlEncoded: String {
+        return compactMap { Parameter(key: $0.key.urlEncoded, value: $0.value) }
+            .compactMap { $0.urlEncoded }
+            .joined(separator: "&")
+    }
+}
+
+
+extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
+    var multipartEncoded: String {
+        return compactMap { Parameter(key: $0.key, value: $0.value) }
+            .sorted { $0.key < $1.key }
+            .compactMap { $0.multipartEncoded }
+            .joined(separator: "\n")
+        + "\n" + MultipartBoundary + "--"
+    }
+}
