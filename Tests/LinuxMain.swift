@@ -65,6 +65,7 @@ extension RestfileDecodingTests {
       ("test_parse_request_order", test_parse_request_order),
       ("test_parse_body_json", test_parse_body_json),
       ("test_parse_body_form", test_parse_body_form),
+      ("test_parse_body_multipart", test_parse_body_multipart),
       ("test_Restfile_init", test_Restfile_init),
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
