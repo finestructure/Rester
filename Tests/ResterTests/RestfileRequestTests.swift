@@ -161,7 +161,7 @@ final class RequestExecutionTests: XCTestCase {
         XCTAssertEqual(names, ["first", "second", "3rd"])
     }
 
-    func test_post_request_json() throws {
+    func test_post_json() throws {
         let s = """
             requests:
               post:
@@ -187,7 +187,7 @@ final class RequestExecutionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
-    func test_post_request_form() throws {
+    func test_post_form() throws {
         let s = """
             requests:
               post:
@@ -202,6 +202,33 @@ final class RequestExecutionTests: XCTestCase {
                     method: POST
                     form:
                       foo: bar
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("post").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_post_multipart() throws {
+        let testFile = path(for: "test.jpg")!
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  multipart:
+                    file: .file(\(testFile))
+                validation:
+                  status: 200
+                  json:
+                    method: POST
+                    headers:
+                      Content-Type: multipart/form-data; charset=utf-8; boundary=__X_RESTER_BOUNDARY__
             """
         var rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)

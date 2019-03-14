@@ -11,11 +11,16 @@ import Foundation
 public struct Body: Codable {
     let json: [Key: Value]?
     let form: [Key: Value]?
+    let multipart: [Key: Value]?
 }
 
 
 extension Body: Substitutable {
     func substitute(variables: [Key : Value]) throws -> Body {
-        return Body(json: try json?.substitute(variables: variables), form: try form?.substitute(variables: variables))
+        return Body(
+            json: try json?.substitute(variables: variables),
+            form: try form?.substitute(variables: variables),
+            multipart: try multipart?.substitute(variables: variables)
+        )
     }
 }

@@ -15,6 +15,18 @@ extension LaunchTests {
       ("test_launch_binary_malformed", test_launch_binary_malformed),
   ]
 }
+extension ParameterTests {
+  static var allTests: [(String, (ParameterTests) -> () throws -> Void)] = [
+      ("test_multipartEncode_file", test_multipartEncode_file),
+      ("test_parseFile_value", test_parseFile_value),
+      ("test_multipartEncoded_file", test_multipartEncoded_file),
+  ]
+}
+extension PathTests {
+  static var allTests: [(String, (PathTests) -> () throws -> Void)] = [
+      ("test_mimeType", test_mimeType),
+  ]
+}
 extension RequestExecutionTests {
   static var allTests: [(String, (RequestExecutionTests) -> () throws -> Void)] = [
       ("test_request_execute", test_request_execute),
@@ -22,8 +34,9 @@ extension RequestExecutionTests {
       ("test_validate_json", test_validate_json),
       ("test_validate_json_regex", test_validate_json_regex),
       ("test_request_order", test_request_order),
-      ("test_post_request_json", test_post_request_json),
-      ("test_post_request_form", test_post_request_form),
+      ("test_post_json", test_post_json),
+      ("test_post_form", test_post_form),
+      ("test_post_multipart", test_post_multipart),
       ("test_substitute_env", test_substitute_env),
       ("test_put_request_json", test_put_request_json),
       ("test_validate_headers", test_validate_headers),
@@ -65,6 +78,7 @@ extension RestfileDecodingTests {
       ("test_parse_request_order", test_parse_request_order),
       ("test_parse_body_json", test_parse_body_json),
       ("test_parse_body_form", test_parse_body_form),
+      ("test_parse_body_multipart", test_parse_body_multipart),
       ("test_Restfile_init", test_Restfile_init),
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
@@ -92,12 +106,15 @@ extension ValidationTests {
 extension ValueTests {
   static var allTests: [(String, (ValueTests) -> () throws -> Void)] = [
       ("test_formUrlEncoded", test_formUrlEncoded),
+      ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
   ]
 }
 
 XCTMain([
   testCase(LaunchTests.allTests),
+  testCase(ParameterTests.allTests),
+  testCase(PathTests.allTests),
   testCase(RequestExecutionTests.allTests),
   testCase(RequestTests.allTests),
   testCase(ResterTests.allTests),
