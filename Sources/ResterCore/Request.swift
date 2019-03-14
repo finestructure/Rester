@@ -121,7 +121,7 @@ extension Request {
                     "multipart/form-data; charset=utf-8; boundary=__X_RESTER_BOUNDARY__",
                     forHTTPHeaderField: "Content-Type"
                 )
-                urlRequest.httpBody = body.multipartEncoded.data(using: .utf8)
+                urlRequest.httpBody = try body.multipartEncoded()
             }
         }
         headers.forEach {

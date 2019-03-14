@@ -45,12 +45,24 @@ extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
 }
 
 
-extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
-    var multipartEncoded: String {
-        return compactMap { Parameter(key: $0.key, value: $0.value) }
+extension Dictionary: MultipartEncoding where Key == ResterCore.Key, Value == ResterCore.Value {
+    func multipartEncoded() throws -> Data {
+        let lineBreak = "\n".data(using: .utf8)!
+        let boundary = MultipartBoundary.data(using: .utf8)!
+        let endMarker = "--".data(using: .utf8)!
+
+        let payloads = try compactMap { Parameter(key: $0.key, value: $0.value) }
             .sorted { $0.key < $1.key }
-            .compactMap { $0.multipartEncoded }
-            .joined(separator: "\n")
-        + "\n" + MultipartBoundary + "--"
+            .map { try $0.multipartEncoded() }
+        // NB: joined produces data that is missing random characters!
+        // therefore we have to do our own joining below
+        //  .joined(separator: lineBreak)
+
+        guard payloads.count > 0 else {
+            throw ResterError.internalError("multipart encoding requires at least one parameter")
+        }
+
+        let tail = payloads[1...].reduce(Data()) { $0 + lineBreak + $1 }
+        return payloads[0] + tail + lineBreak + boundary + endMarker
     }
 }

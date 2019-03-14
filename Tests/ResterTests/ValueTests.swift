@@ -35,7 +35,9 @@ class ValueTests: XCTestCase {
     func test_multipartEncoded() throws {
         do {
             let d: [Key: Value] = ["foo2": "baz", "foo1": "bar"]
-            XCTAssertEqual(d.multipartEncoded, """
+            XCTAssertEqual(
+                String(data: try d.multipartEncoded(), encoding: .utf8),
+                """
                 --__X_RESTER_BOUNDARY__
                 Content-Disposition: form-data; name="foo1"
 

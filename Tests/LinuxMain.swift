@@ -15,6 +15,13 @@ extension LaunchTests {
       ("test_launch_binary_malformed", test_launch_binary_malformed),
   ]
 }
+extension ParameterTests {
+  static var allTests: [(String, (ParameterTests) -> () throws -> Void)] = [
+      ("test_multipartEncode_file", test_multipartEncode_file),
+      ("test_parseFile_value", test_parseFile_value),
+      ("test_multipartEncoded_file", test_multipartEncoded_file),
+  ]
+}
 extension PathTests {
   static var allTests: [(String, (PathTests) -> () throws -> Void)] = [
       ("test_mimeType", test_mimeType),
@@ -106,6 +113,7 @@ extension ValueTests {
 
 XCTMain([
   testCase(LaunchTests.allTests),
+  testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
   testCase(RequestExecutionTests.allTests),
   testCase(RequestTests.allTests),

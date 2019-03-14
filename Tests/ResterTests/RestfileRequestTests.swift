@@ -214,6 +214,7 @@ final class RequestExecutionTests: XCTestCase {
     }
 
     func test_post_multipart() throws {
+        let testFile = path(for: "test.jpg")!
         let s = """
             requests:
               post:
@@ -221,15 +222,13 @@ final class RequestExecutionTests: XCTestCase {
                 method: POST
                 body:
                   multipart:
-                    file: R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+                    file: .file(\(testFile))
                 validation:
                   status: 200
                   json:
                     method: POST
                     headers:
                       Content-Type: multipart/form-data; charset=utf-8; boundary=__X_RESTER_BOUNDARY__
-                    form:
-                      file: R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
             """
         var rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
