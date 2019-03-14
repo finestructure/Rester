@@ -15,6 +15,11 @@ extension LaunchTests {
       ("test_launch_binary_malformed", test_launch_binary_malformed),
   ]
 }
+extension PathTests {
+  static var allTests: [(String, (PathTests) -> () throws -> Void)] = [
+      ("test_mimeType", test_mimeType),
+  ]
+}
 extension RequestExecutionTests {
   static var allTests: [(String, (RequestExecutionTests) -> () throws -> Void)] = [
       ("test_request_execute", test_request_execute),
@@ -101,6 +106,7 @@ extension ValueTests {
 
 XCTMain([
   testCase(LaunchTests.allTests),
+  testCase(PathTests.allTests),
   testCase(RequestExecutionTests.allTests),
   testCase(RequestTests.allTests),
   testCase(ResterTests.allTests),
