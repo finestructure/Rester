@@ -28,21 +28,6 @@ class ParameterTests: XCTestCase {
         )
     }
 
-    func test_parseFile_value() throws {
-        Current.workDir = testDataDirectory()!
-        let testFile = path(for: "test.jpg")!
-
-        XCTAssertEqual(try parseFile(value: .string(".file(\(testFile))")), testFile)
-
-        XCTAssertEqual(try parseFile(value: ".file(test.jpg)"), testFile)
-
-        XCTAssertThrowsError(try parseFile(value: "test.jpg")) { error in
-            XCTAssertEqual(error.legibleLocalizedDescription, "internal error: expected to find .file(...) attribute")
-        }
-
-        // TODO: add test for path with spaces and parenthesis
-    }
-
     func test_multipartEncoded_file() throws {
         // tests multipart encoding of "file" parameters
         Current.workDir = testDataDirectory()!

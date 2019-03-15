@@ -1,6 +1,7 @@
 import XCTest
 
 import LegibleError
+import Path
 import PromiseKit
 import Rainbow
 import Yams
@@ -502,6 +503,35 @@ final class RequestExecutionTests: XCTestCase {
                 // we're expecting the value pulled from the key path `headers.Host` in the json response
                 XCTAssertEqual(console.labels, ["headers.Host"])
                 XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_log_request_file() throws {
+        Current.workDir = testDataDirectory()!
+        let fname = "log.txt"
+        let logfile = Current.workDir/fname
+        try logfile.delete()
+        XCTAssert(!logfile.exists, "log file must not exist prior to test")
+
+        let s = """
+            requests:
+              log:
+                url: https://httpbin.org/anything
+                log: .file(\(fname))
+            """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("log").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                XCTAssert(logfile.exists, "log file must exist after test")
+                let log = try String(contentsOf: logfile)
+                XCTAssert(log.contains("\"url\": \"https://httpbin.org/anything\""), "logfile was: \(log)")
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)

@@ -125,10 +125,10 @@ extension Request {
             case let .text(body):
                 urlRequest.addValue("text/plain; charset=utf-8", forHTTPHeaderField: "Content-Type")
                 urlRequest.httpBody = body.data(using: .utf8)
-            case let .file(fileName):
-                let file = try parseFile(fileName: fileName)
-                urlRequest.addValue(file.mimeType, forHTTPHeaderField: "Content-Type")
-                urlRequest.httpBody = try Data(contentsOf: file)
+            case let .file(file):
+                let path = try file.path()
+                urlRequest.addValue(path.mimeType, forHTTPHeaderField: "Content-Type")
+                urlRequest.httpBody = try Data(contentsOf: path)
             }
         }
         headers.forEach {
@@ -164,7 +164,7 @@ extension Request {
                     throw error
                 }
             }.map { response in
-                if let value = self.log { print(value: value, of: response) }
+                if let value = self.log { try _log(value: value, of: response) }
                 return response
         }
     }
@@ -208,10 +208,10 @@ extension Array where Element == Request {
 }
 
 
-func print(value: Value, of response: Response) {
+func _log(value: Value, of response: Response) throws {
     switch value {
     case .bool(true):
-        ["status", "headers", "json"].forEach { print(value: $0, of: response) }
+        try ["status", "headers", "json"].forEach { try _log(value: $0, of: response) }
     case .string("status"):
         Current.console.display(label: "Status", value: response.status)
     case .string("headers"):
@@ -228,9 +228,11 @@ func print(value: Value, of response: Response) {
         if let json = response.json {
             Current.console.display(label: "JSON", value: json)
         }
+    case .string where (try? value.path()) != nil:      // a bit clumsy but can't see how to
+        try response.data.write(to: try value.path())   // avoid the double call to path()
     case let .array(array) where !array.isEmpty:
         for item in array {
-            print(value: item, of: response)
+            try _log(value: item, of: response)
         }
     default:
         break

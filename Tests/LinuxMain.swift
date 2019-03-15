@@ -18,7 +18,6 @@ extension LaunchTests {
 extension ParameterTests {
   static var allTests: [(String, (ParameterTests) -> () throws -> Void)] = [
       ("test_multipartEncode_file", test_multipartEncode_file),
-      ("test_parseFile_value", test_parseFile_value),
       ("test_multipartEncoded_file", test_multipartEncoded_file),
   ]
 }
@@ -47,6 +46,7 @@ extension RequestExecutionTests {
       ("test_delay_request_substitution", test_delay_request_substitution),
       ("test_log_request", test_log_request),
       ("test_log_request_json_keypath", test_log_request_json_keypath),
+      ("test_log_request_file", test_log_request_file),
       ("test_response_array_validation", test_response_array_validation),
       ("test_response_variable_legacy", test_response_variable_legacy),
       ("test_response_variable", test_response_variable),
@@ -112,6 +112,7 @@ extension ValueTests {
       ("test_formUrlEncoded", test_formUrlEncoded),
       ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
+      ("test_path", test_path),
   ]
 }
 
