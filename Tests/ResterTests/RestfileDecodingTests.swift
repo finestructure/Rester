@@ -142,16 +142,16 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(t.body.multipart?["foo"], Value.string("bar"))
     }
 
-    func test_parse_body_raw() throws {
+    func test_parse_body_text() throws {
         struct Test: Decodable {
             let body: Body
         }
         let s = """
             body:
-              raw: foobar
+              text: foobar
         """
         let t = try YAMLDecoder().decode(Test.self, from: s)
-        XCTAssertEqual(t.body.raw, "foobar")
+        XCTAssertEqual(t.body.text, "foobar")
     }
 
     func test_Restfile_init() throws {

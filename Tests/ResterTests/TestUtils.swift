@@ -94,5 +94,5 @@ extension Body {
     var json: [Key: Value]? { if case let .json(value) = self { return value } else { return nil } }
     var form: [Key: Value]? { if case let .form(value) = self { return value } else { return nil } }
     var multipart: [Key: Value]? { if case let .multipart(value) = self { return value } else { return nil } }
-    var raw: String? { if case let .raw(value) = self { return value } else { return nil } }
+    var text: String? { if case let .text(value) = self { return value } else { return nil } }
 }

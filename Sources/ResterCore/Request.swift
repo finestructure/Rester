@@ -122,8 +122,8 @@ extension Request {
                     forHTTPHeaderField: "Content-Type"
                 )
                 urlRequest.httpBody = try body.multipartEncoded()
-            case let .raw(body):
-                urlRequest.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+            case let .text(body):
+                urlRequest.addValue("text/plain; charset=utf-8", forHTTPHeaderField: "Content-Type")
                 urlRequest.httpBody = body.data(using: .utf8)
             }
         }

@@ -240,22 +240,21 @@ final class RequestExecutionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
-    func test_post_raw() throws {
+    func test_post_text() throws {
         let s = """
             requests:
               post:
                 url: https://httpbin.org/anything
                 method: POST
                 body:
-                  raw: foobar
+                  text: foobar
                 validation:
                   status: 200
                   json:
                     method: POST
                     headers:
-                      Content-Type: application/octet-stream
+                      Content-Type: text/plain; charset=utf-8
                     data: foobar
-                log: json
         """
         var rester = try YAMLDecoder().decode(Restfile.self, from: s)
         let expectation = self.expectation(description: #function)
