@@ -98,25 +98,25 @@ extension Request {
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
-        if [.post, .put].contains(method) {
-            if  // json
-                let body = body?.json,
-                let postData = try? JSONEncoder().encode(body) {
-                urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                urlRequest.httpBody = postData
-            } else if  // form
-                let body = body?.form?.formUrlEncoded,
-                let postData = body.data(using: .utf8) {
-                urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-                urlRequest.httpBody = postData
-                if debug {
-                    print("Request:")
-                    dump(urlRequest)
-                    print("Body:")
-                    dump(body)
+        if [.post, .put].contains(method), let body = body {
+            switch body {
+            case let .json(body):
+                if let postData = try? JSONEncoder().encode(body) {
+                    urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    urlRequest.httpBody = postData
                 }
-            } else if  // multipart
-                let body = body?.multipart {
+            case let .form(body):
+                if let postData = body.formUrlEncoded.data(using: .utf8) {
+                    urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+                    urlRequest.httpBody = postData
+                    if debug {
+                        print("Request:")
+                        dump(urlRequest)
+                        print("Body:")
+                        dump(body)
+                    }
+                }
+            case let .multipart(body):
                 urlRequest.addValue(
                     "multipart/form-data; charset=utf-8; boundary=__X_RESTER_BOUNDARY__",
                     forHTTPHeaderField: "Content-Type"
