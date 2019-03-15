@@ -81,10 +81,8 @@ let main = command(
             print("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
             return true
         case let .invalid(message):
-            if verbose {
-                debugPrint("Response:".bold)
-                debugPrint("\(response)\n")
-            }
+            debugPrint("Response:".bold)
+            debugPrint("\(response)\n")
             print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
             return false
         }
