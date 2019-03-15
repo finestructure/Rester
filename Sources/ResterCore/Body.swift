@@ -16,7 +16,7 @@ public enum Body {
     case form([Key: Value])
     case multipart([Key: Value])
     case text(String)
-    case file(FileName)
+    case file(Value)
 }
 
 
@@ -39,7 +39,7 @@ extension Body: Decodable {
             self = .text(value)
             return
         }
-        if let value = try? container.decode(String.self, forKey: .file) {
+        if let value = try? container.decode(Value.self, forKey: .file) {
             self = .file(value)
             return
         }
@@ -69,8 +69,8 @@ extension Body: Substitutable {
             return .multipart(try dict.substitute(variables: variables))
         case let .text(string):
             return .text(try Value.string(string).substitute(variables: variables).string)
-        case let .file(string):
-            return .file(try Value.string(string).substitute(variables: variables).string)
+        case let .file(file):
+            return .file(try file.substitute(variables: variables))
         }
     }
 }

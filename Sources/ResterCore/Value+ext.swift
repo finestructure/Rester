@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 19/01/2019.
 //
 
+import Path
+import Regex
 import ValueCodable
 
 
@@ -42,5 +44,28 @@ extension Value: Substitutable {
         default:
             return self
         }
+    }
+}
+
+
+extension Value {
+    func path() throws -> Path {
+        if case let .string(string) = self {
+            // FIXME: deal with () in path names
+            let regex = try Regex(pattern: ".file\\((.*?)\\)", groupNames: "file")
+            guard
+                let match = regex.findFirst(in: string),
+                let file = match.group(named: "file")else {
+                    // TODO: provide new error type with more detail
+                    throw ResterError.internalError("expected to find .file(...) attribute")
+            }
+            if let path = Path(file) {
+                // absolute path
+                return path
+            } else {
+                return Current.workDir/file
+            }
+        }
+        throw ResterError.internalError("extracting file requires string value, found: \(self)")
     }
 }

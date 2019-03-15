@@ -8,6 +8,7 @@
 import XCTest
 @testable import ResterCore
 
+import Path
 import Yams
 
 
@@ -64,6 +65,16 @@ class ValueTests: XCTestCase {
             let value: Value = "${request[2].foo}"
             XCTAssertEqual(try value.substitute(variables: response), "bar")
         }
+    }
+
+    func test_path() throws {
+        XCTAssertEqual(try Value.string(".file(foo.txt)").path(), Current.workDir/"foo.txt")
+
+        XCTAssertThrowsError(try Value.string("test.jpg").path()) { error in
+            XCTAssertEqual(error.legibleLocalizedDescription, "internal error: expected to find .file(...) attribute")
+        }
+
+        // TODO: add test for path with spaces and parenthesis
     }
 
 }

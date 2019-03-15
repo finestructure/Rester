@@ -7,7 +7,6 @@
 
 import Foundation
 import Path
-import Regex
 
 
 struct Parameter {
@@ -38,34 +37,10 @@ extension Parameter: URLEncoding {
 extension Parameter: MultipartEncoding {
     func multipartEncoded() throws -> Data {
         if key == "file" {
-            let file = try parseFile(value: value)
-            return try multipartEncode(file: file)
+            return try multipartEncode(file: try value.path())
         } else {
             return try multipartEncode(key: key, value: value)
         }
-    }
-}
-
-
-func parseFile(value: Value) throws -> Path {
-    return try parseFile(fileName: value.string)
-}
-
-
-func parseFile(fileName: String) throws -> Path {
-    // FIXME: deal with () in path names
-    let regex = try Regex(pattern: ".file\\((.*?)\\)", groupNames: "file")
-    guard
-        let match = regex.findFirst(in: fileName),
-        let file = match.group(named: "file")else {
-        // TODO: provide new error type with more detail
-        throw ResterError.internalError("expected to find .file(...) attribute")
-    }
-    if let path = Path(file) {
-        // absolute path
-        return path
-    } else {
-        return Current.workDir/file
     }
 }
 

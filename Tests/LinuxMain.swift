@@ -18,7 +18,6 @@ extension LaunchTests {
 extension ParameterTests {
   static var allTests: [(String, (ParameterTests) -> () throws -> Void)] = [
       ("test_multipartEncode_file", test_multipartEncode_file),
-      ("test_parseFile_value", test_parseFile_value),
       ("test_multipartEncoded_file", test_multipartEncoded_file),
   ]
 }
@@ -112,6 +111,7 @@ extension ValueTests {
       ("test_formUrlEncoded", test_formUrlEncoded),
       ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
+      ("test_path", test_path),
   ]
 }
 
