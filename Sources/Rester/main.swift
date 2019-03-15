@@ -82,7 +82,7 @@ let main = command(
             return true
         case let .invalid(message):
             if verbose {
-                debugPrint("Response was:")
+                debugPrint("Response:".bold)
                 debugPrint("\(response)\n")
             }
             print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
