@@ -70,7 +70,7 @@ func multipartEncode(file: Path) throws -> Data {
     let header = """
         \(MultipartBoundary)
         Content-Disposition: form-data; name="file"; filename="\(file.basename())"
-        Content-Type: \(file.mimeType ?? "application/octet-stream")
+        Content-Type: \(file.mimeType)
 
 
         """

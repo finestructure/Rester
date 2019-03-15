@@ -9,8 +9,8 @@ import Path
 
 
 extension Path {
-    public var mimeType: String? {
-        return MimeTypes[self.extension]
+    public var mimeType: String {
+        return MimeTypes[self.extension] ?? "application/octet-stream"
     }
 }
 
