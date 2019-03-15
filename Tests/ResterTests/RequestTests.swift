@@ -7,6 +7,7 @@
 
 import XCTest
 
+import Path
 import Yams
 @testable import ResterCore
 
@@ -163,6 +164,15 @@ class RequestTests: XCTestCase {
             """
             let r = try YAMLDecoder().decode(Request.Details.self, from: s)
             XCTAssertEqual(r.log, "json")
+        }
+        do {  // file
+            let s = """
+                url: https://httpbin.org/anything
+                log: .file(response.out)
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, ".file(response.out)")
+            XCTAssertEqual(try r.log?.path(), Current.workDir/"response.out")
         }
     }
 
