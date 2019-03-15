@@ -12,6 +12,7 @@ public enum Body {
     case json([Key: Value])
     case form([Key: Value])
     case multipart([Key: Value])
+    case raw(String)
 }
 
 
@@ -30,6 +31,10 @@ extension Body: Decodable {
             self = .multipart(value)
             return
         }
+        if let value = try? container.decode(String.self, forKey: .raw) {
+            self = .raw(value)
+            return
+        }
         throw ResterError.decodingError(
             "body must include one of \(CodingKeys.allCases.map { $0.stringValue }.joined(separator: ", "))"
         )
@@ -39,6 +44,7 @@ extension Body: Decodable {
         case json
         case form
         case multipart
+        case raw
     }
 }
 
@@ -52,6 +58,8 @@ extension Body: Substitutable {
             return .form(try dict.substitute(variables: variables))
         case let .multipart(dict):
             return .multipart(try dict.substitute(variables: variables))
+        case .raw:
+            return self
         }
     }
 }
