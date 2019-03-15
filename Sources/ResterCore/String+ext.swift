@@ -14,3 +14,11 @@ extension String {
         return String(self.dropFirst(prefix.count))
     }
 }
+
+
+extension String: URLEncoding {
+    var urlEncoded: String? {
+        let allowed = CharacterSet.urlHostAllowed.subtracting(CharacterSet(charactersIn: "+"))
+        return addingPercentEncoding(withAllowedCharacters: allowed)
+    }
+}

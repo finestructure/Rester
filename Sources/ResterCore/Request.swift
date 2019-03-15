@@ -98,23 +98,37 @@ extension Request {
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
-        if [.post, .put].contains(method) {
-            if
-                let body = body?.json,
-                let postData = try? JSONEncoder().encode(body) {
-                urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                urlRequest.httpBody = postData
-            } else if
-                let body = body?.form?.formUrlEncoded,
-                let postData = body.data(using: .utf8) {
-                urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-                urlRequest.httpBody = postData
-                if debug {
-                    print("Request:")
-                    dump(urlRequest)
-                    print("Body:")
-                    dump(body)
+        if [.post, .put].contains(method), let body = body {
+            switch body {
+            case let .json(body):
+                if let postData = try? JSONEncoder().encode(body) {
+                    urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    urlRequest.httpBody = postData
                 }
+            case let .form(body):
+                if let postData = body.formUrlEncoded.data(using: .utf8) {
+                    urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+                    urlRequest.httpBody = postData
+                    if debug {
+                        print("Request:")
+                        dump(urlRequest)
+                        print("Body:")
+                        dump(body)
+                    }
+                }
+            case let .multipart(body):
+                urlRequest.addValue(
+                    "multipart/form-data; charset=utf-8; boundary=__X_RESTER_BOUNDARY__",
+                    forHTTPHeaderField: "Content-Type"
+                )
+                urlRequest.httpBody = try body.multipartEncoded()
+            case let .text(body):
+                urlRequest.addValue("text/plain; charset=utf-8", forHTTPHeaderField: "Content-Type")
+                urlRequest.httpBody = body.data(using: .utf8)
+            case let .file(fileName):
+                let file = try parseFile(fileName: fileName)
+                urlRequest.addValue(file.mimeType, forHTTPHeaderField: "Content-Type")
+                urlRequest.httpBody = try Data(contentsOf: file)
             }
         }
         headers.forEach {

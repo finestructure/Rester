@@ -35,11 +35,11 @@ let main = command(
     print("🚀  Resting \(filename.bold) ...\n")
 
     let restfilePath = Path(filename) ?? Path.cwd/filename
-    let workDir = getWorkDir(input: wdir) ?? (restfilePath).parent
+    Current.workDir = getWorkDir(input: wdir) ?? (restfilePath).parent
 
     if verbose {
         debugPrint("Restfile path: \(restfilePath)")
-        debugPrint("Working directory: \(workDir)\n")
+        debugPrint("Working directory: \(Current.workDir)\n")
     }
 
     if timeout != Request.defaultTimeout {
@@ -48,7 +48,7 @@ let main = command(
 
     let rester: Rester
     do {
-        rester = try Rester(path: restfilePath, workDir: workDir)
+        rester = try Rester(path: restfilePath, workDir: Current.workDir)
     } catch {
         display(error)
         exit(1)
@@ -81,10 +81,8 @@ let main = command(
             print("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
             return true
         case let .invalid(message):
-            if verbose {
-                debugPrint("Response was:")
-                debugPrint("\(response)\n")
-            }
+            debugPrint("Response:".bold)
+            debugPrint("\(response)\n")
             print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
             return false
         }

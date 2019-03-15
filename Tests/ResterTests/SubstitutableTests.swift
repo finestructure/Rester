@@ -20,10 +20,13 @@ class SubstitutableTests: XCTestCase {
 
     func test_substitute_Body() throws {
         let vars: [Key: Value] = ["a": "1", "b": 2]
-        let body = Body(json: ["data": "json field: ${a} ${b}"], form: ["data": "form field: ${a} ${b}"])
-        let expanded = try body.substitute(variables: vars)
-        XCTAssertEqual(expanded.json, ["data": "json field: 1 2"])
-        XCTAssertEqual(expanded.form, ["data": "form field: 1 2"])
+        let values: [Key: Value] = ["data": "values: ${a} ${b}"]
+
+        XCTAssertEqual(try Body.json(values).substitute(variables: vars).json, ["data": "values: 1 2"])
+        XCTAssertEqual(try Body.form(values).substitute(variables: vars).form, ["data": "values: 1 2"])
+        XCTAssertEqual(try Body.multipart(values).substitute(variables: vars).multipart, ["data": "values: 1 2"])
+        XCTAssertEqual(try Body.text("${a} ${b}").substitute(variables: vars).text, "1 2")
+        XCTAssertEqual(try Body.file("${a} ${b}").substitute(variables: vars).file, "1 2")
     }
     
 }

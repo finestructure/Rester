@@ -32,6 +32,26 @@ class ValueTests: XCTestCase {
         }
     }
 
+    func test_multipartEncoded() throws {
+        do {
+            let d: [Key: Value] = ["foo2": "baz", "foo1": "bar"]
+            XCTAssertEqual(
+                String(data: try d.multipartEncoded(), encoding: .utf8),
+                """
+                --__X_RESTER_BOUNDARY__
+                Content-Disposition: form-data; name="foo1"
+
+                bar
+                --__X_RESTER_BOUNDARY__
+                Content-Disposition: form-data; name="foo2"
+
+                baz
+                --__X_RESTER_BOUNDARY__--
+                """
+            )
+        }
+    }
+
     func test_key_substitution() throws {
         let d: Value = .dictionary(["foo": "bar"])
         let a: Value = .array(["a", 42, d])
