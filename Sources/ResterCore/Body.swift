@@ -8,11 +8,15 @@
 import Foundation
 
 
+public typealias FileName = String
+
+
 public enum Body {
     case json([Key: Value])
     case form([Key: Value])
     case multipart([Key: Value])
     case text(String)
+    case file(FileName)
 }
 
 
@@ -35,6 +39,10 @@ extension Body: Decodable {
             self = .text(value)
             return
         }
+        if let value = try? container.decode(String.self, forKey: .file) {
+            self = .file(value)
+            return
+        }
         throw ResterError.decodingError(
             "body must include one of \(CodingKeys.allCases.map { $0.stringValue }.joined(separator: ", "))"
         )
@@ -45,6 +53,7 @@ extension Body: Decodable {
         case form
         case multipart
         case text
+        case file
     }
 }
 
@@ -60,6 +69,8 @@ extension Body: Substitutable {
             return .multipart(try dict.substitute(variables: variables))
         case let .text(string):
             return .text(try Value.string(string).substitute(variables: variables).string)
+        case let .file(string):
+            return .file(try Value.string(string).substitute(variables: variables).string)
         }
     }
 }

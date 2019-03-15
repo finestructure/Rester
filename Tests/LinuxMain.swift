@@ -81,6 +81,7 @@ extension RestfileDecodingTests {
       ("test_parse_body_form", test_parse_body_form),
       ("test_parse_body_multipart", test_parse_body_multipart),
       ("test_parse_body_text", test_parse_body_text),
+      ("test_parse_body_file", test_parse_body_file),
       ("test_Restfile_init", test_Restfile_init),
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
