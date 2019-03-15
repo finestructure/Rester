@@ -38,6 +38,7 @@ extension RequestExecutionTests {
       ("test_post_form", test_post_form),
       ("test_post_multipart", test_post_multipart),
       ("test_post_text", test_post_text),
+      ("test_post_file", test_post_file),
       ("test_substitute_env", test_substitute_env),
       ("test_put_request_json", test_put_request_json),
       ("test_validate_headers", test_validate_headers),
