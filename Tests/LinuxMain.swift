@@ -46,6 +46,7 @@ extension RequestExecutionTests {
       ("test_delay_request_substitution", test_delay_request_substitution),
       ("test_log_request", test_log_request),
       ("test_log_request_json_keypath", test_log_request_json_keypath),
+      ("test_log_request_file", test_log_request_file),
       ("test_response_array_validation", test_response_array_validation),
       ("test_response_variable_legacy", test_response_variable_legacy),
       ("test_response_variable", test_response_variable),
