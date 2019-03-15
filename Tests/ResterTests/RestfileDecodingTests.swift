@@ -142,6 +142,18 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssertEqual(t.body.multipart?["foo"], Value.string("bar"))
     }
 
+    func test_parse_body_text() throws {
+        struct Test: Decodable {
+            let body: Body
+        }
+        let s = """
+            body:
+              text: foobar
+        """
+        let t = try YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertEqual(t.body.text, "foobar")
+    }
+
     func test_Restfile_init() throws {
         let workDir = testDataDirectory()!
         let r = try Restfile(path: workDir/"nested/basic.yml")

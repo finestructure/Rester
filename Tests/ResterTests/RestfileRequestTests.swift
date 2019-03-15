@@ -240,6 +240,32 @@ final class RequestExecutionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_post_text() throws {
+        let s = """
+            requests:
+              post:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  text: foobar
+                validation:
+                  status: 200
+                  json:
+                    method: POST
+                    headers:
+                      Content-Type: text/plain; charset=utf-8
+                    data: foobar
+        """
+        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
+        let expectation = self.expectation(description: #function)
+        _ = try rester.expandedRequest("post").test()
+            .map {
+                XCTAssertEqual($0, ValidationResult.valid)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
     func test_substitute_env() throws {
         Current.environment = ["TEST_ID": "foo"]
         let s = """
