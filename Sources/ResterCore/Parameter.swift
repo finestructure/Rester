@@ -48,10 +48,15 @@ extension Parameter: MultipartEncoding {
 
 
 func parseFile(value: Value) throws -> Path {
+    return try parseFile(fileName: value.string)
+}
+
+
+func parseFile(fileName: String) throws -> Path {
     // FIXME: deal with () in path names
     let regex = try Regex(pattern: ".file\\((.*?)\\)", groupNames: "file")
     guard
-        let match = regex.findFirst(in: value.string),
+        let match = regex.findFirst(in: fileName),
         let file = match.group(named: "file")else {
         // TODO: provide new error type with more detail
         throw ResterError.internalError("expected to find .file(...) attribute")
@@ -70,7 +75,7 @@ func multipartEncode(file: Path) throws -> Data {
     let header = """
         \(MultipartBoundary)
         Content-Disposition: form-data; name="file"; filename="\(file.basename())"
-        Content-Type: \(file.mimeType ?? "application/octet-stream")
+        Content-Type: \(file.mimeType)
 
 
         """

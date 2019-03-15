@@ -125,6 +125,10 @@ extension Request {
             case let .text(body):
                 urlRequest.addValue("text/plain; charset=utf-8", forHTTPHeaderField: "Content-Type")
                 urlRequest.httpBody = body.data(using: .utf8)
+            case let .file(fileName):
+                let file = try parseFile(fileName: fileName)
+                urlRequest.addValue(file.mimeType, forHTTPHeaderField: "Content-Type")
+                urlRequest.httpBody = try Data(contentsOf: file)
             }
         }
         headers.forEach {

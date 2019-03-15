@@ -26,6 +26,7 @@ class SubstitutableTests: XCTestCase {
         XCTAssertEqual(try Body.form(values).substitute(variables: vars).form, ["data": "values: 1 2"])
         XCTAssertEqual(try Body.multipart(values).substitute(variables: vars).multipart, ["data": "values: 1 2"])
         XCTAssertEqual(try Body.text("${a} ${b}").substitute(variables: vars).text, "1 2")
+        XCTAssertEqual(try Body.file("${a} ${b}").substitute(variables: vars).file, "1 2")
     }
     
 }

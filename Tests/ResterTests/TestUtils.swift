@@ -95,4 +95,5 @@ extension Body {
     var form: [Key: Value]? { if case let .form(value) = self { return value } else { return nil } }
     var multipart: [Key: Value]? { if case let .multipart(value) = self { return value } else { return nil } }
     var text: String? { if case let .text(value) = self { return value } else { return nil } }
+    var file: String? { if case let .file(value) = self { return value } else { return nil } }
 }
