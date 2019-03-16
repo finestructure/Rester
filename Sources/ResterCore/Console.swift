@@ -10,15 +10,15 @@ import Rainbow
 
 
 public protocol Console {
-    mutating func display(label: String, value: Any)
+    mutating func display(key: String, value: Any)
     mutating func display(verbose message: String)
     mutating func display(error: Error)
 }
 
 
 struct DefaultConsole: Console {
-    mutating func display(label: String, value: Any) {
-        let msg = "\(label):".magenta.bold + " \(value)"
+    mutating func display(key: String, value: Any) {
+        let msg = "\(key):".magenta.bold + " \(value)"
         print(msg, terminator: "\n\n")
     }
 
