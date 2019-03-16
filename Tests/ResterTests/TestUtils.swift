@@ -73,7 +73,7 @@ class TestConsole: Console {
         self.verbose.append(message)
     }
 
-    func display(error: Error) {
+    func display(_ error: Error) {
         self.error.append(error.legibleLocalizedDescription + "\n")
     }
 }
@@ -93,7 +93,7 @@ struct PlainConsole: Console {
         print(message)
     }
 
-    mutating func display(error: Error) {
+    mutating func display(_ error: Error) {
         print("❌  Error: \(error.legibleLocalizedDescription)")
     }
 }

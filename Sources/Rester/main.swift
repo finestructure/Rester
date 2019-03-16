@@ -8,18 +8,6 @@ import ResterCore
 import Yams
 
 
-func display(_ error: Error) {
-    if
-        let decodingError = error as? DecodingError,
-        case let .dataCorrupted(err) = decodingError,
-        let underlying = err.underlyingError as? ResterError {
-        print("❌  Restfile syntax error: \(underlying.legibleLocalizedDescription)")
-    } else {
-        print("❌  Error: \(error.legibleLocalizedDescription)")
-    }
-}
-
-
 let main = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
@@ -45,7 +33,7 @@ let main = command(
     do {
         rester = try Rester(path: restfilePath, workDir: Current.workDir)
     } catch {
-        display(error)
+        Current.console.display(error)
         exit(1)
     }
 
@@ -94,7 +82,7 @@ let main = command(
                 exit(0)
             }
         }.catch { error in
-            display(error)
+            Current.console.display(error)
             exit(1)
     }
 
