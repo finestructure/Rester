@@ -79,26 +79,6 @@ class TestConsole: Console {
 }
 
 
-struct PlainConsole: Console {
-    func display(_ message: String) {
-        print(message)
-    }
-
-    mutating func display(key: String, value: Any) {
-        let msg = "\(key):" + " \(value)"
-        print(msg, terminator: "\n\n")
-    }
-
-    mutating func display(verbose message: String) {
-        print(message)
-    }
-
-    mutating func display(_ error: Error) {
-        print("❌  Error: \(error.legibleLocalizedDescription)")
-    }
-}
-
-
 // Convenience accessors
 extension Body {
     var json: [Key: Value]? { if case let .json(value) = self { return value } else { return nil } }
