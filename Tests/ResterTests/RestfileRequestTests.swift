@@ -315,7 +315,7 @@ final class RequestExecutionTests: XCTestCase {
             """
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = rester.test(beforeRequest: {_ in}, afterRequest: { (name: $0, response: $1, result: $2) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
                 XCTAssertEqual(results[0].name, "post")
@@ -442,7 +442,7 @@ final class RequestExecutionTests: XCTestCase {
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
         let start = Date()
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = rester.test(beforeRequest: {_ in}, afterRequest: { (name: $0, response: $1, result: $2) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
                 XCTAssertEqual(results[0].result, .valid)
@@ -565,7 +565,7 @@ final class RequestExecutionTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(beforeRequest: {_ in }, afterRequest: { (name: $0, response: $1, result: $2) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
                 XCTAssertEqual(results[0].name, "post-array")
@@ -601,7 +601,7 @@ final class RequestExecutionTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(beforeRequest: {_ in }, afterRequest: { (name: $0, response: $1, result: $2) })
             .done { results in
                 XCTAssertEqual(results.count, 2)
                 XCTAssertEqual(results[0].name, "post-array")
@@ -639,7 +639,7 @@ final class RequestExecutionTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(beforeRequest: {_ in }, afterRequest: { (name: $0, response: $1, result: $2) })
             .done { results in
                 XCTAssertEqual(results.count, 2)
                 XCTAssertEqual(results[0].name, "post-array")
@@ -678,7 +678,7 @@ final class RequestExecutionTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) }, timeout: 0.1)
+        _ = r.test(beforeRequest: {_ in }, afterRequest: { (name: $0, response: $1, result: $2) }, timeout: 0.1)
             .done { _ in
                 XCTFail("expected timeout to be raised")
                 expectation.fulfill()

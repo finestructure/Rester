@@ -20,6 +20,26 @@ extension Console {
 }
 
 
+func before(name: Request.Name) {
+    Current.console.display("🎬  \(name.blue) started ...\n")
+}
+
+
+func after(name: Request.Name, response: Response, result: ValidationResult) -> Bool {
+    switch result {
+    case .valid:
+        let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
+        Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
+        return true
+    case let .invalid(message):
+        Current.console.display(verbose: "Response:".bold)
+        Current.console.display(verbose: "\(response)\n")
+        Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+        return false
+    }
+}
+
+
 let main = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
@@ -58,25 +78,7 @@ let main = command(
         exit(0)
     }
 
-    func before(name: Request.Name) {
-        Current.console.display("🎬  \(name.blue) started ...\n")
-    }
-
-    func after(name: Request.Name, response: Response, result: ValidationResult) -> Bool {
-        switch result {
-        case .valid:
-            let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
-            Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
-            return true
-        case let .invalid(message):
-            Current.console.display(verbose: "Response:".bold)
-            Current.console.display(verbose: "\(response)\n")
-            Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
-            return false
-        }
-    }
-
-    rester.test(before: before, after: after, timeout: timeout)
+    rester.test(beforeRequest: before, afterRequest: after, timeout: timeout)
         .done { results in
             let failureCount = results.filter { !$0 }.count
             let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
