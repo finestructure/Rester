@@ -8,11 +8,6 @@ import ResterCore
 import Yams
 
 
-func debugPrint(_ msg: String) {
-    print(msg.lightWhite.italic)
-}
-
-
 func display(_ error: Error) {
     if
         let decodingError = error as? DecodingError,
@@ -38,8 +33,8 @@ let main = command(
     Current.workDir = getWorkDir(input: wdir) ?? (restfilePath).parent
 
     if verbose {
-        debugPrint("Restfile path: \(restfilePath)")
-        debugPrint("Working directory: \(Current.workDir)\n")
+        Current.console.display(verbose: "Restfile path: \(restfilePath)")
+        Current.console.display(verbose: "Working directory: \(Current.workDir)\n")
     }
 
     if timeout != Request.defaultTimeout {
@@ -57,9 +52,9 @@ let main = command(
     if verbose {
         let vars = rester.allVariables
         if vars.count > 0 {
-            debugPrint("Defined variables:")
+            Current.console.display(verbose: "Defined variables:")
             for v in vars.keys {
-                debugPrint("  - \(v)")
+                Current.console.display(verbose: "  - \(v)")
             }
             print("")
         }
@@ -81,8 +76,8 @@ let main = command(
             print("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
             return true
         case let .invalid(message):
-            debugPrint("Response:".bold)
-            debugPrint("\(response)\n")
+            Current.console.display(verbose: "Response:".bold)
+            Current.console.display(verbose: "\(response)\n")
             print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
             return false
         }
