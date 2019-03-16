@@ -8,6 +8,18 @@ import ResterCore
 import Yams
 
 
+extension Console {
+    func display(variables: [Key: Value]) {
+        guard variables.count > 0 else { return }
+        Current.console.display(verbose: "Defined variables:")
+        for v in variables.keys {
+            Current.console.display(verbose: "  - \(v)")
+        }
+        Current.console.display(verbose: "")
+    }
+}
+
+
 let main = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
@@ -38,14 +50,7 @@ let main = command(
     }
 
     if verbose {
-        let vars = rester.allVariables
-        if vars.count > 0 {
-            Current.console.display(verbose: "Defined variables:")
-            for v in vars.keys {
-                Current.console.display(verbose: "  - \(v)")
-            }
-            Current.console.display(verbose: "")
-        }
+        Current.console.display(variables: rester.allVariables)
     }
 
     guard rester.requestCount > 0 else {
