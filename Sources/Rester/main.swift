@@ -15,7 +15,7 @@ let main = command(
     Argument<String>("filename", description: "A Restfile")
 ) { verbose, wdir, timeout, filename in
 
-    print("🚀  Resting \(filename.bold) ...\n")
+    Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
     let restfilePath = Path(filename) ?? Path.cwd/filename
     Current.workDir = getWorkDir(input: wdir) ?? (restfilePath).parent
@@ -44,29 +44,29 @@ let main = command(
             for v in vars.keys {
                 Current.console.display(verbose: "  - \(v)")
             }
-            print("")
+            Current.console.display(verbose: "")
         }
     }
 
     guard rester.requestCount > 0 else {
-        print("⚠️  no requests defined in \(filename.bold)!")
+        Current.console.display("⚠️  no requests defined in \(filename.bold)!")
         exit(0)
     }
 
     func before(name: Request.Name) {
-        print("🎬  \(name.blue) started ...\n")
+        Current.console.display("🎬  \(name.blue) started ...\n")
     }
 
     func after(name: Request.Name, response: Response, result: ValidationResult) -> Bool {
         switch result {
         case .valid:
             let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
-            print("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
+            Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
             return true
         case let .invalid(message):
             Current.console.display(verbose: "Response:".bold)
             Current.console.display(verbose: "\(response)\n")
-            print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+            Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
             return false
         }
     }
@@ -75,7 +75,7 @@ let main = command(
         .done { results in
             let failureCount = results.filter { !$0 }.count
             let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
-            print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
+            Current.console.display("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
             if failureCount > 0 {
                 exit(1)
             } else {
