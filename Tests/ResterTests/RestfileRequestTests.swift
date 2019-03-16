@@ -472,7 +472,7 @@ final class RequestExecutionTests: XCTestCase {
             .map {
                 XCTAssertEqual($0, ValidationResult.valid)
                 // confirm the console receives output
-                XCTAssertEqual(console.labels, ["Status", "Headers", "JSON"])
+                XCTAssertEqual(console.keys, ["Status", "Headers", "JSON"])
                 XCTAssertEqual(console.values[0] as? Int, 200)
                 XCTAssert("\(console.values[1])".contains("\"Content-Type\": \"application/json\""))
                 XCTAssert("\(console.values[2])".contains("\"method\": \"GET\""))
@@ -501,7 +501,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 // confirm the console receives output
                 // we're expecting the value pulled from the key path `headers.Host` in the json response
-                XCTAssertEqual(console.labels, ["headers.Host"])
+                XCTAssertEqual(console.keys, ["headers.Host"])
                 XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
                 expectation.fulfill()
             }.catch {

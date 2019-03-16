@@ -53,13 +53,13 @@ extension ValidationResult: Equatable {
 
 
 class TestConsole: Console {
-    var labels = [String]()
+    var keys = [String]()
     var values = [Any]()
     var verbose = [String]()
     var error: String = ""
 
-    func display(label: String, value: Any) {
-        labels.append(label)
+    func display(key: String, value: Any) {
+        keys.append(key)
         values.append(value)
     }
 
@@ -74,8 +74,8 @@ class TestConsole: Console {
 
 
 struct PlainConsole: Console {
-    mutating func display(label: String, value: Any) {
-        let msg = "\(label):" + " \(value)"
+    mutating func display(key: String, value: Any) {
+        let msg = "\(key):" + " \(value)"
         print(msg, terminator: "\n\n")
     }
 
