@@ -17,6 +17,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/Path.swift.git", from: "0.0.0"),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.3.0"),
         .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.0.0"),
     ],
     targets: [
@@ -28,6 +29,6 @@ let package = Package(
             dependencies: ["LegibleError", "PMKFoundation", "Path", "PromiseKit", "Rainbow", "Regex", "ValueCodable", "Yams"]),
         .testTarget(
             name: "ResterTests",
-            dependencies: ["ResterCore"]),
+            dependencies: ["ResterCore", "SnapshotTesting"]),
     ]
 )

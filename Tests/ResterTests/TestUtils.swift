@@ -7,6 +7,7 @@
 
 import Foundation
 import Path
+import Regex
 import ResterCore
 
 
@@ -96,4 +97,59 @@ extension Body {
     var multipart: [Key: Value]? { if case let .multipart(value) = self { return value } else { return nil } }
     var text: String? { if case let .text(value) = self { return value } else { return nil } }
     var file: Value? { if case let .file(value) = self { return value } else { return nil } }
+}
+
+
+enum TestError: Error {
+    case runtimeError(String)
+}
+
+
+extension String {
+    var maskTime: String {
+        if let regex = try? Regex(pattern: "\\(\\d+\\.?\\d*s\\)") {
+            return regex.replaceAll(in: self, with: "(X.XXXs)")
+        } else {
+            return self
+        }
+    }
+
+    func maskPath(_ path: Path, with placeholder: String? = nil) -> String {
+        let placeholder = path.isDirectory ? (placeholder ?? "XXX") : path.basename()
+        return path.string.r?.replaceAll(in: self, with: placeholder) ?? self
+    }
+}
+
+
+func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (status: Int32, output: String) {
+    // Some of the APIs that we use below are available in macOS 10.13 and above.
+    guard #available(macOS 10.13, *) else {
+        throw TestError.runtimeError("unsupported OS")
+    }
+
+    let binary = productsDirectory.appendingPathComponent("rester")
+
+    let process = Process()
+    process.executableURL = binary
+    process.arguments = [requestFile.string] + extraArguments
+
+    let pipe = Pipe()
+    process.standardOutput = pipe
+
+    #if os(Linux)
+    process.launch()
+    #else
+    try process.run()
+    #endif
+
+    process.waitUntilExit()
+
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    let output = (String(data: data, encoding: .utf8) ?? "no output")
+        .maskTime
+        .maskPath(requestFile)
+        .maskPath(requestFile.parent)  // this is the workDir we're replacing
+    let status = process.terminationStatus
+
+    return (status, output)
 }

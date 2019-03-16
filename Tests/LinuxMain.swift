@@ -10,6 +10,7 @@ import XCTest
 extension LaunchTests {
   static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
       ("test_mask_time", test_mask_time),
+      ("test_mask_path", test_mask_path),
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
       ("test_launch_binary_malformed", test_launch_binary_malformed),
