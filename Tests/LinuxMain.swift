@@ -7,15 +7,7 @@ import XCTest
 @testable import ResterTests
 
 // swiftlint:disable trailing_comma
-extension LaunchTests {
-  static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
-      ("test_mask_time", test_mask_time),
-      ("test_mask_path", test_mask_path),
-      ("test_launch_binary", test_launch_binary),
-      ("test_launch_binary_verbose", test_launch_binary_verbose),
-      ("test_launch_binary_malformed", test_launch_binary_malformed),
-  ]
-}
+
 extension ParameterTests {
   static var allTests: [(String, (ParameterTests) -> () throws -> Void)] = [
       ("test_multipartEncode_file", test_multipartEncode_file),
@@ -117,8 +109,17 @@ extension ValueTests {
   ]
 }
 
+extension LaunchTests {
+  static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
+      ("test_mask_time", test_mask_time),
+      ("test_mask_path", test_mask_path),
+      ("test_launch_binary", test_launch_binary),
+      ("test_launch_binary_verbose", test_launch_binary_verbose),
+      ("test_launch_binary_malformed", test_launch_binary_malformed),
+  ]
+}
+
 XCTMain([
-  testCase(LaunchTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
   testCase(RequestExecutionTests.allTests),
@@ -128,5 +129,7 @@ XCTMain([
   testCase(SubstitutableTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
+  testCase(LaunchTests.allTests),
 ])
+
 // swiftlint:enable trailing_comma
