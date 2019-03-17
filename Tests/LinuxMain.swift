@@ -90,8 +90,10 @@ extension SubstitutableTests {
 }
 extension TestUtilsTests {
   static var allTests: [(String, (TestUtilsTests) -> () throws -> Void)] = [
+      ("test_path", test_path),
       ("test_mask_time", test_mask_time),
       ("test_mask_path", test_mask_path),
+      ("test_examplesDataDir", test_examplesDataDir),
   ]
 }
 extension ValidationTests {

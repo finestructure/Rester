@@ -5,9 +5,16 @@
 //  Created by Sven A. Schmidt on 17/03/2019.
 //
 
+import Path
 import XCTest
 
+
 class TestUtilsTests: XCTestCase {
+
+    func test_path() throws {
+        XCTAssertEqual(path(fixture: "basic.yml")?.basename(), "basic.yml")
+        XCTAssertEqual(path(example: "array")?.basename(), "array")
+    }
 
     func test_mask_time() throws {
         XCTAssertEqual("basic PASSED (0.01s)".maskTime, "basic PASSED (X.XXXs)")
@@ -16,7 +23,7 @@ class TestUtilsTests: XCTestCase {
 
     func test_mask_path() throws {
         do {  // file
-            let filePath = path(for: "basic.yml")!
+            let filePath = path(fixture: "basic.yml")!
             let input = "Resting \(filePath) ...\n\nreferencing the file again: \(filePath). Done."
             let output = "Resting basic.yml ...\n\nreferencing the file again: basic.yml. Done."
             XCTAssertEqual(input.maskPath(filePath), output)
@@ -27,6 +34,11 @@ class TestUtilsTests: XCTestCase {
             let output = "Resting XXX ...\n\nreferencing the file again: XXX. Done."
             XCTAssertEqual(input.maskPath(filePath), output)
         }
+    }
+
+    func test_examplesDataDir() throws {
+        XCTAssertEqual(examplesDirectory()?.basename(), "examples")
+        XCTAssert((examplesDirectory()!/"array.yml").exists)
     }
 
 }

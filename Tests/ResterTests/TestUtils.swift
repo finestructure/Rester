@@ -11,13 +11,24 @@ import Regex
 import ResterCore
 
 
-func path(for fixture: String) -> Path? {
+func path(fixture: String) -> Path? {
     return testDataDirectory()?.join(fixture)
 }
 
 
-func readFixture(_ fixture: String) throws -> String? {
-    guard let file = path(for: fixture) else { return nil }
+func path(example: String) -> Path? {
+    return examplesDirectory()?.join(example)
+}
+
+
+func read(fixture: String) throws -> String? {
+    guard let file = path(fixture: fixture) else { return nil }
+    return try String(contentsOf: file)
+}
+
+
+func read(example: String) throws -> String? {
+    guard let file = path(example: example) else { return nil }
     return try String(contentsOf: file)
 }
 
@@ -36,6 +47,11 @@ var productsDirectory: URL {
 
 func testDataDirectory(path: String = #file) -> Path? {
     return Path(path)?.parent.join("TestData")
+}
+
+
+func examplesDirectory(path: String = #file) -> Path? {
+    return Path(path)?.parent.parent.parent.join("examples")
 }
 
 

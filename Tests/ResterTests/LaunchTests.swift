@@ -15,7 +15,7 @@ import SnapshotTesting
 class LaunchTests: SnapshotTestCase {
 
     func test_launch_binary() throws {
-        let requestFile = path(for: "basic.yml")!
+        let requestFile = path(fixture: "basic.yml")!
         let (status, output) = try launch(with: requestFile)
 
         XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
@@ -23,7 +23,7 @@ class LaunchTests: SnapshotTestCase {
     }
 
     func test_launch_binary_verbose() throws {
-        let requestFile = path(for: "basic.yml")!
+        let requestFile = path(fixture: "basic.yml")!
         let (status, output) = try launch(with: requestFile, extraArguments: ["-v", "-t", "7"])
 
         XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
@@ -31,7 +31,7 @@ class LaunchTests: SnapshotTestCase {
     }
 
     func test_launch_binary_malformed() throws {
-        let requestFile = path(for: "malformed.yml")!
+        let requestFile = path(fixture: "malformed.yml")!
         let (status, output) = try launch(with: requestFile)
 
         XCTAssert(status == 1, "exit status not 1, was: \(status), output: \(output)")
