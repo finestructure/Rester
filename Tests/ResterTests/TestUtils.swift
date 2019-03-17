@@ -174,7 +174,7 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
 
 
 extension Optional {
-    func unwrap() throws -> Wrapped {
+    func unwrapped() throws -> Wrapped {
         if let unwrapped = self {
             return unwrapped
         } else {
