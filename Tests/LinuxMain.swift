@@ -91,8 +91,10 @@ extension SubstitutableTests {
 extension TestUtilsTests {
   static var allTests: [(String, (TestUtilsTests) -> () throws -> Void)] = [
       ("test_path", test_path),
-      ("test_mask_time", test_mask_time),
-      ("test_mask_path", test_mask_path),
+      ("test_maskTime", test_maskTime),
+      ("test_maskPath", test_maskPath),
+      ("test_maskJSONField", test_maskJSONField),
+      ("test_maskLine", test_maskLine),
       ("test_examplesDataDir", test_examplesDataDir),
   ]
 }
@@ -117,6 +119,11 @@ extension ValueTests {
   ]
 }
 
+extension ExampleTests {
+  static var allTests: [(String, (ExampleTests) -> () throws -> Void)] = [
+      ("test_examples", test_examples),
+  ]
+}
 extension LaunchTests {
   static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
       ("test_launch_binary", test_launch_binary),
@@ -136,6 +143,7 @@ XCTMain([
   testCase(TestUtilsTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
+  testCase(ExampleTests.allTests),
   testCase(LaunchTests.allTests),
 ])
 

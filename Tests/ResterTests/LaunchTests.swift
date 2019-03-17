@@ -9,9 +9,6 @@ import XCTest
 import SnapshotTesting
 
 
-@testable import ResterCore
-
-
 class LaunchTests: SnapshotTestCase {
 
     func test_launch_binary() throws {

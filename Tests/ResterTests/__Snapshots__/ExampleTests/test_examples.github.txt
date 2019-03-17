@@ -1,0 +1,15 @@
+🚀  Resting github.yml ...
+
+🎬  releases started ...
+
+[0].id: 16146267
+
+✅  releases PASSED (X.XXXs)
+
+🎬  latest_release started ...
+
+tag_name: <non-deterministic output masked>
+
+✅  latest_release PASSED (X.XXXs)
+
+Executed 2 tests, with 0 failures

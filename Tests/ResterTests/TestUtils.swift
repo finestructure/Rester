@@ -123,6 +123,24 @@ extension String {
         let placeholder = path.isDirectory ? (placeholder ?? "XXX") : path.basename()
         return path.string.r?.replaceAll(in: self, with: placeholder) ?? self
     }
+
+    func maskJSONField(_ name: String) -> String {
+        if let regex = try? Regex(pattern: "\"\(name)\": \"([^\"]+)\"") {
+            return regex.replaceAll(in: self, with: "\"\(name)\": \"XXX\"")
+        } else {
+            return self
+        }
+    }
+
+    func maskLine(prefix: String) -> String {
+        // Should really use '^' instead of '\n' at the start of the pattern but
+        // it fails to match anything in that case
+        if let regex = try? Regex(pattern: "\n\(prefix)[^\n]*") {
+            return regex.replaceAll(in: self, with: "\n\(prefix)<non-deterministic output masked>")
+        } else {
+            return self
+        }
+    }
 }
 
 
@@ -154,7 +172,22 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
         .maskTime
         .maskPath(requestFile)
         .maskPath(requestFile.parent)  // this is the workDir we're replacing
+        .maskLine(prefix: "JSON: ")
+        .maskLine(prefix: "Headers: ")
+        .maskLine(prefix: "tag_name: ")
     let status = process.terminationStatus
 
     return (status, output)
 }
+
+
+extension Optional {
+    func unwrap() throws -> Wrapped {
+        if let unwrapped = self {
+            return unwrapped
+        } else {
+            throw TestError.runtimeError("attempted to unwrap nil Optional")
+        }
+    }
+}
+

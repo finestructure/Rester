@@ -1,0 +1,7 @@
+🚀  Resting post.yml ...
+
+🎬  post_example started ...
+
+✅  post_example PASSED (X.XXXs)
+
+Executed 1 tests, with 0 failures
