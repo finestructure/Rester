@@ -54,10 +54,15 @@ extension ValidationResult: Equatable {
 
 
 class TestConsole: Console {
+    var messages = [String]()
     var keys = [String]()
     var values = [Any]()
     var verbose = [String]()
     var error: String = ""
+
+    func display(_ message: String) {
+        messages.append(message)
+    }
 
     func display(key: String, value: Any) {
         keys.append(key)
@@ -68,24 +73,8 @@ class TestConsole: Console {
         self.verbose.append(message)
     }
 
-    func display(error: Error) {
+    func display(_ error: Error) {
         self.error.append(error.legibleLocalizedDescription + "\n")
-    }
-}
-
-
-struct PlainConsole: Console {
-    mutating func display(key: String, value: Any) {
-        let msg = "\(key):" + " \(value)"
-        print(msg, terminator: "\n\n")
-    }
-
-    mutating func display(verbose message: String) {
-        print(message)
-    }
-
-    mutating func display(error: Error) {
-        print("❌  Error: \(error.legibleLocalizedDescription)")
     }
 }
 

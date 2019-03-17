@@ -13,7 +13,7 @@ import SnapshotTesting
 @testable import ResterCore
 
 
-class LaunchTests: XCTestCase {
+class LaunchTests: SnapshotTestCase {
 
     func test_mask_time() throws {
         XCTAssertEqual("basic PASSED (0.01s)".maskTime, "basic PASSED (X.XXXs)")
@@ -40,9 +40,7 @@ class LaunchTests: XCTestCase {
         let (status, output) = try launch(with: requestFile)
 
         XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
-        #if os(macOS)
         assertSnapshot(matching: output, as: .description)
-        #endif
     }
 
     func test_launch_binary_verbose() throws {
@@ -50,9 +48,7 @@ class LaunchTests: XCTestCase {
         let (status, output) = try launch(with: requestFile, extraArguments: ["-v", "-t", "7"])
 
         XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
-        #if os(macOS)
         assertSnapshot(matching: output, as: .description)
-        #endif
     }
 
     func test_launch_binary_malformed() throws {
@@ -60,9 +56,7 @@ class LaunchTests: XCTestCase {
         let (status, output) = try launch(with: requestFile)
 
         XCTAssert(status == 1, "exit status not 1, was: \(status), output: \(output)")
-        #if os(macOS)
         assertSnapshot(matching: output, as: .description)
-        #endif
     }
 
 }
