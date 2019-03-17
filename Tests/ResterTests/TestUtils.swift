@@ -124,14 +124,6 @@ extension String {
         return path.string.r?.replaceAll(in: self, with: placeholder) ?? self
     }
 
-    func maskJSONField(_ name: String) -> String {
-        if let regex = try? Regex(pattern: "\"\(name)\": \"([^\"]+)\"") {
-            return regex.replaceAll(in: self, with: "\"\(name)\": \"XXX\"")
-        } else {
-            return self
-        }
-    }
-
     func maskLine(prefix: String) -> String {
         // Should really use '^' instead of '\n' at the start of the pattern but
         // it fails to match anything in that case

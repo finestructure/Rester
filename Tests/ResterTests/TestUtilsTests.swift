@@ -36,19 +36,6 @@ class TestUtilsTests: XCTestCase {
         }
     }
 
-    func test_maskJSONField() throws {
-        do {
-            let input = ", \"Date\": \"Sun, 17 Mar 2019 10:14:45 GMT\"]"
-            let output = ", \"Date\": \"XXX\"]"
-            XCTAssertEqual(input.maskJSONField("Date"), output)
-        }
-        do {
-            let input = "\"User-Agent\": \"rester (unknown version) CFNetwork/976 Darwin/18.2.0 (x86_64)\", \"Accept\": \"*/*\""
-            let output = "\"User-Agent\": \"XXX\", \"Accept\": \"*/*\""
-            XCTAssertEqual(input.maskJSONField("User-Agent"), output)
-        }
-    }
-
     func test_maskLine() throws {
         do {
             let input = "first line\nJSON: [\" ...\nnext line"

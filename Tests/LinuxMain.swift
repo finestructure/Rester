@@ -93,7 +93,6 @@ extension TestUtilsTests {
       ("test_path", test_path),
       ("test_maskTime", test_maskTime),
       ("test_maskPath", test_maskPath),
-      ("test_maskJSONField", test_maskJSONField),
       ("test_maskLine", test_maskLine),
       ("test_examplesDataDir", test_examplesDataDir),
   ]
