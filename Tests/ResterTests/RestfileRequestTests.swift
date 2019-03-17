@@ -57,7 +57,7 @@ final class RequestExecutionTests: XCTestCase {
     }
 
     func test_validate_status() throws {
-        let s = try readFixture("httpbin.yml")!
+        let s = try read(fixture: "httpbin.yml")!
         var r = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
@@ -82,7 +82,7 @@ final class RequestExecutionTests: XCTestCase {
     }
 
     func test_validate_json() throws {
-        let s = try readFixture("httpbin.yml")!
+        let s = try read(fixture: "httpbin.yml")!
         var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
@@ -117,7 +117,7 @@ final class RequestExecutionTests: XCTestCase {
     }
 
     func test_validate_json_regex() throws {
-        let s = try readFixture("httpbin.yml")!
+        let s = try read(fixture: "httpbin.yml")!
         var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
@@ -215,7 +215,7 @@ final class RequestExecutionTests: XCTestCase {
     }
 
     func test_post_multipart() throws {
-        let testFile = path(for: "test.jpg")!
+        let testFile = path(fixture: "test.jpg")!
         let s = """
             requests:
               post:
@@ -268,7 +268,7 @@ final class RequestExecutionTests: XCTestCase {
     }
 
      func test_post_file() throws {
-         let testFile = path(for: "test.jpg")!
+         let testFile = path(fixture: "test.jpg")!
          let s = """
              requests:
                post:
@@ -472,7 +472,7 @@ final class RequestExecutionTests: XCTestCase {
             .map {
                 XCTAssertEqual($0, ValidationResult.valid)
                 // confirm the console receives output
-                XCTAssertEqual(console.labels, ["Status", "Headers", "JSON"])
+                XCTAssertEqual(console.keys, ["Status", "Headers", "JSON"])
                 XCTAssertEqual(console.values[0] as? Int, 200)
                 XCTAssert("\(console.values[1])".contains("\"Content-Type\": \"application/json\""))
                 XCTAssert("\(console.values[2])".contains("\"method\": \"GET\""))
@@ -501,7 +501,7 @@ final class RequestExecutionTests: XCTestCase {
                 XCTAssertEqual($0, ValidationResult.valid)
                 // confirm the console receives output
                 // we're expecting the value pulled from the key path `headers.Host` in the json response
-                XCTAssertEqual(console.labels, ["headers.Host"])
+                XCTAssertEqual(console.keys, ["headers.Host"])
                 XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
                 expectation.fulfill()
             }.catch {

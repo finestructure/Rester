@@ -90,11 +90,7 @@ extension Request: Substitutable {
 
 
 extension Request {
-    public func execute(
-        timeout: TimeInterval = Request.defaultTimeout,
-        debug: Bool = false
-        ) throws -> Promise<Response> {
-
+    public func execute(timeout: TimeInterval = Request.defaultTimeout) throws -> Promise<Response> {
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
@@ -109,12 +105,6 @@ extension Request {
                 if let postData = body.formUrlEncoded.data(using: .utf8) {
                     urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
                     urlRequest.httpBody = postData
-                    if debug {
-                        print("Request:")
-                        dump(urlRequest)
-                        print("Body:")
-                        dump(body)
-                    }
                 }
             case let .multipart(body):
                 urlRequest.addValue(
@@ -213,20 +203,20 @@ func _log(value: Value, of response: Response) throws {
     case .bool(true):
         try ["status", "headers", "json"].forEach { try _log(value: $0, of: response) }
     case .string("status"):
-        Current.console.display(label: "Status", value: response.status)
+        Current.console.display(key: "Status", value: response.status)
     case .string("headers"):
-        Current.console.display(label: "Headers", value: response.headers)
+        Current.console.display(key: "Headers", value: response.headers)
     case let .string(keyPath) where keyPath.starts(with: "json."),
          let .string(keyPath) where keyPath.starts(with: "json["):
         guard let json = response.json else { return }
         let res = Value.dictionary(["json": json])
         if let value = res[keyPath] {
             let displayKeyPath = keyPath.deletingPrefix("json").deletingPrefix(".")
-            Current.console.display(label: displayKeyPath, value: value)
+            Current.console.display(key: displayKeyPath, value: value)
         }
     case .string("json"):
         if let json = response.json {
-            Current.console.display(label: "JSON", value: json)
+            Current.console.display(key: "JSON", value: json)
         }
     case .string where (try? value.path()) != nil:      // a bit clumsy but can't see how to
         try response.data.write(to: try value.path())   // avoid the double call to path()

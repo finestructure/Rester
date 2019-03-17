@@ -8,19 +8,34 @@ import ResterCore
 import Yams
 
 
-func debugPrint(_ msg: String) {
-    print(msg.lightWhite.italic)
+extension Console {
+    func display(variables: [Key: Value]) {
+        guard variables.count > 0 else { return }
+        Current.console.display(verbose: "Defined variables:")
+        for v in variables.keys {
+            Current.console.display(verbose: "  - \(v)")
+        }
+        Current.console.display(verbose: "")
+    }
 }
 
 
-func display(_ error: Error) {
-    if
-        let decodingError = error as? DecodingError,
-        case let .dataCorrupted(err) = decodingError,
-        let underlying = err.underlyingError as? ResterError {
-        print("❌  Restfile syntax error: \(underlying.legibleLocalizedDescription)")
-    } else {
-        print("❌  Error: \(error.legibleLocalizedDescription)")
+func before(name: Request.Name) {
+    Current.console.display("🎬  \(name.blue) started ...\n")
+}
+
+
+func after(name: Request.Name, response: Response, result: ValidationResult) -> Bool {
+    switch result {
+    case .valid:
+        let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
+        Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
+        return true
+    case let .invalid(message):
+        Current.console.display(verbose: "Response:".bold)
+        Current.console.display(verbose: "\(response)\n")
+        Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+        return false
     }
 }
 
@@ -32,14 +47,14 @@ let main = command(
     Argument<String>("filename", description: "A Restfile")
 ) { verbose, wdir, timeout, filename in
 
-    print("🚀  Resting \(filename.bold) ...\n")
+    Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
     let restfilePath = Path(filename) ?? Path.cwd/filename
     Current.workDir = getWorkDir(input: wdir) ?? (restfilePath).parent
 
     if verbose {
-        debugPrint("Restfile path: \(restfilePath)")
-        debugPrint("Working directory: \(Current.workDir)\n")
+        Current.console.display(verbose: "Restfile path: \(restfilePath)")
+        Current.console.display(verbose: "Working directory: \(Current.workDir)\n")
     }
 
     if timeout != Request.defaultTimeout {
@@ -50,56 +65,31 @@ let main = command(
     do {
         rester = try Rester(path: restfilePath, workDir: Current.workDir)
     } catch {
-        display(error)
+        Current.console.display(error)
         exit(1)
     }
 
     if verbose {
-        let vars = rester.allVariables
-        if vars.count > 0 {
-            debugPrint("Defined variables:")
-            for v in vars.keys {
-                debugPrint("  - \(v)")
-            }
-            print("")
-        }
+        Current.console.display(variables: rester.allVariables)
     }
 
     guard rester.requestCount > 0 else {
-        print("⚠️  no requests defined in \(filename.bold)!")
+        Current.console.display("⚠️  no requests defined in \(filename.bold)!")
         exit(0)
-    }
-
-    func before(name: Request.Name) {
-        print("🎬  \(name.blue) started ...\n")
-    }
-
-    func after(name: Request.Name, response: Response, result: ValidationResult) -> Bool {
-        switch result {
-        case .valid:
-            let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
-            print("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
-            return true
-        case let .invalid(message):
-            debugPrint("Response:".bold)
-            debugPrint("\(response)\n")
-            print("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
-            return false
-        }
     }
 
     rester.test(before: before, after: after, timeout: timeout)
         .done { results in
             let failureCount = results.filter { !$0 }.count
             let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
-            print("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
+            Current.console.display("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
             if failureCount > 0 {
                 exit(1)
             } else {
                 exit(0)
             }
         }.catch { error in
-            display(error)
+            Current.console.display(error)
             exit(1)
     }
 

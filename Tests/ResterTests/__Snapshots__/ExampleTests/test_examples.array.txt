@@ -1,0 +1,15 @@
+🚀  Resting array.yml ...
+
+🎬  post-array started ...
+
+JSON: <non-deterministic output masked>
+
+✅  post-array PASSED (X.XXXs)
+
+🎬  reference started ...
+
+JSON: <non-deterministic output masked>
+
+✅  reference PASSED (X.XXXs)
+
+Executed 2 tests, with 0 failures

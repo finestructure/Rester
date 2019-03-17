@@ -1,0 +1,15 @@
+🚀  Resting basic.yml ...
+
+Restfile path: basic.yml
+Working directory: XXX
+
+Request timeout: 7.0s
+
+Defined variables:
+  - API_URL
+
+🎬  basic started ...
+
+✅  basic PASSED (X.XXXs)
+
+Executed 1 tests, with 0 failures

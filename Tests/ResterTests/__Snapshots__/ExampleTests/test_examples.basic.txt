@@ -1,0 +1,7 @@
+🚀  Resting basic.yml ...
+
+🎬  basic started ...
+
+✅  basic PASSED (X.XXXs)
+
+Executed 1 tests, with 0 failures
