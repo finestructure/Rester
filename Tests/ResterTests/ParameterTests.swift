@@ -21,7 +21,7 @@ dummy data
 class ParameterTests: XCTestCase {
 
     func test_multipartEncode_file() throws {
-        let file = path(for: "test.jpg")!
+        let file = path(fixture: "test.jpg")!
         XCTAssertEqual(
             String(data: try multipartEncode(file: file), encoding: .utf8),
             testJPG

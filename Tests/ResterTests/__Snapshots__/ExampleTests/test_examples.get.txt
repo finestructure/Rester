@@ -1,0 +1,13 @@
+🚀  Resting get.yml ...
+
+🎬  get_example started ...
+
+Status: 200
+
+Headers: <non-deterministic output masked>
+
+JSON: <non-deterministic output masked>
+
+✅  get_example PASSED (X.XXXs)
+
+Executed 1 tests, with 0 failures

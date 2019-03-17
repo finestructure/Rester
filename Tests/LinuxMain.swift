@@ -88,6 +88,15 @@ extension SubstitutableTests {
       ("test_substitute_Body", test_substitute_Body),
   ]
 }
+extension TestUtilsTests {
+  static var allTests: [(String, (TestUtilsTests) -> () throws -> Void)] = [
+      ("test_path", test_path),
+      ("test_maskTime", test_maskTime),
+      ("test_maskPath", test_maskPath),
+      ("test_maskLine", test_maskLine),
+      ("test_examplesDataDir", test_examplesDataDir),
+  ]
+}
 extension ValidationTests {
   static var allTests: [(String, (ValidationTests) -> () throws -> Void)] = [
       ("test_convertMatcher", test_convertMatcher),
@@ -109,10 +118,13 @@ extension ValueTests {
   ]
 }
 
+extension ExampleTests {
+  static var allTests: [(String, (ExampleTests) -> () throws -> Void)] = [
+      ("test_examples", test_examples),
+  ]
+}
 extension LaunchTests {
   static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
-      ("test_mask_time", test_mask_time),
-      ("test_mask_path", test_mask_path),
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
       ("test_launch_binary_malformed", test_launch_binary_malformed),
@@ -127,8 +139,10 @@ XCTMain([
   testCase(ResterTests.allTests),
   testCase(RestfileDecodingTests.allTests),
   testCase(SubstitutableTests.allTests),
+  testCase(TestUtilsTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
+  testCase(ExampleTests.allTests),
   testCase(LaunchTests.allTests),
 ])
 

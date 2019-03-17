@@ -10,7 +10,7 @@ import XCTest
 class PathTests: XCTestCase {
 
     func test_mimeType() throws {
-        let file = path(for: "test.jpg")!
+        let file = path(fixture: "test.jpg")!
         XCTAssertEqual(file.mimeType, "image/jpeg")
     }
 
