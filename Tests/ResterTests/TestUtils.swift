@@ -167,6 +167,7 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
         .maskLine(prefix: "JSON: ")
         .maskLine(prefix: "Headers: ")
         .maskLine(prefix: "tag_name: ")
+        .maskLine(prefix: "\\[0\\].id: ")
     let status = process.terminationStatus
 
     return (status, output)
