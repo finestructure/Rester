@@ -78,7 +78,7 @@ let main = command(
         exit(0)
     }
 
-    rester.test(beforeRequest: before, afterRequest: after, timeout: timeout)
+    rester.test(before: before, after: after, timeout: timeout)
         .done { results in
             let failureCount = results.filter { !$0 }.count
             let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
