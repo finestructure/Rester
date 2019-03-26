@@ -1,4 +1,4 @@
-// Generated using Sourcery 0.15.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.16.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 
@@ -97,6 +97,11 @@ extension TestUtilsTests {
       ("test_examplesDataDir", test_examplesDataDir),
   ]
 }
+extension UtilsTests {
+  static var allTests: [(String, (UtilsTests) -> () throws -> Void)] = [
+      ("test_format", test_format),
+  ]
+}
 extension ValidationTests {
   static var allTests: [(String, (ValidationTests) -> () throws -> Void)] = [
       ("test_convertMatcher", test_convertMatcher),
@@ -140,6 +145,7 @@ XCTMain([
   testCase(RestfileDecodingTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(TestUtilsTests.allTests),
+  testCase(UtilsTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
   testCase(ExampleTests.allTests),
