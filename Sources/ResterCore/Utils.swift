@@ -23,7 +23,9 @@ public func getWorkDir(input: String) -> Path? {
 
 public func format(_ timeInterval: TimeInterval) -> String? {
     let formatter = NumberFormatter()
-    formatter.positiveFormat = "###0.###"
+    formatter.minimumIntegerDigits = 1
+    formatter.minimumFractionDigits = 3
+    formatter.maximumFractionDigits = 3
     formatter.roundingMode = .halfUp
     return formatter.string(from: NSNumber(value: timeInterval))
 }
