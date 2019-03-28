@@ -24,7 +24,7 @@ jobs:
     - os: linux
       dist: trusty
     - os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
 
     - stage: build base image
       os: linux
