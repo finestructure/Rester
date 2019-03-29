@@ -4,6 +4,8 @@ variables:
 requests:
   releases:
     url: ${BASE_URL}/releases
+    headers:
+      Authorization: token ${GITHUB_TOKEN}
     validation:
       status: 200
       json:
@@ -17,6 +19,8 @@ requests:
   latest_release:
     # use the release id to request release details
     url: ${BASE_URL}/releases/${releases[0].id}
+    headers:
+      Authorization: token ${GITHUB_TOKEN}
     validation:
       status: 200
     log:
