@@ -98,4 +98,4 @@ let main = command(
 }
 
 
-main.run()
+main.run(ResterVersion)

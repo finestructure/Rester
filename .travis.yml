@@ -29,6 +29,8 @@ jobs:
     - stage: build base image
       os: linux
       script: |
+        set -e
+        
         # login
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
@@ -43,6 +45,8 @@ jobs:
     - stage: build app image
       os: linux
       script: |
+        set -e
+
         # login
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
@@ -50,6 +54,9 @@ jobs:
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
         IMG=finestructure/rester:$VERSION
         docker build --pull -t $IMG -f Dockerfile.app --build-arg VERSION=$VERSION .
+
+        # test image
+        docker run --rm $IMG --version
 
         # push IMG
         docker push $IMG
@@ -66,6 +73,7 @@ jobs:
       name: docker swift test
       os: linux
       script: |
+        set -e
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
         IMAGE=finestructure/rester:base-$VERSION
