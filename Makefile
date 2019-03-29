@@ -1,4 +1,6 @@
-.PHONY: magic
+.PHONY: magic version
+
+export VERSION=$(shell git rev-parse HEAD)
 
 clean:
 	rm -rf .build
@@ -6,11 +8,16 @@ clean:
 xcodeproj:
 	swift package generate-xcodeproj
 
-docker-build:
-	docker build --tag rester -f Dockerfile.base .
+build-docker-base:
+	docker build --tag rester-base -f Dockerfile.base .
 
-test-linux: docker-build
-	docker run --rm rester swift test
+build-docker-app: build-docker-base
+	@echo VERSION: $(VERSION)
+	docker tag rester-base finestructure/rester:base-$(VERSION)
+	docker build --tag rester:$(VERSION) -f Dockerfile.app --build-arg VERSION=$(VERSION) .
+
+test-linux: docker-build-base
+	docker run --rm rester-base swift test
 
 test-macos: xcodeproj
 	set -o pipefail && \
@@ -29,5 +36,5 @@ magic:
 release-macos:
 	swift build --static-swift-stdlib -c release
 
-release-linux: docker-build
-	docker run --rm -v $(PWD):/host -w /host rester swift build --static-swift-stdlib -c release
+release-linux: docker-build-base
+	docker run --rm -v $(PWD):/host -w /host rester-base swift build --static-swift-stdlib -c release
