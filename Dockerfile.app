@@ -7,6 +7,7 @@ FROM finestructure/rester:base-${VERSION} as build
 RUN make version
 
 RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so /build/lib
+# && cp -R /usr/lib/swift/linux/*.so.* /build/lib
 RUN swift build -c release && mv `swift build -c release --show-bin-path` /build/bin
 
 # temporary fix for broken symlinks (fs 5.0 image only?)

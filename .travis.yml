@@ -51,6 +51,9 @@ jobs:
         IMG=finestructure/rester:$VERSION
         docker build --pull -t $IMG -f Dockerfile.app --build-arg VERSION=$VERSION .
 
+        # test image
+        docker run --rm $IMG --version
+
         # push IMG
         docker push $IMG
 
