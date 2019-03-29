@@ -5,7 +5,7 @@ env:
   global:
     - secure: VndZQDxw463ynheGhUHjgU8nj9JpuE8AwVSXaoR/mSceL7cS38gTTiVAWOLVgbXDu3KFnzR0SD0qwTyXb3nuDh9NMkv1qTrSZipgPkerzGddAhxuwGAuD+eIdL7uRgFm2UUETGxfGdXw/OxfuDV/mgDWS8Kf52GCeUuZOp5cj3CWfCkPi8N/O6Ba7Y1OkhzF8y90BWcsk5ZhN4Upa4GK+tjI/gJ8O3CP77itrBD6ttunBrFQvsqv3RgsyA/Zf52nJXr90eDHlSxMMnstGmZJerGOApDuNCA++gZA+vNMNB1W5NojzCJVAnIG6VM1Y5gUMRNnDOC41glsY4lkrI+OfIPAzO3zG814M8cRwKCb0b8b3KC8KS88uWDn4nS5WMSDNzQx8J00aU99sBtzdHEyEcwsl5k/ZAEY+F/kYW43HFbp2gYLROnC0iokqKCuVWdXbtupbmCQblKwSDJSzt5wkIY9rTeb2J6LKB1dsDwp0i+illqE7axtLTPpTkZ/rl9tXn4xqJIsdmtwy13RtDHRkFbqLqMFe7ZzHvl53p6pGykBqWJ1yWU0mmJ+lFll2STY8kOOqdL2LbV56QvTS4K5GZyzKYhBkRJot2lazNztG8EsTeJ4M90rWgbIBs3hWsZrtAb/W9lSFx9Ei5q5SsS07Y41Mogj4K26K/2e+D70T8E=
     - secure: B6XiFb6QjgmLtBhZ/o1921dsMpe66+1EeaDA06tuu41jtKWpveC9tcWL+1s8yMuHy9VVh2vADAID8vSSnkeCnrb7GZIpTtgtXg6bz2dfIEXVaXO2KWPrj/yf1oNtQ6yMkGpkC6Jl8PVYNb62DA751dj+CrbpXNcs2MNtdpcMGBbYTFAMbSM525DobZ3RXgc78itAGphSZjTZhzQh6sMxdoISsvfhQla2+8K1fvAdnB5UBCYgVr0rM6exHuT2k3ZS51SrEwCArpd0UyOvPudpVK8/uKWYxiBIIKI8mZD5yvJqCAVqpoIUP79mUDYlDreNcA9yRD7nCu/sBrkhw9wd6ipuayX0WgaLoBLSGTywOp/rWRT6+j+j6QBICWBLpNkDng0doYNALfK+pvfEtDZWUdS5bGFR4NCRrs/DCyboYgk4uE6RkODUa1pItzWR/Kpm/4Ts8gY/+zKTwKTF2LpIojnTwc3sAibVy/MutEQpZH/oFua97BVmMoKdIfqvikbJxxbyq/j4X+LzS0I+ga/GO09qFSyawGiqQT3ULUGctNQth6/Ocs7WuOb8lHZ67+dihMgclq2DVMPii3torSI41/JWfL0tME7t9kk726lVUi4XZd5x/4wtWVhvmVUoUzGYv28HWo99k4aE7CTN5LAx1TpQ8nRxfwrajcbwV06r4W8=
-
+    - secure: "j39yC3GJMPK1/s/Q3VLT7fLuwhkN9lmo9OcRVb5iP8OW7HPrxb4b/e7Yp5Gia2KBjHVai/1zH0YA8UFzQju4VjvZdgLc1F+I7FK4NCXG2Vib3fy76A2wOvNl29qrTMgjYjA6dsfdUigLtZf0EE0yLV8MeVGVzsOa4w2iiJhZtWoNbBY7Xo/cAm9csZvvMJ7W+03tmsWo0VLwV9b1F8gW+WXWNLjg84tOj4KsGPDd+1dniK5xb2OxmmzygcxULm5Sbw/Dityz963LFGHIXlVxPzlQxFnio7iOQn60SA12+dwmRfRWHdUTWp7/pQgvK69kdTCJ2D8K5/QTNuxEJQ+dAT8OEoGISYUa9wS88bHM4NqK+uA9t5XsLkrpSyHMCvWadeacwMyIqxGcc9IwHVJYpMwFX2+ufu3g3JwXV54w+jjj72N/shMvhKQVfMM1V+zUGKyblPMYfbFizywa96/R4UTQFjvBknC95SnsQPOqCEEaiBKYVGtHWiFxXIsiX07lEsbsrbdzczFxBJCgYLPSpkVuydWkXxjpXZ3mo47lZomJy354RW3nRs4pfmz99o5IVjeLPqUiElXA9tkFu4yzRB5L1K+LUxwnLy1SX79BvA06rQBkqXRt5TBidtow3LcxpfrqwP0Eoop6GnoiPhbez3ZUnp3hgskAZovqCKaPzsc="
 
 stages:
   - build base image
@@ -24,7 +24,7 @@ jobs:
     - os: linux
       dist: trusty
     - os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
 
     - stage: build base image
       os: linux
@@ -33,10 +33,9 @@ jobs:
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
         # build
-        tag=base
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
-        IMG=finestructure/rester:$tag-$VERSION
-        docker build --pull -t $IMG -f Dockerfile.$tag .
+        IMG=finestructure/rester:base-$VERSION
+        docker build --pull -t $IMG -f Dockerfile.base .
 
         # push
         docker push $IMG
@@ -70,4 +69,4 @@ jobs:
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
         IMAGE=finestructure/rester:base-$VERSION
-        docker run --rm $IMAGE swift test
+        docker run --rm -e GITHUB_TOKEN=$GITHUB_TOKEN $IMAGE swift test
