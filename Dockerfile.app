@@ -3,9 +3,11 @@
 ARG VERSION=${VERSION}
 FROM finestructure/rester:base-${VERSION} as build
 
-RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so /build/lib
-RUN swift build -c release && mv `swift build -c release --show-bin-path` /build/bin
+# add VERSION to binary
+RUN make version
 
+RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so /build/lib && cp -R /usr/lib/swift/linux/*.so.* /build/lib
+RUN swift build -c release && mv `swift build -c release --show-bin-path` /build/bin
 
 # deployment image
 
