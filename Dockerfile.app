@@ -6,14 +6,8 @@ FROM finestructure/rester:base-${VERSION} as build
 # add VERSION to binary
 RUN make version
 
-RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so /build/lib
-# && cp -R /usr/lib/swift/linux/*.so.* /build/lib
+RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so /build/lib && cp -R /usr/lib/swift/linux/*.so.* /build/lib
 RUN swift build -c release && mv `swift build -c release --show-bin-path` /build/bin
-
-# temporary fix for broken symlinks (fs 5.0 image only?)
-RUN cp /usr/lib/swift/linux/libicudataswift.so.61.1 /build/lib/
-RUN cp /usr/lib/swift/linux/libicui18nswift.so.61.1 /build/lib/
-RUN cp /usr/lib/swift/linux/libicuucswift.so.61.1 /build/lib/
 
 # deployment image
 
