@@ -29,8 +29,6 @@ jobs:
     - stage: build base image
       os: linux
       script: |
-        set -eu
-
         # login
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
