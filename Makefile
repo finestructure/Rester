@@ -38,3 +38,6 @@ release-macos:
 
 release-linux: docker-build-base
 	docker run --rm -v $(PWD):/host -w /host rester-base swift build --static-swift-stdlib -c release
+
+version:
+	echo "public let ResterVersion = \"$(VERSION)\"" > Sources/ResterCore/Version.swift
