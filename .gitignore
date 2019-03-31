@@ -3,3 +3,4 @@
 /Packages
 /*.xcodeproj
 Tests/ResterTests/TestData/log.txt
+doc-assets/
