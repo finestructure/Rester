@@ -17,7 +17,7 @@ and processes it
 
 [![asciicast](https://asciinema.org/a/237892.svg)](https://asciinema.org/a/237892)
 
-Features:
+Rester currently supports:
 
 - Request methods: GET, POST, PUT, DELETE
 - Variable substitution
@@ -26,8 +26,8 @@ Features:
   - query parameters
   - forms
   - multipart
-- Send headers
-- Use response values as substitution variables
+- Sending headers
+- Using response values as substitution variables
 - Batch file processing
 - Delay between requests
 
