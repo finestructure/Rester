@@ -1,8 +1,8 @@
 # Rester
 
-[![](https://img.shields.io/badge/Swift-5-blue.svg) [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
+![](https://img.shields.io/badge/Swift-5-blue.svg) [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
 
-Rester is a command line tool to test (REST) APIs. It processes a request description like the following:
+Rester is a command line tool to test (REST) APIs. It takes a request description like the following:
 
 ```
 # basic.yml
@@ -13,18 +13,9 @@ requests:
       status: 200
 ```
 
-into
+and processes it
 
-```
-$ rester examples/basic.yml 
-🚀  Resting examples/basic.yml ...
-
-🎬  basic started ...
-
-✅  basic PASSED (0.013s)
-
-Executed 1 tests, with 0 failures
-```
+[![asciicast](https://asciinema.org/a/237887.svg)](https://asciinema.org/a/237887)
 
 Features:
 
