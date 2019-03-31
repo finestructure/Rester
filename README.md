@@ -2,7 +2,7 @@
 
 ![](https://img.shields.io/badge/Swift-5-blue.svg) [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
 
-Rester is a command line tool to test (REST) APIs. It takes a request description like the following:
+Rester is a command line tool to test HTTP APIs. It takes a request description like the following:
 
 ```
 # basic.yml
@@ -15,7 +15,7 @@ requests:
 
 and processes it
 
-[![asciicast](https://asciinema.org/a/237887.svg)](https://asciinema.org/a/237887)
+[![asciicast](https://asciinema.org/a/237892.svg)](https://asciinema.org/a/237892)
 
 Features:
 
@@ -25,11 +25,13 @@ Features:
   - JSON
   - query parameters
   - forms
+  - multipart
 - Send headers
 - Use response values as substitution variables
 - Batch file processing
 - Delay between requests
-  
+
+See [Upcoming Features](https://github.com/finestructure/Rester/issues/28) for a list of what is planned for future releases.
 
 ## Example request sequence
 
@@ -64,37 +66,49 @@ requests:
 
 Result:
 
-```
-$ rester examples/github.yml
-🚀  Resting examples/github.yml ...
-
-🎬  releases started ...
-
-[0].id: 15863504
-
-✅  releases PASSED (0.012s)
-
-🎬  latest_release started ...
-
-tag_name: "0.0.6"
-
-✅  latest_release PASSED (0.011s)
-
-Executed 2 tests, with 0 failures
-```
+[![asciicast](https://asciinema.org/a/237894.svg)](https://asciinema.org/a/237894)
 
 ## Running `rester`
 
 The easiest way to run `rester` is via docker:
 
 ```
-docker run --rm -it -v $PWD:/host -w /host finestructure/rester examples/github.yml
+docker run --rm -t -v $PWD:/host -w /host finestructure/rester examples/github.yml
 ```
+
+It's probably easiest to define an alias:
+
+```
+alias rester="docker run --rm -t -v $PWD:/host -w /host finestructure/rester"
+rester examples/basic.yml
+```
+
+A word regarding the docker parameters:
+
+- `--rm` cleans up the container after running
+- `-t` attaches a tty (this helps with flushing and unicode representation)
+- `-v $PWD:/host` maps your current directory onto `/host` inside the container
+- `-w /host` sets that `/host` directory as the working directory inside the container. This way you can simply reference files relative to your working directory and they will be found at the same path inside the container.
+
+Note that if you want to test APIs that are running on `localhost`, you will also want to add
+
+- `--network host`
+
+to your `docker run` command. This lets the container run on the host network and allows it to see the host as `localhost`.
 
 ## Installing `rester`
 
-- Using [Mint](https://github.com/yonaskolb/Mint)
+`rester` requires Swift 5. You can build and install it from source via the Swift Package Manager:
 
 ```
+git clone https://github.com/finestructure/rester
+cd rester
+swift build -c release
+```
+
+On macOS, the easiest way to install and update `rester` is probably [Mint](https://github.com/yonaskolb/Mint):
+
+```
+brew install mint
 mint install finestructure/rester
 ```
