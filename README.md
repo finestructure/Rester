@@ -68,6 +68,8 @@ Result:
 
 [![asciicast](https://asciinema.org/a/237894.svg)](https://asciinema.org/a/237894)
 
+The [examples directory](examples) demonstrates further uses of rester. You can also find the output these examples generate in the [test snapshot directory](Tests/ResterTests/__Snapshots__/ExampleTests/).
+
 ## Running `rester`
 
 The easiest way to run `rester` is via docker:
