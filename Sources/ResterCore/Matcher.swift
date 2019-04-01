@@ -65,9 +65,10 @@ extension Matcher {
                 guard let index = Int(key) else {
                     return .invalid("key '\(key)' not convertible into index")
                 }
-                if
-                    let element = value[index],
-                    case let .invalid(msg) = exp.validate(element) {
+                guard let element = value[index] else {
+                    return .invalid("index \(index) out of bounds")
+                }
+                if case let .invalid(msg) = exp.validate(element) {
                     return .invalid("index '\(index)' validation error: \(msg)")
                 }
             }
