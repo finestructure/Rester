@@ -36,7 +36,7 @@ class IssuesTests: XCTestCase {
 
         _ = try r.test()
             .map {
-                XCTAssertEqual($0, .valid)
+                XCTAssertEqual($0, .invalid("json invalid: key 'json' validation error: key 'values' validation error: index 0 out of bounds"))
                 expectation.fulfill()
         }
 
