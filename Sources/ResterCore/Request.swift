@@ -31,6 +31,11 @@ public struct Request: Decodable {
 
     let name: Name
     let details: Details
+
+    init(name: Name, details: Details) {
+        self.name = name
+        self.details = details
+    }
 }
 
 
@@ -90,7 +95,7 @@ extension Request: Substitutable {
 
 
 extension Request {
-    public func execute(timeout: TimeInterval = Request.defaultTimeout) throws -> Promise<Response> {
+    public func execute(timeout: TimeInterval = Request.defaultTimeout, validateCertificate: Bool = true) throws -> Promise<Response> {
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
@@ -129,10 +134,14 @@ extension Request {
             Current.console.display(verbose: "Delaying for \(delay)s")
         }
 
+        // NB: URLSession keeps a strong reference to the delegate, so we don't need to keep it around ourselves
+        let delegate = SessionDelegate(validateCertificate: validateCertificate)
+        let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: .main)
+
         let request = after(seconds: delay)
             .then { () -> Promise<(start: Date, response: (data: Data, response: URLResponse))> in
                 let start = Date()
-                return URLSession.shared.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
+                return session.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
             }.map {
                 Response(
                     elapsed: Date().timeIntervalSince($0.start),
@@ -230,3 +239,22 @@ func _log(value: Value, of response: Response) throws {
 }
 
 
+extension Request {
+    class SessionDelegate: NSObject, URLSessionDelegate {
+        let validateCertificate: Bool
+
+        init(validateCertificate: Bool = true) {
+            self.validateCertificate = validateCertificate
+        }
+
+        func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+            if validateCertificate {
+                completionHandler(.performDefaultHandling, nil)
+            } else {
+                // trust certificate
+                let cred = challenge.protectionSpace.serverTrust.map { URLCredential(trust: $0) }
+                completionHandler(.useCredential, cred)
+            }
+        }
+    }
+}

@@ -44,8 +44,9 @@ let main = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout"),
+    Flag("insecure", default: false, description: "do not validate SSL certificate"),
     Argument<String>("filename", description: "A Restfile")
-) { verbose, wdir, timeout, filename in
+) { verbose, wdir, timeout, insecure, filename in
 
     Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
@@ -78,7 +79,7 @@ let main = command(
         exit(0)
     }
 
-    rester.test(before: before, after: after, timeout: timeout)
+    rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
         .done { results in
             let failureCount = results.filter { !$0 }.count
             let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold

@@ -187,10 +187,7 @@ class RequestTests: XCTestCase {
     }
 
     func test_request_execute_elapsed() throws {
-        let s = """
-            url: https://httpbin.org/delay/1
-        """
-        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let d = Request.Details(url: "https://httpbin.org/delay/1")
         let r = Request(name: "basic", details: d)
 
         let expectation = self.expectation(description: #function)
@@ -205,4 +202,26 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_execute_validateCertificate_false() throws {
+        let d = Request.Details(url: "https://self-signed.badssl.com")
+        let r = Request(name: "test", details: d)
+
+        let expectation = self.expectation(description: #function)
+
+        _ = try r.execute(validateCertificate: false)
+            .map {
+                XCTAssertEqual($0.response.statusCode, 200)
+                expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 5)
+    }
+
+}
+
+
+extension Request.Details {
+    init(url: String) {
+        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil)
+    }
 }
