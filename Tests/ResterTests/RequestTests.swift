@@ -187,10 +187,7 @@ class RequestTests: XCTestCase {
     }
 
     func test_request_execute_elapsed() throws {
-        let s = """
-            url: https://httpbin.org/delay/1
-        """
-        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let d = Request.Details(url: "https://httpbin.org/delay/1")
         let r = Request(name: "basic", details: d)
 
         let expectation = self.expectation(description: #function)
@@ -205,4 +202,51 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_execute_validateCertificate() throws {
+        // switching off certificate validation only works on macOS for now
+        #if os(macOS)
+        let d = Request.Details(url: "https://self-signed.badssl.com")
+        let r = Request(name: "test", details: d)
+
+        do {  // test that verification (default case) raises exception
+            let expectation = self.expectation(description: #function)
+
+            _ = try r.execute(validateCertificate: true)
+                .map { _ in
+                    XCTFail("bad SSL certificate must not succeed")
+                    expectation.fulfill()
+                }.catch {
+                    XCTAssert($0.legibleLocalizedDescription.starts(with: "The certificate for this server is invalid"), "was instead: \($0.legibleLocalizedDescription)")
+                    expectation.fulfill()
+            }
+
+            waitForExpectations(timeout: 5)
+        }
+
+        do {  // test that insecure process succeeds
+            let expectation = self.expectation(description: #function)
+
+            _ = try r.execute(validateCertificate: false)
+                .map {
+                    XCTAssertEqual($0.response.statusCode, 200)
+                    expectation.fulfill()
+                }.catch {
+                    XCTFail($0.legibleLocalizedDescription)
+                    expectation.fulfill()
+            }
+
+            waitForExpectations(timeout: 5)
+        }
+        #else
+        print("test disabled - switching off certificate validation unsupported on Linux")
+        #endif
+    }
+
+}
+
+
+extension Request.Details {
+    init(url: String) {
+        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil)
+    }
 }
