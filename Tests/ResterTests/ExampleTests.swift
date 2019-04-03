@@ -22,7 +22,7 @@ class ExampleTests: SnapshotTestCase {
                 // the delay test is intended to show the timeout error - so it's expected to fail
                 XCTAssert(status == 1, "exit status not 0, was: \(status), output: \(output)")
             } else if name == "github" && Current.environment["GITHUB_TOKEN"] == nil {
-                print("⚠️ skipping test_examples for 'github' because GITHUB_TOKEN is not set")
+                print("⚠️ Skipping test_examples for 'github' because GITHUB_TOKEN is not set")
                 continue
             } else {
                 XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")

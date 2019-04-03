@@ -31,11 +31,6 @@ public struct Request: Decodable {
 
     let name: Name
     let details: Details
-
-    init(name: Name, details: Details) {
-        self.name = name
-        self.details = details
-    }
 }
 
 
