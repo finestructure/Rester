@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/onevcat/Rainbow.git",
         "state": {
           "branch": null,
-          "revision": "797a68d0a642609424b08f11eb56974a54d5f6e2",
-          "version": "3.1.4"
+          "revision": "9c52c1952e9b2305d4507cf473392ac2d7c9b155",
+          "version": "3.1.5"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/finestructure/ValueCodable",
         "state": {
           "branch": null,
-          "revision": "2f4b50523c698e60a29fccf3751ed1c135e0075c",
-          "version": "0.0.3"
+          "revision": "e3c7b2577fa7a39cc6312e5b1d601cf5135facca",
+          "version": "0.0.4"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "26ab35f50ea891e8edefcc9d975db2f6b67e1d68",
-          "version": "1.0.1"
+          "revision": "b08dba4bcea978bf1ad37703a384097d3efce5af",
+          "version": "1.0.2"
         }
       }
     ]
