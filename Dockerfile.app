@@ -12,10 +12,10 @@ RUN swift build -c release && mv `swift build -c release --show-bin-path` /build
 # deployment image
 
 ARG VERSION=${VERSION}
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN apt-get -qq update && apt-get install -y \
-  libicu55 libxml2 libbsd0 libcurl3 libatomic1 \
+  libicu60 libxml2 libbsd0 libcurl3 libatomic1 \
   tzdata \
   && rm -r /var/lib/apt/lists/*
 
