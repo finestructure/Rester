@@ -12,7 +12,7 @@ import Regex
 
 
 public struct Request: Decodable {
-    public static let defaultTimeout: TimeInterval = 5
+    public static let defaultTimeout: TimeInterval = 10
 
     public typealias Name = String
     typealias Headers = [Key: Value]

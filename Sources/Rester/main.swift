@@ -43,7 +43,7 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
 let main = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
-    Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout"),
+    Option<TimeInterval>("timeout", default: 10, flag: "t", description: "Request timeout"),
     Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
     Argument<String>("filename", description: "A Restfile")
 ) { verbose, wdir, timeout, insecure, filename in
