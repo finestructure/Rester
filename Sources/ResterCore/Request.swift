@@ -136,7 +136,7 @@ extension Request {
 
         // NB: URLSession keeps a strong reference to the delegate, so we don't need to keep it around ourselves
         let delegate = SessionDelegate(validateCertificate: validateCertificate)
-        let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: .main)
+        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: .main)
 
         let request = after(seconds: delay)
             .then { () -> Promise<(start: Date, response: (data: Data, response: URLResponse))> in
@@ -248,13 +248,16 @@ extension Request {
         }
 
         func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-            if validateCertificate {
-                completionHandler(.performDefaultHandling, nil)
-            } else {
+            #if os(macOS)
+            // switching off certificate validation only works on macOS for now
+            if !validateCertificate {
                 // trust certificate
                 let cred = challenge.protectionSpace.serverTrust.map { URLCredential(trust: $0) }
                 completionHandler(.useCredential, cred)
+                return
             }
+            #endif
+            completionHandler(.performDefaultHandling, nil)
         }
     }
 }

@@ -203,6 +203,8 @@ class RequestTests: XCTestCase {
     }
 
     func test_execute_validateCertificate() throws {
+        // switching off certificate validation only works on macOS for now
+        #if os(macOS)
         let d = Request.Details(url: "https://self-signed.badssl.com")
         let r = Request(name: "test", details: d)
 
@@ -235,6 +237,9 @@ class RequestTests: XCTestCase {
 
             waitForExpectations(timeout: 5)
         }
+        #else
+        print("test disabled - switching off certificate validation unsupported on Linux")
+        #endif
     }
 
 }

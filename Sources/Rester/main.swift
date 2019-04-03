@@ -44,9 +44,16 @@ let main = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Option<TimeInterval>("timeout", default: 5, flag: "t", description: "Request timeout"),
-    Flag("insecure", default: false, description: "do not validate SSL certificate"),
+    Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
     Argument<String>("filename", description: "A Restfile")
 ) { verbose, wdir, timeout, insecure, filename in
+
+    #if !os(macOS)
+    if insecure {
+        Current.console.display("--insecure flag currently only supported on macOS")
+        exit(1)
+    }
+    #endif
 
     Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
