@@ -16,7 +16,7 @@ build-docker-app: build-docker-base
 	docker tag rester-base finestructure/rester:base-$(VERSION)
 	docker build --tag rester:$(VERSION) -f Dockerfile.app --build-arg VERSION=$(VERSION) .
 
-test-linux: docker-build-base
+test-linux: build-docker-base
 	docker run --rm rester-base swift test
 
 test-macos: xcodeproj
