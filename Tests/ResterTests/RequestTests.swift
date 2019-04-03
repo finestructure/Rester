@@ -202,19 +202,39 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
-    func test_execute_validateCertificate_false() throws {
+    func test_execute_validateCertificate() throws {
         let d = Request.Details(url: "https://self-signed.badssl.com")
         let r = Request(name: "test", details: d)
 
-        let expectation = self.expectation(description: #function)
+        do {  // test that verification (default case) raises exception
+            let expectation = self.expectation(description: #function)
 
-        _ = try r.execute(validateCertificate: false)
-            .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                expectation.fulfill()
+            _ = try r.execute(validateCertificate: true)
+                .map { _ in
+                    XCTFail("bad SSL certificate must not succeed")
+                    expectation.fulfill()
+                }.catch {
+                    XCTAssert($0.legibleLocalizedDescription.starts(with: "The certificate for this server is invalid"), "was instead: \($0.legibleLocalizedDescription)")
+                    expectation.fulfill()
+            }
+
+            waitForExpectations(timeout: 5)
         }
 
-        waitForExpectations(timeout: 5)
+        do {  // test that insecure process succeeds
+            let expectation = self.expectation(description: #function)
+
+            _ = try r.execute(validateCertificate: false)
+                .map {
+                    XCTAssertEqual($0.response.statusCode, 200)
+                    expectation.fulfill()
+                }.catch {
+                    XCTFail($0.legibleLocalizedDescription)
+                    expectation.fulfill()
+            }
+
+            waitForExpectations(timeout: 5)
+        }
     }
 
 }

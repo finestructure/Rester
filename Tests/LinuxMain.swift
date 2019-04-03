@@ -62,7 +62,7 @@ extension RequestTests {
       ("test_parse_log", test_parse_log),
       ("test_parse_log_keypath", test_parse_log_keypath),
       ("test_request_execute_elapsed", test_request_execute_elapsed),
-      ("test_execute_validateCertificate_false", test_execute_validateCertificate_false),
+      ("test_execute_validateCertificate", test_execute_validateCertificate),
   ]
 }
 extension ResterTests {
