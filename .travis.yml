@@ -67,7 +67,9 @@ jobs:
 
     - stage: test
       name: swift test
-      script: swift test
+      script: swift test --enable-code-coverage
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -X xcodellvm
     
     - stage: test
       name: docker swift test
