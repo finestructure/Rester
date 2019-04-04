@@ -16,19 +16,22 @@ build-docker-app: build-docker-base
 	docker tag rester-base finestructure/rester:base-$(VERSION)
 	docker build --tag rester:$(VERSION) -f Dockerfile.app --build-arg VERSION=$(VERSION) .
 
-test-linux: build-docker-base
+test-linux-spm: build-docker-base
 	docker run --rm rester-base swift test
 
-test-macos: xcodeproj
+test-macos-xcode: xcodeproj
 	set -o pipefail && \
 	xcodebuild test \
 		-scheme Rester \
 		-destination platform="macOS" \
+		-enableCodeCoverage YES
 
-test-swift:
-	swift test
+test-macos-spm: BUILD_DIR=$(shell swift build --show-bin-path)
+test-macos-spm:
+	swift test --enable-code-coverage
+	xcrun llvm-cov report -ignore-filename-regex=".build/*" -instr-profile $(BUILD_DIR)/codecov/default.profdata $(BUILD_DIR)/rester
 
-test-all: test-linux test-macos
+test-all: test-linux-spm test-macos-spm test-macos-xcode
 
 magic:
 	sourcery   --templates ./.sourcery   --sources Tests   --args testimports='@testable import '"ResterTests"   --output Tests/LinuxMain.swift
