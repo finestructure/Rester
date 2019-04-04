@@ -70,7 +70,7 @@ jobs:
       os: osx
       script: swift test --enable-code-coverage
       after_success:
-        - bash <(curl -s https://codecov.io/bash) -X xcodellvm -D $(swift build --show-bin-path)
+        - bash <(curl -s https://codecov.io/bash) -J '^Rester$' -J '^ResterCore$' -D $(swift build --show-bin-path)
     
     - stage: test
       name: docker swift test
