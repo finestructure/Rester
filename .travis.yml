@@ -21,13 +21,13 @@ stages:
 
 jobs:
   include:
-    - os: linux
-      dist: trusty
-    - os: osx
-      osx_image: xcode10.2
 
-    - stage: build base image
+    - &linux
       os: linux
+      dist: trusty
+    
+    - <<: *linux
+      stage: build base image
       script: |
         set -e
         
@@ -42,8 +42,8 @@ jobs:
         # push
         docker push $IMG
 
-    - stage: build app image
-      os: linux
+    - <<: *linux
+      stage: build app image
       script: |
         set -e
 
@@ -65,16 +65,19 @@ jobs:
         docker tag $IMG finestructure/rester:latest
         docker push finestructure/rester:latest
 
-    - stage: test
-      name: swift test
+    - name: swift test
+      stage: test
       os: osx
+      osx_image: xcode10.2
       script: swift test --enable-code-coverage
       after_success:
         - bash <(curl -s https://codecov.io/bash) -J '^Rester$' -J '^ResterCore$' -D $(swift build --show-bin-path)
     
-    - stage: test
+    - <<: *linux
       name: docker swift test
+      stage: test
       os: linux
+      dist: trusty
       script: |
         set -e
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
