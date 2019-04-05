@@ -1,0 +1,12 @@
+🚀  Resting error.yml ...
+
+🎬  error started ...
+
+Response:
+Status:   500
+Headers: <non-deterministic output masked>
+Data:     0 bytes
+
+❌  error FAILED : status invalid: (500) is not equal to (200)
+
+Executed 1 tests, with 1 failures
