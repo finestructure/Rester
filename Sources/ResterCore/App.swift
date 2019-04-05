@@ -10,18 +10,6 @@ import Foundation
 import Path
 
 
-extension Console {
-    func display(variables: [Key: Value]) {
-        guard variables.count > 0 else { return }
-        Current.console.display(verbose: "Defined variables:")
-        for v in variables.keys {
-            Current.console.display(verbose: "  - \(v)")
-        }
-        Current.console.display(verbose: "")
-    }
-}
-
-
 func before(name: Request.Name) {
     Current.console.display("🎬  \(name.blue) started ...\n")
 }

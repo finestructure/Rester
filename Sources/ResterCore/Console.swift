@@ -17,6 +17,18 @@ public protocol Console {
 }
 
 
+extension Console {
+    mutating func display(variables: [Key: Value]) {
+        guard variables.count > 0 else { return }
+        display(verbose: "Defined variables:")
+        for v in variables.keys {
+            display(verbose: "  - \(v)")
+        }
+        display(verbose: "")
+    }
+}
+
+
 struct DefaultConsole: Console {
     mutating func display(_ message: String) {
         print(message)
