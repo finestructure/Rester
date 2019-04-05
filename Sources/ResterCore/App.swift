@@ -102,7 +102,13 @@ public let app = command(
                         Current.console.display(summary: results.count, failed: failureCount)
                 }
             }
-            // FIXME: .catch { error  ... somehow (does not compile atm)
+            chain.catch { error in
+                // branching the chain here and installing an error handler so we can terminate in
+                // case something goes wrong inside a request
+                // See https://github.com/mxcl/PromiseKit/blob/master/Documentation/FAQ.md#how-do-branched-chains-work
+                Current.console.display(error)
+                exit(1)
+            }
             RunLoop.main.run(until: Date(timeIntervalSinceNow: TimeInterval(loop)))
             Current.console.display("")
             Current.console.display("TOTAL: ", terminator: "")
