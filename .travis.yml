@@ -9,7 +9,7 @@ env:
 
 stages:
   - test
-  - push app image
+  - deploy
 
 
 jobs:
@@ -41,8 +41,10 @@ jobs:
         IMAGE=finestructure/rester:base-$VERSION
         docker build --pull -t $IMAGE -f Dockerfile.base .
         docker run --rm -e GITHUB_TOKEN=$GITHUB_TOKEN $IMAGE swift test
+        docker push $IMAGE
 
-    - stage: push app image
+    - name: push app image
+      stage: deploy
       os: linux
       dist: trusty
       script: |
