@@ -1,5 +1,7 @@
 🚀  Resting delay.yml ...
 
+Request timeout: 1.0s
+
 🎬  timeout started ...
 
 ❌  Error: request timed out: timeout

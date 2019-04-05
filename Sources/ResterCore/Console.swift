@@ -10,7 +10,7 @@ import Rainbow
 
 
 public protocol Console {
-    mutating func display(_ message: String)
+    mutating func display(_ message: String, terminator: String)
     mutating func display(key: String, value: Any)
     mutating func display(verbose message: String)
     mutating func display(_ error: Error)
@@ -18,6 +18,10 @@ public protocol Console {
 
 
 extension Console {
+    mutating func display(_ message: String) {
+        display(message, terminator: "\n")
+    }
+
     mutating func display(variables: [Key: Value]) {
         guard variables.count > 0 else { return }
         display(verbose: "Defined variables:")
@@ -37,8 +41,8 @@ extension Console {
 
 
 struct DefaultConsole: Console {
-    mutating func display(_ message: String) {
-        print(message)
+    mutating func display(_ message: String, terminator: String) {
+        print(message, terminator: terminator)
     }
 
     mutating func display(key: String, value: Any) {

@@ -76,7 +76,7 @@ class TestConsole: Console {
     var verbose = [String]()
     var error: String = ""
 
-    func display(_ message: String) {
+    func display(_ message: String, terminator: String) {
         messages.append(message)
     }
 

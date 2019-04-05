@@ -15,8 +15,11 @@ class ExampleTests: SnapshotTestCase {
 
     func test_examples() throws {
         for file in try examplesDirectory().unwrapped().ls().files(withExtension: "yml") {
-            let (status, output) = try launch(with: file)
             let name = file.basename(dropExtension: true)
+
+            // we want the "delay" test to timeout, so let's do that quickly
+            let extraArgs = name == "delay" ? ["-t", "1"] : []
+            let (status, output) = try launch(with: file, extraArguments: extraArgs)
 
             switch name {
             case "delay", "error":
