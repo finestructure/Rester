@@ -79,8 +79,7 @@ public let app = command(
     rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
         .done { results in
             let failureCount = results.filter { !$0 }.count
-            let failureMsg = failureCount == 0 ? "0".green.bold : failureCount.description.red.bold
-            Current.console.display("Executed \(results.count.description.bold) tests, with \(failureMsg) failures")
+            Current.console.display(summary: results.count, failed: failureCount)
             if failureCount > 0 {
                 exit(1)
             } else {

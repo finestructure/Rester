@@ -9,4 +9,4 @@ Data:     0 bytes
 
 ❌  error FAILED : status invalid: (500) is not equal to (200)
 
-Executed 1 tests, with 1 failures
+Executed 1 test, with 1 failure
