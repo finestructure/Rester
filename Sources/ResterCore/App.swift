@@ -31,7 +31,7 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
 }
 
 
-func process(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose: Bool, workdir: String) throws -> Promise<[Bool]> {
+func process(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose: Bool, workdir: String) -> Promise<[Bool]> {
     Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
     let restfilePath = Path(filename) ?? Path.cwd/filename
@@ -46,7 +46,12 @@ func process(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose:
         Current.console.display(verbose: "Request timeout: \(timeout)s\n")
     }
 
-    let rester = try Rester(path: restfilePath, workDir: Current.workDir)
+    let rester: Rester
+    do {
+        rester = try Rester(path: restfilePath, workDir: Current.workDir)
+    } catch {
+        return Promise(error: error)
+    }
 
     if verbose {
         Current.console.display(variables: rester.allVariables)
@@ -89,7 +94,7 @@ public let app = command(
         var chain = Promise()
         while true {
             chain = chain.then { _ -> Promise<Void> in
-                try process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
+                process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
                     .done { results in
                         let failureCount = results.filter { !$0 }.count
                         grandTotal += results.count
@@ -105,27 +110,20 @@ public let app = command(
             Current.console.display("")
         }
     } else {
-        do {
-            _ = try process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
-                .done { results in
-                    let failureCount = results.filter { !$0 }.count
-                    Current.console.display(summary: results.count, failed: failureCount)
-                    if failureCount > 0 {
-                        exit(1)
-                    } else {
-                        exit(0)
-                    }
-                }.catch { error in
-                    Current.console.display(error)
+        _ = process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
+            .done { results in
+                let failureCount = results.filter { !$0 }.count
+                Current.console.display(summary: results.count, failed: failureCount)
+                if failureCount > 0 {
                     exit(1)
-            }
-        } catch {
-            // FIXME: Try making `process` non-throwing by throwing in a Promise and roll this catch block into the one above
-            Current.console.display(error)
-            exit(1)
+                } else {
+                    exit(0)
+                }
+            }.catch { error in
+                Current.console.display(error)
+                exit(1)
         }
     }
 
     RunLoop.main.run()
-
 }
