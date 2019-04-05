@@ -71,7 +71,7 @@ jobs:
       osx_image: xcode10.2
       script: swift test --enable-code-coverage
       after_success:
-        - bash <(curl -s https://codecov.io/bash) -J '^Rester$' -J '^ResterCore$' -D .build
+        - bash <(curl -s https://codecov.io/bash) -J '^ResterCore$' -D .build
     
     - <<: *linux
       name: docker swift test
