@@ -1,3 +1,3 @@
 import ResterCore
 
-main.run(ResterVersion)
+app.run(ResterVersion)

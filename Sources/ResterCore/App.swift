@@ -42,7 +42,7 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
 }
 
 
-public let main = command(
+public let app = command(
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Option<TimeInterval>("timeout", default: 10, flag: "t", description: "Request timeout"),
