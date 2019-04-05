@@ -8,42 +8,43 @@ env:
     - secure: "j39yC3GJMPK1/s/Q3VLT7fLuwhkN9lmo9OcRVb5iP8OW7HPrxb4b/e7Yp5Gia2KBjHVai/1zH0YA8UFzQju4VjvZdgLc1F+I7FK4NCXG2Vib3fy76A2wOvNl29qrTMgjYjA6dsfdUigLtZf0EE0yLV8MeVGVzsOa4w2iiJhZtWoNbBY7Xo/cAm9csZvvMJ7W+03tmsWo0VLwV9b1F8gW+WXWNLjg84tOj4KsGPDd+1dniK5xb2OxmmzygcxULm5Sbw/Dityz963LFGHIXlVxPzlQxFnio7iOQn60SA12+dwmRfRWHdUTWp7/pQgvK69kdTCJ2D8K5/QTNuxEJQ+dAT8OEoGISYUa9wS88bHM4NqK+uA9t5XsLkrpSyHMCvWadeacwMyIqxGcc9IwHVJYpMwFX2+ufu3g3JwXV54w+jjj72N/shMvhKQVfMM1V+zUGKyblPMYfbFizywa96/R4UTQFjvBknC95SnsQPOqCEEaiBKYVGtHWiFxXIsiX07lEsbsrbdzczFxBJCgYLPSpkVuydWkXxjpXZ3mo47lZomJy354RW3nRs4pfmz99o5IVjeLPqUiElXA9tkFu4yzRB5L1K+LUxwnLy1SX79BvA06rQBkqXRt5TBidtow3LcxpfrqwP0Eoop6GnoiPhbez3ZUnp3hgskAZovqCKaPzsc="
 
 stages:
-  - build base image
-  - build app image
   - test
-
-
-# install:
-# - if [[ $TRAVIS_OS_NAME == "linux" ]]; then
-#     eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
-#   fi
+  - push app image
 
 
 jobs:
   include:
 
-    - &linux
+    - name: macos spm test
+      stage: test
+      os: osx
+      osx_image: xcode10.2
+      script: make test-macos-spm
+
+    - name: macos xcode test
+      stage: test
+      os: osx
+      osx_image: xcode10.2
+      script: make test-macos-xcode
+      after_success:
+        # upload coverage data
+        - bash <(curl -s https://codecov.io/bash) -J '^ResterCore$' -D .build/derivedData
+    
+    - name: docker spm test
+      stage: test
       os: linux
       dist: trusty
-    
-    - <<: *linux
-      stage: build base image
       script: |
         set -e
-        
-        # login
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-        # build
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
-        IMG=finestructure/rester:base-$VERSION
-        docker build --pull -t $IMG -f Dockerfile.base .
+        IMAGE=finestructure/rester:base-$VERSION
+        docker build --pull -t $IMAGE -f Dockerfile.base .
+        docker run --rm -e GITHUB_TOKEN=$GITHUB_TOKEN $IMAGE swift test
 
-        # push
-        docker push $IMG
-
-    - <<: *linux
-      stage: build app image
+    - stage: push app image
+      os: linux
+      dist: trusty
       script: |
         set -e
 
@@ -64,23 +65,3 @@ jobs:
         # tag and push latest
         docker tag $IMG finestructure/rester:latest
         docker push finestructure/rester:latest
-
-    - name: swift test
-      stage: test
-      os: osx
-      osx_image: xcode10.2
-      script: swift test --enable-code-coverage
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) -J '^ResterCore$' -D .build
-    
-    - <<: *linux
-      name: docker swift test
-      stage: test
-      os: linux
-      dist: trusty
-      script: |
-        set -e
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
-        IMAGE=finestructure/rester:base-$VERSION
-        docker run --rm -e GITHUB_TOKEN=$GITHUB_TOKEN $IMAGE swift test

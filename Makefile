@@ -24,7 +24,8 @@ test-macos-xcode: xcodeproj
 	xcodebuild test \
 		-scheme Rester \
 		-destination platform="macOS" \
-		-enableCodeCoverage YES
+		-enableCodeCoverage YES \
+		-derivedDataPath .build/derivedData
 
 test-macos-spm: BUILD_DIR=$(shell swift build --show-bin-path)
 test-macos-spm:
