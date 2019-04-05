@@ -23,10 +23,10 @@ let package = Package(
     targets: [
         .target(
             name: "Rester",
-            dependencies: ["Commander", "Rainbow", "ResterCore"]),
+            dependencies: ["ResterCore"]),
         .target(
             name: "ResterCore",
-            dependencies: ["LegibleError", "PMKFoundation", "Path", "PromiseKit", "Rainbow", "Regex", "ValueCodable", "Yams"]),
+            dependencies: ["Commander", "LegibleError", "PMKFoundation", "Path", "PromiseKit", "Rainbow", "Regex", "ValueCodable", "Yams"]),
         .testTarget(
             name: "ResterTests",
             dependencies: ["ResterCore", "SnapshotTesting"]),
