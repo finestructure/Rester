@@ -1,6 +1,6 @@
 # Rester
 
-![](https://img.shields.io/badge/Swift-5-blue.svg) [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
+![](https://img.shields.io/badge/Swift-5-blue.svg) [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester) [![codecov](https://codecov.io/gh/finestructure/Rester/branch/develop/graph/badge.svg)](https://codecov.io/gh/finestructure/Rester)
 
 Rester is a command line tool to test HTTP APIs. It takes a request description like the following:
 
