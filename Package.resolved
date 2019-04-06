@@ -57,11 +57,11 @@
       },
       {
         "package": "Regex",
-        "repositoryURL": "https://github.com/crossroadlabs/Regex.git",
+        "repositoryURL": "https://github.com/finestructure/Regex.git",
         "state": {
-          "branch": null,
-          "revision": "f144250678e4c13f1d820ffa265a8326b25bcd86",
-          "version": "1.1.0"
+          "branch": "master",
+          "revision": "efd275e10eb225f3932400bad6c617391c919fdc",
+          "version": null
         }
       },
       {

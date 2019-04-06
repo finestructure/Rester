@@ -35,4 +35,13 @@ class LaunchTests: SnapshotTestCase {
         assertSnapshot(matching: output, as: .description)
     }
 
+    func test_launch_binary_loop_termination() throws {
+        // ensure a bad file terminates the loop
+        let requestFile = try path(fixture: "loop-error.yml").unwrapped()
+        let (status, output) = try launch(with: requestFile, extraArguments: ["--loop", "2"])
+
+        XCTAssert(status == 1, "exit status not 1, was: \(status), output: \(output)")
+        assertSnapshot(matching: output, as: .description)
+    }
+
 }

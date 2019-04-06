@@ -45,12 +45,9 @@ public struct Response: Equatable {
 extension Response: CustomStringConvertible {
     public var description: String {
         return """
-        Status code: \(response.statusCode)
-        Headers:
-        \(response.allHeaderFields)
-        Data:
-        \(data.count) bytes
-        \(String(data: data, encoding: .utf8) ?? "no data")
+        Status:   \(response.statusCode)
+        Headers:  \(response.allHeaderFields)
+        Data:     \(data.count) bytes
         """
     }
 }

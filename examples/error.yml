@@ -1,0 +1,6 @@
+requests:
+  error:
+    # example of a request failing validation
+    url: https://httpbin.org/status/500
+    validation:
+      status: 200

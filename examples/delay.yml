@@ -2,19 +2,14 @@ variables:
   API_URL: https://httpbin.org
 requests:
   # will time out with message: ❌  Error: request timed out: timeout
-  # because calling /delay/10 will delay the response for 10s
-  # which is longer than the default timeout of 5s
+  # because calling /delay/11 will delay the response for 11s
+  # which is longer than the default timeout of 10s
   timeout:
-    url: ${API_URL}/delay/10
+    url: ${API_URL}/delay/11
     method: GET
     validation:
       status: 200
-  passes_1:
-    url: ${API_URL}/anything
-    method: GET
-    validation:
-      status: 200
-  passes_2:
+  not reached:
     url: ${API_URL}/anything
     method: GET
     validation:
