@@ -44,4 +44,11 @@ class LaunchTests: SnapshotTestCase {
         assertSnapshot(matching: output, as: .description)
     }
 
+    func test_launch_binary_help() throws {
+        let (status, output) = try launch(arguments: ["--help"])
+
+        XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
+        assertSnapshot(matching: output, as: .description)
+    }
+
 }
