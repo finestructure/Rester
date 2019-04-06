@@ -1,0 +1,14 @@
+Usage:
+
+    $ rester <filename>
+
+Arguments:
+
+    filename - A Restfile
+
+Options:
+    --insecure [default: false] - do not validate SSL certificate (macOS only)
+    --loop - keep executing file every <loop> seconds
+    --timeout - Request timeout
+    --verbose [default: false] - Verbose output
+    --workdir [default: ] - Working directory (for the purpose of resolving relative paths in Restfiles)
