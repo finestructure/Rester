@@ -1,4 +1,4 @@
-FROM finestructure/swift:5.0
+FROM swift:5.0
 
 WORKDIR /package
 
