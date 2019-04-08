@@ -1,3 +1,5 @@
+# based on https://github.com/vapor/api-template/blob/b5573ace9632e2d28362cd278cdaac43ff9a00ea/web.Dockerfile
+
 # base image
 
 ARG VERSION=${VERSION}
