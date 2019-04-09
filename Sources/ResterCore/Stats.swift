@@ -20,12 +20,24 @@ public struct Stats {
 extension Stats: CustomStringConvertible {
     public var description: String {
         return """
-        Average:   \(durations.average)
-        Median:    \(durations.median)
-        Min:       \(durations.min().flatMap {String($0)} ?? "-")
-        Max:       \(durations.max().flatMap {String($0)} ?? "-")
-        90% Pctl:  \(durations.percentile(0.9))
+        Average:   \(durations.average.ms)
+        Median:    \(durations.median.ms)
+        Min:       \(durations.min()?.ms ?? "-")
+        Max:       \(durations.max()?.ms ?? "-")
+        90% Pctl:  \(durations.percentile(0.9).ms)
         """
+    }
+}
+
+
+extension Double {
+    public var ms: String {
+        let formatter = NumberFormatter()
+        formatter.minimumIntegerDigits = 1
+        formatter.minimumFractionDigits = 3
+        formatter.maximumFractionDigits = 3
+        formatter.roundingMode = .halfUp
+        return (formatter.string(from: NSNumber(value: self)) ?? "-") + " s"
     }
 }
 
