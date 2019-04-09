@@ -7,6 +7,7 @@
 
 import Foundation
 import Path
+import PromiseKit
 
 
 public func getWorkDir(input: String) -> Path? {
@@ -28,4 +29,14 @@ public func format(_ timeInterval: TimeInterval) -> String? {
     formatter.maximumFractionDigits = 3
     formatter.roundingMode = .halfUp
     return formatter.string(from: NSNumber(value: timeInterval))
+}
+
+
+public func forever<T>(interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
+    func loop() -> Promise<T> {
+        return body().then { _ in
+            return after(interval).then(on: nil, loop)
+        }
+    }
+    return loop()
 }
