@@ -10,16 +10,39 @@ import Rainbow
 
 
 public protocol Console {
-    mutating func display(_ message: String)
+    mutating func display(_ message: String, terminator: String)
     mutating func display(key: String, value: Any)
     mutating func display(verbose message: String)
     mutating func display(_ error: Error)
 }
 
 
-struct DefaultConsole: Console {
+extension Console {
     mutating func display(_ message: String) {
-        print(message)
+        display(message, terminator: "\n")
+    }
+
+    mutating func display(variables: [Key: Value]) {
+        guard variables.count > 0 else { return }
+        display(verbose: "Defined variables:")
+        for v in variables.keys {
+            display(verbose: "  - \(v)")
+        }
+        display(verbose: "")
+    }
+
+    mutating func display(summary total: Int, failed: Int) {
+        let testLabel = (total == 1) ? "test" : "tests"
+        let failure = failed == 0 ? "0".green.bold : String(failed).red.bold
+        let failureLabel = (failed == 1) ? "failure" : "failures"
+        display("Executed \(String(total).bold) \(testLabel), with \(failure) \(failureLabel)")
+    }
+}
+
+
+struct DefaultConsole: Console {
+    mutating func display(_ message: String, terminator: String) {
+        print(message, terminator: terminator)
     }
 
     mutating func display(key: String, value: Any) {

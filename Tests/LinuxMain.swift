@@ -139,6 +139,8 @@ extension LaunchTests {
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
       ("test_launch_binary_malformed", test_launch_binary_malformed),
+      ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
+      ("test_launch_loop_duration", test_launch_loop_duration),
   ]
 }
 

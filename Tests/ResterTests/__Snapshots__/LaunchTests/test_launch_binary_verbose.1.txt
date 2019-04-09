@@ -12,4 +12,4 @@ Defined variables:
 
 ✅  basic PASSED (X.XXXs)
 
-Executed 1 tests, with 0 failures
+Executed 1 test, with 0 failures

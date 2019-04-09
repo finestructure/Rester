@@ -9,7 +9,7 @@ let package = Package(
         .executable(name: "rester", targets: ["Rester"])
     ],
     dependencies: [
-        .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.0.0"),
+        .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
         .package(url: "https://github.com/finestructure/ValueCodable", from: "0.0.2"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "1.0.0"),
         .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
@@ -23,10 +23,10 @@ let package = Package(
     targets: [
         .target(
             name: "Rester",
-            dependencies: ["Commander", "Rainbow", "ResterCore"]),
+            dependencies: ["ResterCore"]),
         .target(
             name: "ResterCore",
-            dependencies: ["LegibleError", "PMKFoundation", "Path", "PromiseKit", "Rainbow", "Regex", "ValueCodable", "Yams"]),
+            dependencies: ["Commander", "LegibleError", "PMKFoundation", "Path", "PromiseKit", "Rainbow", "Regex", "ValueCodable", "Yams"]),
         .testTarget(
             name: "ResterTests",
             dependencies: ["ResterCore", "SnapshotTesting"]),

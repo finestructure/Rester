@@ -15,16 +15,20 @@ class ExampleTests: SnapshotTestCase {
 
     func test_examples() throws {
         for file in try examplesDirectory().unwrapped().ls().files(withExtension: "yml") {
-            let (status, output) = try launch(with: file)
             let name = file.basename(dropExtension: true)
 
-            if name == "delay" {
-                // the delay test is intended to show the timeout error - so it's expected to fail
+            // we want the "delay" test to timeout, so let's do that quickly
+            let extraArgs = name == "delay" ? ["-t", "1"] : []
+            let (status, output) = try launch(with: file, extraArguments: extraArgs)
+
+            switch name {
+            case "delay", "error":
+                // these tests are intended to show errors - so they are expected to fail
                 XCTAssert(status == 1, "exit status not 0, was: \(status), output: \(output)")
-            } else if name == "github" && Current.environment["GITHUB_TOKEN"] == nil {
+            case "github" where Current.environment["GITHUB_TOKEN"] == nil:
                 print("⚠️ Skipping test_examples for 'github' because GITHUB_TOKEN is not set")
                 continue
-            } else {
+            default:
                 XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
             }
 

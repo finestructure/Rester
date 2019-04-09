@@ -1,8 +1,14 @@
 # Rester
 
-![](https://img.shields.io/badge/Swift-5-blue.svg) [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
+![Swift 5](https://img.shields.io/badge/Swift-5-blue.svg)
+[![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
+[![codecov](https://codecov.io/gh/finestructure/Rester/branch/develop/graph/badge.svg)](https://codecov.io/gh/finestructure/Rester)
+[![Twitter: @_sa_s](https://img.shields.io/badge/twitter-@_sa_s-blue.svg?style=flat)](https://twitter.com/_sa_s)
 
-Rester is a command line tool to test HTTP APIs. It takes a request description like the following:
+
+Rester is a command line tool to test HTTP APIs. It processes declaratively written request descriptions as a test script, executing and validating the requests as specified.
+
+For instance, a description like the following:
 
 ```
 # basic.yml
@@ -13,7 +19,7 @@ requests:
       status: 200
 ```
 
-and processes it
+is processed as follows:
 
 [![asciicast](https://asciinema.org/a/237892.svg)](https://asciinema.org/a/237892)
 
@@ -29,6 +35,7 @@ Rester currently supports:
 - Sending headers
 - Using response values as substitution variables
 - Batch file processing
+- Uploading and downloading of files
 - Delay between requests
 
 See [Upcoming Features](https://github.com/finestructure/Rester/issues/28) for a list of what is planned for future releases.
@@ -68,7 +75,14 @@ Result:
 
 [![asciicast](https://asciinema.org/a/237894.svg)](https://asciinema.org/a/237894)
 
+## More examples
+
 The [examples directory](examples) demonstrates further uses of rester. You can also find the output these examples generate in the [test snapshot directory](Tests/ResterTests/__Snapshots__/ExampleTests/).
+
+A few noteworthy examples for common tasks are
+
+- [`github.yml`](examples/github.yml): Use the Github API to fetch and print the latest release version of `rester`. Demonstrates the use of response variables and how to index into response arrays and objects as well as how to log responses.
+- [`multipart.yml`](examples/multipart.yml): Performs a multipart upload of an image.
 
 ## Running `rester`
 

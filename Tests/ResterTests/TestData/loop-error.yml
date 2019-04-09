@@ -1,0 +1,5 @@
+# deliberately broken file to ensure looping terminates on error
+requests:
+  breaking:
+    invalid_key:
+      url: https://httpbin.org/anything
