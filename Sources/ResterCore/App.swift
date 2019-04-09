@@ -68,12 +68,13 @@ func process(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose:
 
 public let app = command(
     Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
+    Option<Int?>("duration", default: .none, flag: "d", description: "duration <seconds> to loop for"),
     Option<Int?>("loop", default: .none, flag: "l", description: "keep executing file every <loop> seconds"),
     Option<TimeInterval>("timeout", default: Request.defaultTimeout, flag: "t", description: "Request timeout"),
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Argument<String>("filename", description: "A Restfile")
-) { insecure, loop, timeout, verbose, workdir, filename in
+) { insecure, duration, loop, timeout, verbose, workdir, filename in
 
     signal(SIGINT) { s in
         print("\nInterrupted by user, terminating ...")
@@ -92,7 +93,9 @@ public let app = command(
         var grandTotal = 0
         var failedTotal = 0
 
-        forever(interval: .seconds(loop)) {
+        let until = duration.map { Duration.seconds($0) } ?? .forever
+
+        run(until, interval: .seconds(loop)) {
             process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
                 .done { results in
                     let failureCount = results.filter { !$0 }.count
@@ -104,6 +107,8 @@ public let app = command(
                     Current.console.display(summary: grandTotal, failed: failedTotal)
                     Current.console.display("")
             }
+            }.done {
+                exit(failedTotal == 0 ? 0 : 1)
             }.catch { error in
                 Current.console.display(error)
                 exit(1)
@@ -113,11 +118,7 @@ public let app = command(
             .done { results in
                 let failureCount = results.filter { !$0 }.count
                 Current.console.display(summary: results.count, failed: failureCount)
-                if failureCount > 0 {
-                    exit(1)
-                } else {
-                    exit(0)
-                }
+                exit(failureCount == 0 ? 0 : 1)
             }.catch { error in
                 Current.console.display(error)
                 exit(1)

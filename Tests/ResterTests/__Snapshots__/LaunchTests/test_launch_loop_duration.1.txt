@@ -1,0 +1,32 @@
+Running every 1 seconds ...
+
+🚀  Resting basic.yml ...
+
+🎬  basic started ...
+
+✅  basic PASSED (X.XXXs)
+
+Executed 1 test, with 0 failures
+
+TOTAL: Executed 1 test, with 0 failures
+
+🚀  Resting basic.yml ...
+
+🎬  basic started ...
+
+✅  basic PASSED (X.XXXs)
+
+Executed 1 test, with 0 failures
+
+TOTAL: Executed 2 tests, with 0 failures
+
+🚀  Resting basic.yml ...
+
+🎬  basic started ...
+
+✅  basic PASSED (X.XXXs)
+
+Executed 1 test, with 0 failures
+
+TOTAL: Executed 3 tests, with 0 failures
+

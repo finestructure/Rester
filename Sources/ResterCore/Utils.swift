@@ -32,9 +32,28 @@ public func format(_ timeInterval: TimeInterval) -> String? {
 }
 
 
-public func forever<T>(interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
+public enum Duration {
+    case forever
+    case seconds(Int)
+
+    var end: Date? {
+        switch self {
+        case .forever:
+            return nil
+        case .seconds(let sec):
+            return Date().addingTimeInterval(TimeInterval(sec))
+        }
+    }
+}
+
+
+public func run<T>(_ duration: Duration, interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
+    let end = duration.end
     func loop() -> Promise<T> {
-        return body().then { _ in
+        if let end = end, Date().timeIntervalSince(end) > 0 {
+            return body()
+        }
+        return body().then { res in
             return after(interval).then(on: nil, loop)
         }
     }
