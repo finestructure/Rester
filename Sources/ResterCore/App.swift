@@ -11,6 +11,9 @@ import Path
 import PromiseKit
 
 
+var stats = [Request.Name: Stats]()
+
+
 func before(name: Request.Name) {
     Current.console.display("🎬  \(name.blue) started ...\n")
 }
@@ -21,6 +24,12 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
     case .valid:
         let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
         Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
+        stats[name, default: Stats()].add(response.elapsed)
+        for (name, stats) in stats.sorted(by: { $0.key > $1.key }) {
+            print(name.blue)
+            print(stats)
+            print()
+        }
         return true
     case let .invalid(message):
         Current.console.display(verbose: "Response:".bold)
