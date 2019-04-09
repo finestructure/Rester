@@ -68,12 +68,13 @@ func process(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose:
 
 public let app = command(
     Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
+    Option<Int?>("duration", default: .none, flag: "d", description: "duration <seconds> to loop for"),
     Option<Int?>("loop", default: .none, flag: "l", description: "keep executing file every <loop> seconds"),
     Option<TimeInterval>("timeout", default: Request.defaultTimeout, flag: "t", description: "Request timeout"),
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Argument<String>("filename", description: "A Restfile")
-) { insecure, loop, timeout, verbose, workdir, filename in
+) { insecure, duration, loop, timeout, verbose, workdir, filename in
 
     signal(SIGINT) { s in
         print("\nInterrupted by user, terminating ...")
@@ -91,40 +92,33 @@ public let app = command(
         print("Running every \(loop) seconds ...\n")
         var grandTotal = 0
         var failedTotal = 0
-        var chain = Promise()
-        while true {
-            chain = chain.then { _ -> Promise<Void> in
-                process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
-                    .done { results in
-                        let failureCount = results.filter { !$0 }.count
-                        grandTotal += results.count
-                        failedTotal += failureCount
-                        Current.console.display(summary: results.count, failed: failureCount)
-                }
+
+        let until = duration.map { Duration.seconds($0) } ?? .forever
+
+        run(until, interval: .seconds(loop)) {
+            process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
+                .done { results in
+                    let failureCount = results.filter { !$0 }.count
+                    grandTotal += results.count
+                    failedTotal += failureCount
+                    Current.console.display(summary: results.count, failed: failureCount)
+                    Current.console.display("")
+                    Current.console.display("TOTAL: ", terminator: "")
+                    Current.console.display(summary: grandTotal, failed: failedTotal)
+                    Current.console.display("")
             }
-            chain.catch { error in
-                // branching the chain here and installing an error handler so we can terminate in
-                // case something goes wrong inside a request
-                // See https://github.com/mxcl/PromiseKit/blob/master/Documentation/FAQ.md#how-do-branched-chains-work
+            }.done {
+                exit(failedTotal == 0 ? 0 : 1)
+            }.catch { error in
                 Current.console.display(error)
                 exit(1)
-            }
-            RunLoop.main.run(until: Date(timeIntervalSinceNow: TimeInterval(loop)))
-            Current.console.display("")
-            Current.console.display("TOTAL: ", terminator: "")
-            Current.console.display(summary: grandTotal, failed: failedTotal)
-            Current.console.display("")
         }
     } else {
         _ = process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
             .done { results in
                 let failureCount = results.filter { !$0 }.count
                 Current.console.display(summary: results.count, failed: failureCount)
-                if failureCount > 0 {
-                    exit(1)
-                } else {
-                    exit(0)
-                }
+                exit(failureCount == 0 ? 0 : 1)
             }.catch { error in
                 Current.console.display(error)
                 exit(1)
