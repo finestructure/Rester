@@ -112,8 +112,10 @@ enum TestError: Error {
 
 extension String {
     var maskTime: String {
-        if let regex = try? Regex(pattern: "\\(\\d+\\.?\\d*s\\)") {
-            return regex.replaceAll(in: self, with: "(X.XXXs)")
+        // select 2+ decimal places to capture the timings (which are typically longers)
+        // and not the timeout parameter (e.g. "Request timeout: 7.0s")
+        if let regex = try? Regex(pattern: "\\d+\\.\\d{2,}s") {
+            return regex.replaceAll(in: self, with: "X.XXXs")
         } else {
             return self
         }

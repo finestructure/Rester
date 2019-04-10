@@ -50,4 +50,11 @@ class LaunchTests: SnapshotTestCase {
         XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
         assertSnapshot(matching: output, as: .description)
     }
+
+    func test_launch_stats() throws {
+        let requestFile = try path(fixture: "basic2.yml").unwrapped()
+        let (status, output) = try launch(with: requestFile, extraArguments: ["--stats"])
+        XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
+        assertSnapshot(matching: output, as: .description)
+    }
 }

@@ -37,7 +37,7 @@ extension Double {
         formatter.minimumFractionDigits = 3
         formatter.maximumFractionDigits = 3
         formatter.roundingMode = .halfUp
-        return (formatter.string(from: NSNumber(value: self)) ?? "-") + " s"
+        return (formatter.string(from: NSNumber(value: self)) ?? "-") + "s"
     }
 }
 

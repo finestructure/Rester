@@ -1,0 +1,32 @@
+🚀  Resting basic2.yml ...
+
+🎬  request 1 started ...
+
+✅  request 1 PASSED (X.XXXs)
+
+request 1
+Average:   X.XXXs
+Median:    X.XXXs
+Min:       X.XXXs
+Max:       X.XXXs
+90% Pctl:  NaNs
+
+🎬  request 2 started ...
+
+✅  request 2 PASSED (X.XXXs)
+
+request 2
+Average:   X.XXXs
+Median:    X.XXXs
+Min:       X.XXXs
+Max:       X.XXXs
+90% Pctl:  NaNs
+
+request 1
+Average:   X.XXXs
+Median:    X.XXXs
+Min:       X.XXXs
+Max:       X.XXXs
+90% Pctl:  NaNs
+
+Executed 2 tests, with 0 failures
