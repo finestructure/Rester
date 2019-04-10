@@ -67,16 +67,12 @@ extension Collection where Element == Double {
     public func percentile(_ p: Double) -> Element {
         guard count >= 2 else { return .nan }
         let s = sorted()
-        let cutoff = abs(p).clamp(max: 1.0) * Double(count)
+        let cutoff = abs(p).clamp(max: 0.99) * Double(count)
         let index = Int(cutoff)
-        if index == count {
-            return s[index - 1]
-        } else if Double(index) == cutoff {
-            if index == 0 {
-                return s[index]/2.0
-            } else {
-                return [s[index - 1], s[index]].average
-            }
+        let isInteger = (Double(index) == cutoff)
+        if isInteger {
+            guard (1..<count).contains(index) else { return .nan }
+            return [s[index - 1], s[index]].average
         } else {
             return s[index]
         }

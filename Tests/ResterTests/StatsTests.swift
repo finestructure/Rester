@@ -31,9 +31,10 @@ class StatsTests: XCTestCase {
         XCTAssertEqual(scores.percentile(1.1), 99.0)
         XCTAssertEqual(scores.percentile(0.5), scores.median)
         XCTAssertEqual([1, 4, -3, 2, -9, -7, 0, -4, -1, 2, 1, -5, -3, 10, 10, 5].percentile(0.75), 3)
-        XCTAssertEqual([0, 1].percentile(0), 0)  // questionable, maybe should be .nan
-        XCTAssert([1.0].percentile(0.5).isNaN)
-        XCTAssert([1.0].percentile(1.0).isNaN)
-        XCTAssert([1.0].percentile(0).isNaN)
+        XCTAssert([0, 1].percentile(0).isNaN)
+        XCTAssert([1].percentile(0.5).isNaN)
+        XCTAssert([1].percentile(1.0).isNaN)
+        XCTAssert([1].percentile(0).isNaN)
+        XCTAssert([Double]().percentile(0).isNaN)
     }
 }
