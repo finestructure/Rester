@@ -25,9 +25,8 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
         let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
         Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
         if statistics != nil {
-            // FIXME: avoid unsafe unwrap ("if var" will reset stats)
-            statistics![name, default: Stats()].add(response.elapsed)
-            Current.console.display(statistics!)
+            statistics?[name, default: Stats()].add(response.elapsed)
+            Current.console.display(statistics)
         }
         return true
     case let .invalid(message):

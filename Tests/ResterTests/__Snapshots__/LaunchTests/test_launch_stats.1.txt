@@ -16,7 +16,7 @@ Std dev:   -
 
 ✅  request 2 PASSED (X.XXXs)
 
-request 2
+request 1
 Average:   X.XXXs
 Median:    X.XXXs
 Min:       X.XXXs
@@ -24,7 +24,7 @@ Max:       X.XXXs
 Std dev:   -
 90% Pctl:  -
 
-request 1
+request 2
 Average:   X.XXXs
 Median:    X.XXXs
 Min:       X.XXXs
