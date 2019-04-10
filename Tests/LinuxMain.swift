@@ -93,6 +93,7 @@ extension StatsTests {
       ("test_average", test_average),
       ("test_median", test_median),
       ("test_percentile", test_percentile),
+      ("test_stddev", test_stddev),
   ]
 }
 extension SubstitutableTests {

@@ -25,16 +25,21 @@ class StatsTests: XCTestCase {
     }
 
     func test_percentile() {
-        let scores: [Double] = [43, 54, 56, 61, 62, 66, 68, 69, 69, 70, 71, 72, 77, 78, 79, 85, 87, 88, 89, 93, 95, 96, 98, 99, 99].shuffled()
-        XCTAssertEqual(scores.percentile(0.9), 98.0)
-        XCTAssertEqual(scores.percentile(1.0), 99.0)
-        XCTAssertEqual(scores.percentile(1.1), 99.0)
-        XCTAssertEqual(scores.percentile(0.5), scores.median)
+        let values: [Double] = [43, 54, 56, 61, 62, 66, 68, 69, 69, 70, 71, 72, 77, 78, 79, 85, 87, 88, 89, 93, 95, 96, 98, 99, 99].shuffled()
+        XCTAssertEqual(values.percentile(0.9), 98.0)
+        XCTAssertEqual(values.percentile(1.0), 99.0)
+        XCTAssertEqual(values.percentile(1.1), 99.0)
+        XCTAssertEqual(values.percentile(0.5), values.median)
         XCTAssertEqual([1, 4, -3, 2, -9, -7, 0, -4, -1, 2, 1, -5, -3, 10, 10, 5].percentile(0.75), 3)
         XCTAssert([0, 1].percentile(0).isNaN)
         XCTAssert([1].percentile(0.5).isNaN)
         XCTAssert([1].percentile(1.0).isNaN)
         XCTAssert([1].percentile(0).isNaN)
         XCTAssert([Double]().percentile(0).isNaN)
+    }
+
+    func test_stddev() {
+        let values: [Double] = [10, 8, 10, 8, 8 , 4]
+        XCTAssertEqual(values.stddev, 2.19, accuracy: 0.01)
     }
 }

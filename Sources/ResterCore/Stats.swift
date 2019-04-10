@@ -20,29 +20,33 @@ public struct Stats {
 extension Stats: CustomStringConvertible {
     public var description: String {
         return """
-        Average:   \(durations.average.ms)
-        Median:    \(durations.median.ms)
-        Min:       \(durations.min()?.ms ?? "-")
-        Max:       \(durations.max()?.ms ?? "-")
-        90% Pctl:  \(durations.percentile(0.9).ms)
+        Average:   \(durations.average.fmt)
+        Median:    \(durations.median.fmt)
+        Min:       \(durations.min()?.fmt ?? "-")
+        Max:       \(durations.max()?.fmt ?? "-")
+        Std dev:   \(durations.stddev.fmt)
+        90% Pctl:  \(durations.percentile(0.9).fmt)
         """
     }
 }
 
 
 extension Double {
-    public var ms: String {
+    fileprivate var fmt: String {
+        guard !isNaN else { return "-" }
         let formatter = NumberFormatter()
         formatter.minimumIntegerDigits = 1
         formatter.minimumFractionDigits = 3
         formatter.maximumFractionDigits = 3
         formatter.roundingMode = .halfUp
-        return (formatter.string(from: NSNumber(value: self)) ?? "-") + "s"
+        guard let str = formatter.string(from: NSNumber(value: self)) else { return "-" }
+        return str + "s"
     }
 }
 
 
 // TODO: move to Collection+ext
+
 
 extension Collection where Element == Double {
     public var average: Element {
@@ -50,6 +54,7 @@ extension Collection where Element == Double {
         return isEmpty ? .nan : total / Element(count)
     }
 }
+
 
 extension Collection where Element == Double {
     public var median: Element {
@@ -62,6 +67,7 @@ extension Collection where Element == Double {
         }
     }
 }
+
 
 extension Collection where Element == Double {
     public func percentile(_ p: Double) -> Element {
@@ -76,6 +82,17 @@ extension Collection where Element == Double {
         } else {
             return s[index]
         }
+    }
+}
+
+
+extension Collection where Element == Double {
+    public var stddev: Element {
+        guard count > 0 else { return .nan }
+        let mean = average
+        let sumOfMeanSqr = map { pow($0 - mean, 2) }.reduce(0, +)
+        let variance = sumOfMeanSqr / Double(count - 1)
+        return sqrt(variance)
     }
 }
 

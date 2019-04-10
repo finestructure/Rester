@@ -9,7 +9,8 @@ Average:   X.XXXs
 Median:    X.XXXs
 Min:       X.XXXs
 Max:       X.XXXs
-90% Pctl:  NaNs
+Std dev:   -
+90% Pctl:  -
 
 🎬  request 2 started ...
 
@@ -20,13 +21,15 @@ Average:   X.XXXs
 Median:    X.XXXs
 Min:       X.XXXs
 Max:       X.XXXs
-90% Pctl:  NaNs
+Std dev:   -
+90% Pctl:  -
 
 request 1
 Average:   X.XXXs
 Median:    X.XXXs
 Min:       X.XXXs
 Max:       X.XXXs
-90% Pctl:  NaNs
+Std dev:   -
+90% Pctl:  -
 
 Executed 2 tests, with 0 failures
