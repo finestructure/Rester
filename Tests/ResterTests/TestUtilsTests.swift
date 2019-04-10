@@ -18,7 +18,8 @@ class TestUtilsTests: XCTestCase {
 
     func test_maskTime() throws {
         XCTAssertEqual("basic PASSED (0.01s)".maskTime, "basic PASSED (X.XXXs)")
-        XCTAssertEqual("basic PASSED (0s)".maskTime, "basic PASSED (X.XXXs)")
+        // NB: not masking timings without at least 2+ decimal places
+        XCTAssertEqual("basic PASSED (0s)".maskTime, "basic PASSED (0s)")
     }
 
     func test_maskPath() throws {
