@@ -167,19 +167,19 @@ class RestfileDecodingTests: XCTestCase {
     }
 
     func test_Restfile_init() throws {
-        let workDir = testDataDirectory()!
-        let r = try Restfile(path: workDir/"nested/basic.yml")
+        let workDir = examplesDirectory()!
+        let r = try Restfile(path: workDir/"basic.yml")
         XCTAssertEqual(r.requests.map { $0.name }, ["basic"])
     }
 
     func test_parse_restfiles_basic() throws {
-        let workDir = testDataDirectory()!
+        let workDir = examplesDirectory()!
 
         let s = """
             restfiles:
-              - env.yml
-              - nested/basic.yml
-              - nested/basic2.yml
+              - batch/env.yml
+              - batch/basic.yml
+              - batch/basic2.yml
         """
 
         let rest = try YAMLDecoder().decode(Restfile.self, from: s, userInfo: [.relativePath: workDir])

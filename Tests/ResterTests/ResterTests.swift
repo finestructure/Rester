@@ -13,13 +13,13 @@ import XCTest
 class ResterTests: XCTestCase {
 
     func test_init() throws {
-        let workDir = testDataDirectory()!
+        let workDir = examplesDirectory()!
 
         let s = """
             restfiles:
-              - env.yml
-              - nested/basic.yml
-              - nested/basic2.yml
+              - batch/env.yml
+              - batch/basic.yml
+              - batch/basic2.yml
         """
 
         let r = try Rester(yml: s, workDir: workDir)
