@@ -47,12 +47,13 @@ extension Double {
 extension Collection where Element == Double {
     public var average: Element {
         let total = reduce(0, +)
-        return isEmpty ? 0 : total / Element(count)
+        return isEmpty ? .nan : total / Element(count)
     }
 }
 
 extension Collection where Element == Double {
     public var median: Element {
+        guard !isEmpty else { return .nan }
         let s = sorted()
         if count.isMultiple(of: 2) {
             return [s[count/2 - 1], s[count/2]].average
@@ -64,13 +65,18 @@ extension Collection where Element == Double {
 
 extension Collection where Element == Double {
     public func percentile(_ p: Double) -> Element {
+        guard count >= 2 else { return .nan }
         let s = sorted()
-        let cutoff = p.clamp(max: 1.0) * Double(count)
+        let cutoff = abs(p).clamp(max: 1.0) * Double(count)
         let index = Int(cutoff)
         if index == count {
             return s[index - 1]
         } else if Double(index) == cutoff {
-            return [s[index - 1], s[index]].average
+            if index == 0 {
+                return s[index]/2.0
+            } else {
+                return [s[index - 1], s[index]].average
+            }
         } else {
             return s[index]
         }

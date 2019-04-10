@@ -88,6 +88,13 @@ extension RestfileDecodingTests {
       ("test_parse_complex_form", test_parse_complex_form),
   ]
 }
+extension StatsTests {
+  static var allTests: [(String, (StatsTests) -> () throws -> Void)] = [
+      ("test_average", test_average),
+      ("test_median", test_median),
+      ("test_percentile", test_percentile),
+  ]
+}
 extension SubstitutableTests {
   static var allTests: [(String, (SubstitutableTests) -> () throws -> Void)] = [
       ("test_substitute", test_substitute),
@@ -152,6 +159,7 @@ XCTMain([
   testCase(RequestTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileDecodingTests.allTests),
+  testCase(StatsTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(TestUtilsTests.allTests),
   testCase(UtilsTests.allTests),
