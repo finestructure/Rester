@@ -24,6 +24,7 @@ test-macos-xcode: xcodeproj
 	xcodebuild test \
 		-scheme Rester \
 		-destination platform="macOS" \
+		-parallel-testing-enabled YES \
 		-enableCodeCoverage YES \
 		-derivedDataPath .build/derivedData
 
