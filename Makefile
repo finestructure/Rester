@@ -17,7 +17,7 @@ build-docker-app: build-docker-base
 	docker build --tag rester:$(VERSION) -f Dockerfile.app --build-arg VERSION=$(VERSION) .
 
 test-linux-spm: build-docker-base
-	docker run --rm rester-base swift test
+	docker run --rm rester-base swift test --parallel
 
 test-macos-xcode: xcodeproj
 	set -o pipefail && \
@@ -30,13 +30,13 @@ test-macos-xcode: xcodeproj
 
 test-macos-spm: BUILD_DIR=$(shell swift build --show-bin-path)
 test-macos-spm:
-	swift test --enable-code-coverage
+	swift test --parallel --enable-code-coverage
 	xcrun llvm-cov report -ignore-filename-regex=".build/*" -instr-profile $(BUILD_DIR)/codecov/default.profdata $(BUILD_DIR)/rester
 
 test-all: test-linux-spm test-macos-spm test-macos-xcode
 
 magic:
-	sourcery   --templates ./.sourcery   --sources Tests   --args testimports='@testable import '"ResterTests"   --output Tests/LinuxMain.swift
+	sourcery --templates ./.sourcery --sources Tests --args testimports='@testable import '"ResterTests" --output Tests/LinuxMain.swift
 
 release-macos:
 	swift build --static-swift-stdlib -c release
