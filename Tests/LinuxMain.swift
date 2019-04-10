@@ -140,6 +140,9 @@ extension ValueTests {
 extension ExampleTests {
   static var allTests: [(String, (ExampleTests) -> () throws -> Void)] = [
       ("test_examples", test_examples),
+      ("test_error_example", test_error_example),
+      ("test_delay_example", test_delay_example),
+      ("test_github_example", test_github_example),
   ]
 }
 extension LaunchTests {
