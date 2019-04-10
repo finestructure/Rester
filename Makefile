@@ -40,7 +40,7 @@ magic:
 release-macos:
 	swift build --static-swift-stdlib -c release
 
-release-linux: docker-build-base
+release-linux: build-docker-base
 	docker run --rm -v $(PWD):/host -w /host rester-base swift build --static-swift-stdlib -c release
 
 version:
