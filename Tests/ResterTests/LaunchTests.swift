@@ -57,4 +57,5 @@ class LaunchTests: SnapshotTestCase {
         XCTAssert(status == 0, "exit status not 0, was: \(status), output: \(output)")
         assertSnapshot(matching: output, as: .description)
     }
+    
 }
