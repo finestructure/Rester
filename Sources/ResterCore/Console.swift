@@ -37,6 +37,15 @@ extension Console {
         let failureLabel = (failed == 1) ? "failure" : "failures"
         display("Executed \(String(total).bold) \(testLabel), with \(failure) \(failureLabel)")
     }
+
+    mutating func display(_ stats: [Request.Name: Stats]?) {
+        guard let stats = stats else { return }
+        for (name, stats) in stats.sorted(by: { $0.key < $1.key }) {
+            print(name.blue)
+            print(stats)
+            print()
+        }
+    }
 }
 
 

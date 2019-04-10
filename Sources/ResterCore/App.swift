@@ -11,6 +11,9 @@ import Path
 import PromiseKit
 
 
+var statistics: [Request.Name: Stats]? = nil
+
+
 func before(name: Request.Name) {
     Current.console.display("🎬  \(name.blue) started ...\n")
 }
@@ -21,6 +24,10 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
     case .valid:
         let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
         Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
+        if statistics != nil {
+            statistics?[name, default: Stats()].add(response.elapsed)
+            Current.console.display(statistics)
+        }
         return true
     case let .invalid(message):
         Current.console.display(verbose: "Response:".bold)
@@ -70,11 +77,12 @@ public let app = command(
     Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
     Option<Int?>("duration", default: .none, flag: "d", description: "duration <seconds> to loop for"),
     Option<Int?>("loop", default: .none, flag: "l", description: "keep executing file every <loop> seconds"),
+    Flag("stats", flag: "s", description: "Show stats"),
     Option<TimeInterval>("timeout", default: Request.defaultTimeout, flag: "t", description: "Request timeout"),
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Argument<String>("filename", description: "A Restfile")
-) { insecure, duration, loop, timeout, verbose, workdir, filename in
+) { insecure, duration, loop, stats, timeout, verbose, workdir, filename in
 
     signal(SIGINT) { s in
         print("\nInterrupted by user, terminating ...")
@@ -87,6 +95,10 @@ public let app = command(
         exit(1)
     }
     #endif
+
+    if stats {
+        statistics = [:]
+    }
 
     if let loop = loop {
         print("Running every \(loop) seconds ...\n")
