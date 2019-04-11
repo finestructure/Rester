@@ -8,7 +8,7 @@ public struct Restfile {
     public let variables: [Key: Value]
     let requests: [Request]
     let restfiles: [Restfile]
-    let setUp: [Request]
+    let setupRequests: [Request]
 }
 
 
@@ -21,14 +21,14 @@ extension Restfile: Decodable {
             let paths = try? container.decode([Path].self, forKey: .restfiles)
             restfiles = try paths?.map { try Restfile(path: $0) } ?? []
         }
-        setUp = try container.decodeRequests(for: .setUp)
+        setupRequests = try container.decodeRequests(for: .setupRequests)
     }
 
     enum CodingKeys: String, CodingKey {
         case variables
         case requests
         case restfiles
-        case setUp = "set_up"
+        case setupRequests = "set_up"
     }
 }
 
@@ -54,15 +54,4 @@ func aggregate(variables: [Key: Value]?, from restfiles: [Restfile]?) -> [Key: V
     }
 
     return topLevelVariables
-}
-
-
-func aggregate(requests: [Request]?, from restfiles: [Restfile]?) -> [Request] {
-    let topLevelRequests = requests ?? []
-
-    if let otherRequests = restfiles?.compactMap({ $0.requests }) {
-        return otherRequests.reduce(topLevelRequests, +)
-    }
-
-    return topLevelRequests
 }

@@ -268,7 +268,7 @@ class RestfileTests: XCTestCase {
                   status: 200
             """
         let rest = try YAMLDecoder().decode(Restfile.self, from: s)
-        XCTAssertEqual(rest.setUp["basic"]?.details.url, "https://httpbin.org/anything")
+        XCTAssertEqual(rest.setupRequests["basic"]?.details.url, "https://httpbin.org/anything")
     }
 
 }

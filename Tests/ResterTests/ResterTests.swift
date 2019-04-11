@@ -12,6 +12,21 @@ import XCTest
 
 class ResterTests: XCTestCase {
 
+    func test_aggregate_requests() throws {
+        // set up
+        let r1 = Request(name: "r1", details: .init(url: "url"))
+        let r2 = Request(name: "r2", details: .init(url: "url"))
+        let rf1 = Restfile(variables: [:], requests: [r1, r2], restfiles: [], setupRequests: [])
+        let r3 = Request(name: "r3", details: .init(url: "url"))
+        let r4 = Request(name: "r4", details: .init(url: "url"))
+        let rf2 = Restfile(variables: [:], requests: [r3, r4], restfiles: [], setupRequests: [])
+        // MUT
+        let res = aggregate(keyPath: \.requests, from: [rf1, rf2])
+        // assert
+        let names = res.map { $0.name }
+        XCTAssertEqual(names, ["r1", "r2", "r3", "r4"])
+    }
+
     func test_init() throws {
         let workDir = examplesDirectory()!
 
@@ -26,6 +41,7 @@ class ResterTests: XCTestCase {
         XCTAssertEqual(r.requests.count, 2)
         XCTAssertEqual(r.variables, ["API_URL": "https://httpbin.org"])
         XCTAssertEqual(r.requests.map { $0.name }, ["basic", "basic2"])
+        XCTAssertEqual(r.setupRequests.count, 0)
     }
 
     func test_basic() throws {
@@ -262,6 +278,42 @@ class ResterTests: XCTestCase {
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 10)
+    }
+
+    func test_set_up() throws {
+        let s = """
+            variables:
+              API_URL: https://httpbin.org
+            set_up:
+              s1:
+                url: ${API_URL}/anything
+                method: POST
+                body:
+                  json:
+                    values:
+                      - foo
+                validation:
+                  status: 200
+            requests:
+              r1:
+                url: ${API_URL}/anything/${s1.json.values[0]}
+                validation:
+                  status: 200
+                  json:  # url is mirrored back in json response
+                    url: https://httpbin.org/anything/foo
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 1)
+                XCTAssertEqual(results[0].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 500)
     }
 
 }

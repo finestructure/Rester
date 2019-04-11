@@ -63,6 +63,7 @@ extension RequestValidationTests {
 }
 extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
+      ("test_aggregate_requests", test_aggregate_requests),
       ("test_init", test_init),
       ("test_basic", test_basic),
       ("test_substitute_env", test_substitute_env),
@@ -71,6 +72,7 @@ extension ResterTests {
       ("test_response_variable", test_response_variable),
       ("test_delay_env_var_substitution", test_delay_env_var_substitution),
       ("test_timeout_error", test_timeout_error),
+      ("test_set_up", test_set_up),
   ]
 }
 extension RestfileTests {
