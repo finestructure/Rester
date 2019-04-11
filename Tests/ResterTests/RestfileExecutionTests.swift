@@ -197,55 +197,6 @@ final class RestfileExecutionTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
-    func test_delete_request() throws {
-        let s = """
-            requests:
-              delete:
-                url: https://httpbin.org/anything
-                method: DELETE
-                validation:
-                  status: 200
-                  json:
-                    method: DELETE
-            """
-        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
-        let expectation = self.expectation(description: #function)
-        _ = try rester.expandedRequest("delete").test()
-            .map {
-                XCTAssertEqual($0, ValidationResult.valid)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
-    }
-
-    func test_delay_request() throws {
-        let console = TestConsole()
-        Current.console = console
-        let s = """
-            requests:
-              delay:
-                delay: 2
-                url: https://httpbin.org/anything
-                validation:
-                  status: 200
-            """
-        var rester = try YAMLDecoder().decode(Restfile.self, from: s)
-        let expectation = self.expectation(description: #function)
-        let start = Date()
-        _ = try rester.expandedRequest("delay").test()
-            .map {
-                XCTAssertEqual($0, ValidationResult.valid)
-                XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
-        let elapsed = Date().timeIntervalSince(start)
-        XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
-    }
-
     func test_delay_request_substitution() throws {
         Current.environment = ["DELAY": "2"]
         let console = TestConsole()

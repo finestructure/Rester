@@ -160,6 +160,25 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_delete() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            method: DELETE
+            validation:
+              status: 200
+              json:
+                method: DELETE
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
     func test_parse_headers() throws {
         let s = """
             url: https://foo.bar
@@ -303,6 +322,32 @@ class RequestTests: XCTestCase {
             let resolved = try req.substitute(variables: vars)
             XCTAssertEqual(resolved.delay, 2)
         }
+    }
+
+    func test_delay_execution() throws {
+        let console = TestConsole()
+        Current.console = console
+        let s = """
+            delay: 2
+            url: https://httpbin.org/anything
+            validation:
+              status: 200
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        let start = Date()
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
+            expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
     func test_parse_log() throws {
