@@ -8,53 +8,7 @@ import Yams
 @testable import ResterCore
 
 
-extension String {
-    func ends(with string: String) -> Bool {
-        return reversed().starts(with: string.reversed())
-    }
-}
-
-
-extension Restfile {
-    public mutating func expandedRequest(_ requestName: String) throws -> Request {
-        guard let req = requests[requestName]
-            else { throw ResterError.noSuchRequest(requestName) }
-        let aggregatedVariables = aggregate(variables: variables, from: restfiles)
-        return try req.substitute(variables: aggregatedVariables)
-    }
-}
-
-
 final class RestfileExecutionTests: XCTestCase {
-
-    func test_expandedRequest() throws {
-        let s = """
-            variables:
-              API_URL: https://httpbin.org
-            requests:
-              basic:
-                url: ${API_URL}/anything
-                method: GET
-                validation:
-                  status: 200
-            """
-        var r = try YAMLDecoder().decode(Restfile.self, from: s)
-
-        let expectation = self.expectation(description: #function)
-
-        _ = try r.expandedRequest("basic").execute()
-            .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                // httpbin returns the request data back to us:
-                // { "method": "GET", ... }
-                struct Result: Codable { let method: String }
-                let res = try JSONDecoder().decode(Result.self, from: $0.data)
-                XCTAssertEqual(res.method, "GET")
-                expectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 5)
-    }
 
     func test_request_order() throws {
         let s = """
@@ -218,41 +172,6 @@ final class RestfileExecutionTests: XCTestCase {
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 5)
-    }
-
-    func test_timeout_error() throws {
-        let console = TestConsole()
-        Current.console = console
-        let s = """
-            requests:
-              # will time out with message: ❌  Error: request timed out: timeout
-              timeout:
-                url: https://httpbin.org/delay/10
-                method: GET
-                validation:
-                  status: 200
-              passes_1:
-                url: https://httpbin.org/anything
-                method: GET
-                validation:
-                  status: 200
-              passes_2:
-                url: https://httpbin.org/anything
-                method: GET
-                validation:
-                  status: 200
-            """
-        let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) }, timeout: 0.1)
-            .done { _ in
-                XCTFail("expected timeout to be raised")
-                expectation.fulfill()
-            }.catch {
-                XCTAssertEqual($0.legibleLocalizedDescription, "request timed out: \("timeout".blue)")
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 10)
     }
 
 }
