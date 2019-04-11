@@ -26,6 +26,8 @@ extension PathTests {
 }
 extension RequestLoggingTests {
   static var allTests: [(String, (RequestLoggingTests) -> () throws -> Void)] = [
+      ("test_parse_log", test_parse_log),
+      ("test_parse_log_keypath", test_parse_log_keypath),
       ("test_log_request", test_log_request),
       ("test_log_request_json_keypath", test_log_request_json_keypath),
       ("test_log_request_file", test_log_request_file),
@@ -48,8 +50,6 @@ extension RequestTests {
       ("test_parse_delay", test_parse_delay),
       ("test_delay_substitution", test_delay_substitution),
       ("test_delay_execution", test_delay_execution),
-      ("test_parse_log", test_parse_log),
-      ("test_parse_log_keypath", test_parse_log_keypath),
       ("test_request_execute_elapsed", test_request_execute_elapsed),
       ("test_execute_validateCertificate", test_execute_validateCertificate),
   ]

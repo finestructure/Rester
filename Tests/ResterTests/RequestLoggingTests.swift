@@ -14,6 +14,54 @@ import Yams
 
 class RequestLoggingTests: XCTestCase {
 
+    func test_parse_log() throws {
+        do {  // true
+            let s = """
+                url: https://httpbin.org/anything
+                log: true
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, .bool(true))
+        }
+        do {  // array
+            let s = """
+                url: https://httpbin.org/anything
+                log:
+                  - status
+                  - headers
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, .array(["status", "headers"]))
+        }
+        do {  // dict
+            let s = """
+                url: https://httpbin.org/anything
+                log: json
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, "json")
+        }
+        do {  // file
+            let s = """
+                url: https://httpbin.org/anything
+                log: .file(response.out)
+            """
+            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+            XCTAssertEqual(r.log, ".file(response.out)")
+            XCTAssertEqual(try r.log?.path(), Current.workDir/"response.out")
+        }
+    }
+
+    func test_parse_log_keypath() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            log:
+              - json.data.property
+        """
+        let r = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(r.log, .array(["json.data.property"]))
+    }
+
     func test_log_request() throws {
         let console = TestConsole()
         Current.console = console
@@ -90,6 +138,5 @@ class RequestLoggingTests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
-
 
 }

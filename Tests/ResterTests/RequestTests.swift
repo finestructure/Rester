@@ -350,54 +350,6 @@ class RequestTests: XCTestCase {
         XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
-    func test_parse_log() throws {
-        do {  // true
-            let s = """
-                url: https://httpbin.org/anything
-                log: true
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, .bool(true))
-        }
-        do {  // array
-            let s = """
-                url: https://httpbin.org/anything
-                log:
-                  - status
-                  - headers
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, .array(["status", "headers"]))
-        }
-        do {  // dict
-            let s = """
-                url: https://httpbin.org/anything
-                log: json
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, "json")
-        }
-        do {  // file
-            let s = """
-                url: https://httpbin.org/anything
-                log: .file(response.out)
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, ".file(response.out)")
-            XCTAssertEqual(try r.log?.path(), Current.workDir/"response.out")
-        }
-    }
-
-    func test_parse_log_keypath() throws {
-        let s = """
-            url: https://httpbin.org/anything
-            log:
-              - json.data.property
-        """
-        let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-        XCTAssertEqual(r.log, .array(["json.data.property"]))
-    }
-
     func test_request_execute_elapsed() throws {
         let d = Request.Details(url: "https://httpbin.org/delay/1")
         let r = Request(name: "basic", details: d)
