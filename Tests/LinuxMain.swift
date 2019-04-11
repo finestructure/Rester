@@ -24,33 +24,6 @@ extension PathTests {
       ("test_mimeType", test_mimeType),
   ]
 }
-extension RequestExecutionTests {
-  static var allTests: [(String, (RequestExecutionTests) -> () throws -> Void)] = [
-      ("test_request_execute", test_request_execute),
-      ("test_validate_status", test_validate_status),
-      ("test_validate_json", test_validate_json),
-      ("test_validate_json_regex", test_validate_json_regex),
-      ("test_request_order", test_request_order),
-      ("test_post_json", test_post_json),
-      ("test_post_form", test_post_form),
-      ("test_post_multipart", test_post_multipart),
-      ("test_post_text", test_post_text),
-      ("test_post_file", test_post_file),
-      ("test_substitute_env", test_substitute_env),
-      ("test_put_request_json", test_put_request_json),
-      ("test_validate_headers", test_validate_headers),
-      ("test_delete_request", test_delete_request),
-      ("test_delay_request", test_delay_request),
-      ("test_delay_request_substitution", test_delay_request_substitution),
-      ("test_log_request", test_log_request),
-      ("test_log_request_json_keypath", test_log_request_json_keypath),
-      ("test_log_request_file", test_log_request_file),
-      ("test_response_array_validation", test_response_array_validation),
-      ("test_response_variable_legacy", test_response_variable_legacy),
-      ("test_response_variable", test_response_variable),
-      ("test_timeout_error", test_timeout_error),
-  ]
-}
 extension RequestTests {
   static var allTests: [(String, (RequestTests) -> () throws -> Void)] = [
       ("test_parse_headers", test_parse_headers),
@@ -87,6 +60,33 @@ extension RestfileDecodingTests {
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
       ("test_parse_complex_form", test_parse_complex_form),
       ("test_parse_set_up", test_parse_set_up),
+  ]
+}
+extension RestfileExecutionTests {
+  static var allTests: [(String, (RestfileExecutionTests) -> () throws -> Void)] = [
+      ("test_execute", test_execute),
+      ("test_validate_status", test_validate_status),
+      ("test_validate_json", test_validate_json),
+      ("test_validate_json_regex", test_validate_json_regex),
+      ("test_request_order", test_request_order),
+      ("test_post_json", test_post_json),
+      ("test_post_form", test_post_form),
+      ("test_post_multipart", test_post_multipart),
+      ("test_post_text", test_post_text),
+      ("test_post_file", test_post_file),
+      ("test_substitute_env", test_substitute_env),
+      ("test_put_request_json", test_put_request_json),
+      ("test_validate_headers", test_validate_headers),
+      ("test_delete_request", test_delete_request),
+      ("test_delay_request", test_delay_request),
+      ("test_delay_request_substitution", test_delay_request_substitution),
+      ("test_log_request", test_log_request),
+      ("test_log_request_json_keypath", test_log_request_json_keypath),
+      ("test_log_request_file", test_log_request_file),
+      ("test_response_array_validation", test_response_array_validation),
+      ("test_response_variable_legacy", test_response_variable_legacy),
+      ("test_response_variable", test_response_variable),
+      ("test_timeout_error", test_timeout_error),
   ]
 }
 extension StatsTests {
@@ -161,10 +161,10 @@ XCTMain([
   testCase(IssuesTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
-  testCase(RequestExecutionTests.allTests),
   testCase(RequestTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileDecodingTests.allTests),
+  testCase(RestfileExecutionTests.allTests),
   testCase(StatsTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(TestUtilsTests.allTests),

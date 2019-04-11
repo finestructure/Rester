@@ -25,9 +25,9 @@ extension Restfile {
 }
 
 
-final class RequestExecutionTests: XCTestCase {
+final class RestfileExecutionTests: XCTestCase {
 
-    func test_request_execute() throws {
+    func test_execute() throws {
         let s = """
             variables:
               API_URL: https://httpbin.org
