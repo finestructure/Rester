@@ -47,6 +47,13 @@ extension RequestTests {
       ("test_execute_validateCertificate", test_execute_validateCertificate),
   ]
 }
+extension RequestValidationTests {
+  static var allTests: [(String, (RequestValidationTests) -> () throws -> Void)] = [
+      ("test_validate_status", test_validate_status),
+      ("test_validate_json", test_validate_json),
+      ("test_validate_json_regex", test_validate_json_regex),
+  ]
+}
 extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
       ("test_init", test_init),
@@ -75,9 +82,6 @@ extension RestfileDecodingTests {
 extension RestfileExecutionTests {
   static var allTests: [(String, (RestfileExecutionTests) -> () throws -> Void)] = [
       ("test_expandedRequest", test_expandedRequest),
-      ("test_validate_status", test_validate_status),
-      ("test_validate_json", test_validate_json),
-      ("test_validate_json_regex", test_validate_json_regex),
       ("test_request_order", test_request_order),
       ("test_substitute_env", test_substitute_env),
       ("test_log_request", test_log_request),
@@ -162,6 +166,7 @@ XCTMain([
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
   testCase(RequestTests.allTests),
+  testCase(RequestValidationTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileDecodingTests.allTests),
   testCase(RestfileExecutionTests.allTests),
