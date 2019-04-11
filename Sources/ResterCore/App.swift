@@ -104,13 +104,14 @@ public let app = command(
         print("Running every \(loop) seconds ...\n")
         var grandTotal = 0
         var failedTotal = 0
+        var runSetup = true
 
         let until = duration.map { Duration.seconds($0) } ?? .forever
 
         run(until, interval: .seconds(loop)) {
             Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
-            return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
+            return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure, runSetup: runSetup)
                 .done { results in
                     let failureCount = results.filter { !$0 }.count
                     grandTotal += results.count
@@ -120,6 +121,7 @@ public let app = command(
                     Current.console.display("TOTAL: ", terminator: "")
                     Current.console.display(summary: grandTotal, failed: failedTotal)
                     Current.console.display("")
+                    runSetup = false
             }
             }.done {
                 exit(failedTotal == 0 ? 0 : 1)

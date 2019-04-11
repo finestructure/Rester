@@ -1,0 +1,26 @@
+Running every 1 seconds ...
+
+🚀  Resting set_up.yml ...
+
+🎬  setup request started ...
+
+✅  setup request PASSED (X.XXXs)
+
+🎬  other request started ...
+
+✅  other request PASSED (X.XXXs)
+
+Executed 1 test, with 0 failures
+
+TOTAL: Executed 1 test, with 0 failures
+
+🚀  Resting set_up.yml ...
+
+🎬  other request started ...
+
+✅  other request PASSED (X.XXXs)
+
+Executed 1 test, with 0 failures
+
+TOTAL: Executed 2 tests, with 0 failures
+
