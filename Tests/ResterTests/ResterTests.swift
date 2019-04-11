@@ -12,6 +12,21 @@ import XCTest
 
 class ResterTests: XCTestCase {
 
+    func test_aggregate_variables() throws {
+        // set up
+        let v0: [Key: Value] = ["k0": "v0"]
+        let v1: [Key: Value] = ["k1": "v1"]
+        let v2: [Key: Value] = ["k2": "v2"]
+        let v2a: [Key: Value] = ["k2": "v2a"]
+        let rf1 = Restfile(variables: v1, requests: [], restfiles: [], setupRequests: [])
+        let rf2 = Restfile(variables: v2, requests: [], restfiles: [], setupRequests: [])
+        let rf2a = Restfile(variables: v2a, requests: [], restfiles: [], setupRequests: [])
+        // MUT
+        let res = aggregate(variables: v0, from: [rf1, rf2, rf2a])
+        // assert
+        XCTAssertEqual(res, ["k0": "v0", "k1": "v1", "k2": "v2a"])
+    }
+
     func test_aggregate_requests() throws {
         // set up
         let r1 = Request(name: "r1", details: .init(url: "url"))

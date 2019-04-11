@@ -86,6 +86,13 @@ extension Rester {
 }
 
 
+func aggregate(variables: [Key: Value], from restfiles: [Restfile]) -> [Key: Value] {
+    return restfiles.map({ $0.variables }).reduce(variables) { aggregate, next in
+        aggregate.merging(next, strategy: .lastWins)
+    }
+}
+
+
 func aggregate(keyPath: KeyPath<Restfile, [Request]>, from restfiles: [Restfile]) -> [Request] {
     return restfiles.map { $0[keyPath: keyPath] }.reduce([], +)
 }

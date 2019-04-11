@@ -63,6 +63,7 @@ extension RequestValidationTests {
 }
 extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
+      ("test_aggregate_variables", test_aggregate_variables),
       ("test_aggregate_requests", test_aggregate_requests),
       ("test_init", test_init),
       ("test_basic", test_basic),

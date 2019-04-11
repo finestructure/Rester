@@ -43,15 +43,3 @@ extension Restfile {
     }
 }
 
-
-func aggregate(variables: [Key: Value]?, from restfiles: [Restfile]?) -> [Key: Value] {
-    let topLevelVariables = variables ?? [:]
-
-    if let otherVariableDicts = restfiles?.compactMap({ $0.variables }) {
-        return otherVariableDicts.reduce(topLevelVariables) { aggregate, next in
-            aggregate.merging(next, strategy: .lastWins)
-        }
-    }
-
-    return topLevelVariables
-}
