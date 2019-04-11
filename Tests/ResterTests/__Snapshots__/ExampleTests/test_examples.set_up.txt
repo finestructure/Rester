@@ -1,0 +1,11 @@
+🚀  Resting set_up.yml ...
+
+🎬  setup request started ...
+
+✅  setup request PASSED (X.XXXs)
+
+🎬  other request started ...
+
+✅  other request PASSED (X.XXXs)
+
+Executed 1 test, with 0 failures
