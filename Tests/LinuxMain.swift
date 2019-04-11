@@ -86,6 +86,7 @@ extension RestfileDecodingTests {
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
       ("test_parse_complex_form", test_parse_complex_form),
+      ("test_parse_set_up", test_parse_set_up),
   ]
 }
 extension StatsTests {

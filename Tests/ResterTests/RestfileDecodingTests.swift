@@ -259,4 +259,16 @@ class RestfileDecodingTests: XCTestCase {
         XCTAssert(encodedForm.contains("username=foo.bar.baz%40example.com"), "was: \(encodedForm)")
     }
 
+    func test_parse_set_up() throws {
+        let s = """
+            set_up:
+              basic:
+                url: https://httpbin.org/anything
+                validation:
+                  status: 200
+            """
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
+        XCTAssertEqual(rest.setUp["basic"]?.details.url, "https://httpbin.org/anything")
+    }
+
 }

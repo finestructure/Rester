@@ -8,6 +8,7 @@ public struct Restfile {
     public let variables: [Key: Value]
     let requests: [Request]
     let restfiles: [Restfile]
+    let setUp: [Request]
 }
 
 
@@ -15,26 +16,19 @@ extension Restfile: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         variables = (try? container.decode([Key: Value].self, forKey: .variables)) ?? [:]
-
-        if container.contains(.requests) {
-            do {
-                let req = try container.decode(OrderedDict<Request.Name, Request.Details>.self, forKey: .requests)
-                requests = req.items.compactMap { $0.first }.map { Request(name: $0.key, details: $0.value) }
-            } catch let DecodingError.keyNotFound(key, _) {
-                throw ResterError.keyNotFound(key.stringValue)
-            }
-        } else {
-            requests = []
+        requests = try container.decodeRequests(for: .requests)
+        do {
+            let paths = try? container.decode([Path].self, forKey: .restfiles)
+            restfiles = try paths?.map { try Restfile(path: $0) } ?? []
         }
-
-        let paths = try? container.decode([Path].self, forKey: .restfiles)
-        restfiles = try paths?.map { try Restfile(path: $0) } ?? []
+        setUp = try container.decodeRequests(for: .setUp)
     }
 
-    enum CodingKeys: CodingKey {
+    enum CodingKeys: String, CodingKey {
         case variables
         case requests
         case restfiles
+        case setUp = "set_up"
     }
 }
 
