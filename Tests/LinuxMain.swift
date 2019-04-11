@@ -92,11 +92,6 @@ extension RestfileDecodingTests {
       ("test_parse_set_up", test_parse_set_up),
   ]
 }
-extension RestfileTests {
-  static var allTests: [(String, (RestfileTests) -> () throws -> Void)] = [
-      ("test_request_order", test_request_order),
-  ]
-}
 extension StatsTests {
   static var allTests: [(String, (StatsTests) -> () throws -> Void)] = [
       ("test_average", test_average),
@@ -174,7 +169,6 @@ XCTMain([
   testCase(RequestValidationTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileDecodingTests.allTests),
-  testCase(RestfileTests.allTests),
   testCase(StatsTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(TestUtilsTests.allTests),
