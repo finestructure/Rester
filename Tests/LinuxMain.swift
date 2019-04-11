@@ -74,7 +74,7 @@ extension RestfileDecodingTests {
 }
 extension RestfileExecutionTests {
   static var allTests: [(String, (RestfileExecutionTests) -> () throws -> Void)] = [
-      ("test_execute", test_execute),
+      ("test_expandedRequest", test_expandedRequest),
       ("test_validate_status", test_validate_status),
       ("test_validate_json", test_validate_json),
       ("test_validate_json_regex", test_validate_json_regex),
