@@ -23,9 +23,9 @@ class ResterTests: XCTestCase {
         """
 
         let r = try Rester(yml: s, workDir: workDir)
-        XCTAssertEqual(r.allRequests.count, 2)
-        XCTAssertEqual(r.allVariables, ["API_URL": "https://httpbin.org"])
-        XCTAssertEqual(r.allRequests.map { $0.name }, ["basic", "basic2"])
+        XCTAssertEqual(r.requests.count, 2)
+        XCTAssertEqual(r.variables, ["API_URL": "https://httpbin.org"])
+        XCTAssertEqual(r.requests.map { $0.name }, ["basic", "basic2"])
     }
 
     func test_basic() throws {

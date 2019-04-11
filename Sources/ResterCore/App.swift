@@ -38,7 +38,7 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
 }
 
 
-func process(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose: Bool, workdir: String) -> Promise<[Bool]> {
+func test(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose: Bool, workdir: String) -> Promise<[Bool]> {
     Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
     let restfilePath = Path(filename) ?? Path.cwd/filename
@@ -61,10 +61,10 @@ func process(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose:
     }
 
     if verbose {
-        Current.console.display(variables: rester.allVariables)
+        Current.console.display(variables: rester.variables)
     }
 
-    guard rester.requestCount > 0 else {
+    guard rester.requests.count > 0 else {
         Current.console.display("⚠️  no requests defined in \(filename.bold)!")
         return .value([Bool]())
     }
@@ -108,7 +108,7 @@ public let app = command(
         let until = duration.map { Duration.seconds($0) } ?? .forever
 
         run(until, interval: .seconds(loop)) {
-            process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
+            test(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
                 .done { results in
                     let failureCount = results.filter { !$0 }.count
                     grandTotal += results.count
@@ -126,7 +126,7 @@ public let app = command(
                 exit(1)
         }
     } else {
-        _ = process(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
+        _ = test(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
             .done { results in
                 let failureCount = results.filter { !$0 }.count
                 Current.console.display(summary: results.count, failed: failureCount)

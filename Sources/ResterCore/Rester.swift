@@ -11,12 +11,16 @@ import PromiseKit
 import Yams
 
 
-public struct Rester {
-    let restfile: Restfile
-    public var allVariables: [Key: Value]
-    let allRequests: [Request]
+public class Rester {
+    public var variables: [Key: Value] { return _variables }
+    public var requests: [Request] { return _requests }
 
-    public init(path: Path, workDir: Path = Path.cwd) throws {
+    let restfile: Restfile
+    let _requests: [Request]
+    let _variables: [Key: Value]
+    var responses = [Key: Value]()
+
+    public convenience init(path: Path, workDir: Path = Path.cwd) throws {
         if !path.exists {
             throw ResterError.fileNotFound(path.string)
         }
@@ -27,8 +31,8 @@ public struct Rester {
     init(yml: String, workDir: Path = Path.cwd) throws {
         let r = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
 
-        allVariables = aggregate(variables: r.variables, from: r.restfiles)
-        allRequests = aggregate(requests: r.requests, from: r.restfiles)
+        _variables = aggregate(variables: r.variables, from: r.restfiles)
+        _requests = aggregate(requests: r.requests, from: r.restfiles)
 
         restfile = r
     }
@@ -36,31 +40,24 @@ public struct Rester {
 
 
 extension Rester {
-    public var requestCount: Int { return allRequests.count }
-}
-
-
-extension Rester {
-    public func test<T>(
-        before: @escaping (Request.Name) -> (),
-        after: @escaping (Request.Name, Response, ValidationResult) -> T,
-        timeout: TimeInterval = Request.defaultTimeout,
-        validateCertificate: Bool = true
+    public func test<T>(before: @escaping (Request.Name) -> (),
+                        after: @escaping (Request.Name, Response, ValidationResult) -> T,
+                        timeout: TimeInterval = Request.defaultTimeout,
+                        validateCertificate: Bool = true
         ) -> Promise<[T]> {
 
         var results = [T]()
-        var jsonResponses = [Key: Value]()
         var chain = Promise()
-        for req in allRequests {
+        for req in requests {
             chain = chain.then { _ -> Promise<Void> in
                 before(req.name)
-                let variables = self.allVariables.merging(jsonResponses, strategy: .lastWins)
+                let variables = self.variables.merging(self.responses, strategy: .lastWins)
                 let resolved = try req.substitute(variables: variables)
                 return try resolved
                     .execute(timeout: timeout, validateCertificate: validateCertificate)
                     .map { response -> (Response, ValidationResult) in
                         if let json = response.json {
-                            jsonResponses[req.name] = json
+                            self.responses[req.name] = json
                         }
                         return (response, resolved.validate(response))
                     }.map { response, result in
