@@ -73,8 +73,8 @@ extension ResterTests {
       ("test_timeout_error", test_timeout_error),
   ]
 }
-extension RestfileDecodingTests {
-  static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
+extension RestfileTests {
+  static var allTests: [(String, (RestfileTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
       ("test_parse_malformed_request", test_parse_malformed_request),
@@ -168,7 +168,7 @@ XCTMain([
   testCase(RequestTests.allTests),
   testCase(RequestValidationTests.allTests),
   testCase(ResterTests.allTests),
-  testCase(RestfileDecodingTests.allTests),
+  testCase(RestfileTests.allTests),
   testCase(StatsTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(TestUtilsTests.allTests),

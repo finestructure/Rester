@@ -5,7 +5,7 @@ import Yams
 @testable import ResterCore
 
 
-class RestfileDecodingTests: XCTestCase {
+class RestfileTests: XCTestCase {
 
     func test_decode_variables() throws {
         let s = """
