@@ -8,7 +8,7 @@ import Yams
 @testable import ResterCore
 
 
-final class RestfileExecutionTests: XCTestCase {
+final class RestfileTests: XCTestCase {
 
     func test_request_order() throws {
         let s = """

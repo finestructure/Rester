@@ -88,8 +88,8 @@ extension RestfileDecodingTests {
       ("test_parse_set_up", test_parse_set_up),
   ]
 }
-extension RestfileExecutionTests {
-  static var allTests: [(String, (RestfileExecutionTests) -> () throws -> Void)] = [
+extension RestfileTests {
+  static var allTests: [(String, (RestfileTests) -> () throws -> Void)] = [
       ("test_request_order", test_request_order),
       ("test_substitute_env", test_substitute_env),
       ("test_response_array_validation", test_response_array_validation),
@@ -174,7 +174,7 @@ XCTMain([
   testCase(RequestValidationTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileDecodingTests.allTests),
-  testCase(RestfileExecutionTests.allTests),
+  testCase(RestfileTests.allTests),
   testCase(StatsTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(TestUtilsTests.allTests),
