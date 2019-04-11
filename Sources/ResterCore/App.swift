@@ -38,10 +38,8 @@ func after(name: Request.Name, response: Response, result: ValidationResult) -> 
 }
 
 
-func test(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose: Bool, workdir: String) -> Promise<[Bool]> {
-    Current.console.display("🚀  Resting \(filename.bold) ...\n")
-
-    let restfilePath = Path(filename) ?? Path.cwd/filename
+func read(restfile: String, timeout: TimeInterval, verbose: Bool, workdir: String) throws -> Rester {
+    let restfilePath = Path(restfile) ?? Path.cwd/restfile
     Current.workDir = getWorkDir(input: workdir) ?? (restfilePath).parent
 
     if verbose {
@@ -53,23 +51,17 @@ func test(_ filename: String, insecure: Bool, timeout: TimeInterval, verbose: Bo
         Current.console.display(verbose: "Request timeout: \(timeout)s\n")
     }
 
-    let rester: Rester
-    do {
-        rester = try Rester(path: restfilePath, workDir: Current.workDir)
-    } catch {
-        return Promise(error: error)
-    }
+    let rester = try Rester(path: restfilePath, workDir: Current.workDir)
 
     if verbose {
         Current.console.display(variables: rester.variables)
     }
 
     guard rester.requests.count > 0 else {
-        Current.console.display("⚠️  no requests defined in \(filename.bold)!")
-        return .value([Bool]())
+        throw ResterError.genericError("⚠️  no requests defined in \(restfile.bold)!")
     }
 
-    return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
+    return rester
 }
 
 
@@ -100,6 +92,14 @@ public let app = command(
         statistics = [:]
     }
 
+    let rester: Rester
+    do {
+        rester = try read(restfile: filename, timeout: timeout, verbose: verbose, workdir: workdir)
+    } catch {
+        Current.console.display(error)
+        exit(1)
+    }
+
     if let loop = loop {
         print("Running every \(loop) seconds ...\n")
         var grandTotal = 0
@@ -108,7 +108,9 @@ public let app = command(
         let until = duration.map { Duration.seconds($0) } ?? .forever
 
         run(until, interval: .seconds(loop)) {
-            test(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
+            Current.console.display("🚀  Resting \(filename.bold) ...\n")
+
+            return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
                 .done { results in
                     let failureCount = results.filter { !$0 }.count
                     grandTotal += results.count
@@ -126,7 +128,9 @@ public let app = command(
                 exit(1)
         }
     } else {
-        _ = test(filename, insecure: insecure, timeout: timeout, verbose: verbose, workdir: workdir)
+        Current.console.display("🚀  Resting \(filename.bold) ...\n")
+
+        _ = rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
             .done { results in
                 let failureCount = results.filter { !$0 }.count
                 Current.console.display(summary: results.count, failed: failureCount)

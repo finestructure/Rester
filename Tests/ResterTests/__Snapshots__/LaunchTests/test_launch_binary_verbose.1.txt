@@ -1,5 +1,3 @@
-🚀  Resting basic.yml ...
-
 Restfile path: basic.yml
 Working directory: XXX
 
@@ -7,6 +5,8 @@ Request timeout: 7.0s
 
 Defined variables:
   - API_URL
+
+🚀  Resting basic.yml ...
 
 🎬  basic started ...
 
