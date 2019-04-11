@@ -24,6 +24,13 @@ extension PathTests {
       ("test_mimeType", test_mimeType),
   ]
 }
+extension RequestLoggingTests {
+  static var allTests: [(String, (RequestLoggingTests) -> () throws -> Void)] = [
+      ("test_log_request", test_log_request),
+      ("test_log_request_json_keypath", test_log_request_json_keypath),
+      ("test_log_request_file", test_log_request_file),
+  ]
+}
 extension RequestTests {
   static var allTests: [(String, (RequestTests) -> () throws -> Void)] = [
       ("test_post_json", test_post_json),
@@ -84,9 +91,6 @@ extension RestfileExecutionTests {
       ("test_expandedRequest", test_expandedRequest),
       ("test_request_order", test_request_order),
       ("test_substitute_env", test_substitute_env),
-      ("test_log_request", test_log_request),
-      ("test_log_request_json_keypath", test_log_request_json_keypath),
-      ("test_log_request_file", test_log_request_file),
       ("test_response_array_validation", test_response_array_validation),
       ("test_response_variable_legacy", test_response_variable_legacy),
       ("test_response_variable", test_response_variable),
@@ -165,6 +169,7 @@ XCTMain([
   testCase(IssuesTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
+  testCase(RequestLoggingTests.allTests),
   testCase(RequestTests.allTests),
   testCase(RequestValidationTests.allTests),
   testCase(ResterTests.allTests),
