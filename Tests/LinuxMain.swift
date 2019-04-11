@@ -50,6 +50,7 @@ extension RequestTests {
 extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
       ("test_init", test_init),
+      ("test_delay_env_var_substitution", test_delay_env_var_substitution),
   ]
 }
 extension RestfileDecodingTests {
@@ -79,7 +80,6 @@ extension RestfileExecutionTests {
       ("test_validate_json_regex", test_validate_json_regex),
       ("test_request_order", test_request_order),
       ("test_substitute_env", test_substitute_env),
-      ("test_delay_request_substitution", test_delay_request_substitution),
       ("test_log_request", test_log_request),
       ("test_log_request_json_keypath", test_log_request_json_keypath),
       ("test_log_request_file", test_log_request_file),
