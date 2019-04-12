@@ -40,9 +40,9 @@ class LaunchTests: SnapshotTestCase {
         assertSnapshot(matching: output, as: .description)
     }
 
-    func test_launch_loop_duration() throws {
+    func test_launch_loop_count() throws {
         let requestFile = try path(example: "basic.yml").unwrapped()
-        let (status, output) = try launch(with: requestFile, extraArguments: ["-l", "0.0", "-i", "3"])
+        let (status, output) = try launch(with: requestFile, extraArguments: ["-l", "0.0", "-c", "3"])
         XCTAssertEqual(status, 0)
         assertSnapshot(matching: output, as: .description)
     }
@@ -56,7 +56,7 @@ class LaunchTests: SnapshotTestCase {
     
     func test_launch_set_up() throws {
         let requestFile = try path(example: "set_up.yml").unwrapped()
-        let (status, output) = try launch(with: requestFile, extraArguments: ["-l", "0", "-i", "2"])
+        let (status, output) = try launch(with: requestFile, extraArguments: ["-l", "0", "-c", "2"])
         XCTAssertEqual(status, 0)
         assertSnapshot(matching: output, as: .description)
     }
