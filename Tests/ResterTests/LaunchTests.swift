@@ -32,6 +32,21 @@ class LaunchTests: SnapshotTestCase {
         assertSnapshot(matching: output, as: .description)
     }
 
+    func test_launch_no_requests() throws {
+        // TODO: improve this error message
+        let requestFile = try path(fixture: "no-requests.yml").unwrapped()
+        let (status, output) = try launch(with: requestFile)
+        XCTAssertEqual(status, 1)
+        assertSnapshot(matching: output, as: .description)
+    }
+
+    func test_launch_no_restfiles() throws {
+        let requestFile = try path(fixture: "no-restfiles.yml").unwrapped()
+        let (status, output) = try launch(with: requestFile)
+        XCTAssertEqual(status, 1)
+        assertSnapshot(matching: output, as: .description)
+    }
+
     func test_launch_binary_loop_termination() throws {
         // ensure a bad file terminates the loop
         let requestFile = try path(fixture: "loop-error.yml").unwrapped()

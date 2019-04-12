@@ -160,6 +160,8 @@ extension LaunchTests {
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
       ("test_launch_binary_malformed", test_launch_binary_malformed),
+      ("test_launch_no_requests", test_launch_no_requests),
+      ("test_launch_no_restfiles", test_launch_no_restfiles),
       ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
       ("test_launch_loop_count", test_launch_loop_count),
       ("test_launch_stats", test_launch_stats),
