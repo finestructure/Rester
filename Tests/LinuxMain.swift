@@ -121,6 +121,9 @@ extension TestUtilsTests {
 extension UtilsTests {
   static var allTests: [(String, (UtilsTests) -> () throws -> Void)] = [
       ("test_format", test_format),
+      ("test_iterationParameters", test_iterationParameters),
+      ("test_loopParameters", test_loopParameters),
+      ("test_Iteration_incremented_done", test_Iteration_incremented_done),
   ]
 }
 extension ValidationTests {

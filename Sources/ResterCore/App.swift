@@ -67,13 +67,17 @@ func read(restfile: String, timeout: TimeInterval, verbose: Bool, workdir: Strin
 
 public let app = command(
     Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
-    Option<Int?>("count", default: .none, flag: "c", description: "number of iterations to loop for"),
-    Option<Double?>("duration", default: .none, flag: "d", description: "duration <seconds> to loop for"),
-    Option<Double?>("loop", default: .none, flag: "l", description: "keep executing file every <loop> seconds"),
+    Option<Int?>("count", default: .none, flag: "c",
+                 description: "number of iterations to loop for (implies `--loop 0`)"),
+    Option<Double?>("duration", default: .none, flag: "d",
+                    description: "duration <seconds> to loop for (implies `--loop 0`"),
+    Option<Double?>("loop", default: .none, flag: "l",
+                    description: "keep executing file every <loop> seconds"),
     Flag("stats", flag: "s", description: "Show stats"),
     Option<TimeInterval>("timeout", default: Request.defaultTimeout, flag: "t", description: "Request timeout"),
     Flag("verbose", flag: "v", description: "Verbose output"),
-    Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
+    Option<String>("workdir", default: "", flag: "w",
+                   description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Argument<String>("filename", description: "A Restfile")
 ) { insecure, count, duration, loop, stats, timeout, verbose, workdir, filename in
 
@@ -101,26 +105,17 @@ public let app = command(
         exit(1)
     }
 
-    if let loop = loop {
-        let until: LoopCondition
-        switch (count, duration) {
-        case let (i?, .some):
-            Current.console.display("⚠️  Both iterations and duration specified, using iterations.\n")
-            until = .times(i)
-        case let (i?, .none):
-            until = .times(i)
-        case let (.none, d?):
-            until = LoopCondition(seconds: d)
-        default:
-            until = .forever
-        }
+    if count != nil && duration != nil {
+        Current.console.display("⚠️  Both count and duration specified, using count.\n")
+    }
 
-        print("Running every \(loop) seconds ...\n")
+    if let loop = loopParameters(count: count, duration: duration, loop: loop) {
+        print("Running every \(loop.delay) seconds ...\n")
         var grandTotal = 0
         var failedTotal = 0
         var runSetup = true
 
-        run(until, interval: loop.seconds) {
+        run(loop.iteration, interval: loop.delay.seconds) {
             Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
             return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure, runSetup: runSetup)
