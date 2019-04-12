@@ -7,6 +7,7 @@
 
 import XCTest
 
+import Gen
 @testable import ResterCore
 
 
@@ -332,6 +333,8 @@ class ResterTests: XCTestCase {
     }
 
     func test_mode_random() throws {
+        // https://xkcd.com/221
+        Current.rng = AnyRandomNumberGenerator(LCRNG(seed: 0))
         let s = """
             mode: random
             requests:

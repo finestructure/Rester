@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import Gen
 import Path
 
 
@@ -15,6 +16,7 @@ public struct World {
     public var console: Console = DefaultConsole()
     public var environment = ProcessInfo.processInfo.environment
     public var workDir = Path.cwd
+    var rng = AnyRandomNumberGenerator(SystemRandomNumberGenerator())
 }
 
 

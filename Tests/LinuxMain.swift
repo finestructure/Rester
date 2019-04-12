@@ -118,6 +118,7 @@ extension TestUtilsTests {
       ("test_maskPath", test_maskPath),
       ("test_maskLine", test_maskLine),
       ("test_examplesDataDir", test_examplesDataDir),
+      ("test_RNG", test_RNG),
   ]
 }
 extension UtilsTests {

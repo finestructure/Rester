@@ -80,10 +80,8 @@ extension Rester {
         #warning("pass in mode")
         let mode = Mode.random
         if mode == .random {
-            #warning("put in Current")
             let rnd = Gen.element(of: requests)
-            var rng = LCRNG(seed: 0)
-            guard let chosenRequest = rnd.run(using: &rng) else {
+            guard let chosenRequest = rnd.run(using: &Current.rng) else {
                 let err = ResterError.internalError("failed to choose random request")
                 return Promise(error: err)
             }
