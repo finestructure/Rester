@@ -160,7 +160,6 @@ extension LaunchTests {
       ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
       ("test_launch_loop_duration", test_launch_loop_duration),
       ("test_launch_stats", test_launch_stats),
-      ("test_launch_set_up", test_launch_set_up),
   ]
 }
 
