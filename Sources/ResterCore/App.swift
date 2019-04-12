@@ -67,8 +67,8 @@ func read(restfile: String, timeout: TimeInterval, verbose: Bool, workdir: Strin
 
 public let app = command(
     Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
-    Option<Int?>("duration", default: .none, flag: "d", description: "duration <seconds> to loop for"),
-    Option<Int?>("loop", default: .none, flag: "l", description: "keep executing file every <loop> seconds"),
+    Option<Double?>("duration", default: .none, flag: "d", description: "duration <seconds> to loop for"),
+    Option<Double?>("loop", default: .none, flag: "l", description: "keep executing file every <loop> seconds"),
     Flag("stats", flag: "s", description: "Show stats"),
     Option<TimeInterval>("timeout", default: Request.defaultTimeout, flag: "t", description: "Request timeout"),
     Flag("verbose", flag: "v", description: "Verbose output"),
@@ -108,7 +108,7 @@ public let app = command(
 
         let until = duration.map { Duration.seconds($0) } ?? .forever
 
-        run(until, interval: .seconds(loop)) {
+        run(until, interval: loop.seconds) {
             Current.console.display("🚀  Resting \(filename.bold) ...\n")
 
             return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure, runSetup: runSetup)

@@ -34,7 +34,7 @@ public func format(_ timeInterval: TimeInterval) -> String? {
 
 public enum Duration {
     case forever
-    case seconds(Int)
+    case seconds(Double)
 
     var end: Date? {
         switch self {

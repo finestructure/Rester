@@ -56,7 +56,7 @@ class LaunchTests: SnapshotTestCase {
     
     func test_launch_set_up() throws {
         let requestFile = try path(example: "set_up.yml").unwrapped()
-        let (status, output) = try launch(with: requestFile, extraArguments: ["-l", "1", "-d", "2"])
+        let (status, output) = try launch(with: requestFile, extraArguments: ["-l", "0.5", "-d", "1.2"])
         XCTAssertEqual(status, 0)
         assertSnapshot(matching: output, as: .description)
     }
