@@ -271,4 +271,23 @@ class RestfileTests: XCTestCase {
         XCTAssertEqual(rest.setupRequests["basic"]?.details.url, "https://httpbin.org/anything")
     }
 
+    func test_parse_mode() throws {
+        do {  // explicit
+            let s = """
+                mode: random
+                """
+            let rest = try YAMLDecoder().decode(Restfile.self, from: s)
+            XCTAssertEqual(rest.mode, .random)
+        }
+        do {  // default
+            let s = """
+                requests:
+                  r1:
+                    url: http://foo.bar
+                """
+            let rest = try YAMLDecoder().decode(Restfile.self, from: s)
+            XCTAssertEqual(rest.mode, .sequential)
+        }
+    }
+
 }

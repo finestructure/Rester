@@ -18,9 +18,9 @@ class ResterTests: XCTestCase {
         let v1: [Key: Value] = ["k1": "v1"]
         let v2: [Key: Value] = ["k2": "v2"]
         let v2a: [Key: Value] = ["k2": "v2a"]
-        let rf1 = Restfile(variables: v1, requests: [], restfiles: [], setupRequests: [])
-        let rf2 = Restfile(variables: v2, requests: [], restfiles: [], setupRequests: [])
-        let rf2a = Restfile(variables: v2a, requests: [], restfiles: [], setupRequests: [])
+        let rf1 = Restfile(variables: v1, requests: [], restfiles: [], setupRequests: [], mode: .sequential)
+        let rf2 = Restfile(variables: v2, requests: [], restfiles: [], setupRequests: [], mode: .sequential)
+        let rf2a = Restfile(variables: v2a, requests: [], restfiles: [], setupRequests: [], mode: .sequential)
         // MUT
         let res = aggregate(variables: v0, from: [rf1, rf2, rf2a])
         // assert
@@ -31,10 +31,10 @@ class ResterTests: XCTestCase {
         // set up
         let r1 = Request(name: "r1", details: .init(url: "url"))
         let r2 = Request(name: "r2", details: .init(url: "url"))
-        let rf1 = Restfile(variables: [:], requests: [r1, r2], restfiles: [], setupRequests: [])
+        let rf1 = Restfile(variables: [:], requests: [r1, r2], restfiles: [], setupRequests: [], mode: .sequential)
         let r3 = Request(name: "r3", details: .init(url: "url"))
         let r4 = Request(name: "r4", details: .init(url: "url"))
-        let rf2 = Restfile(variables: [:], requests: [r3, r4], restfiles: [], setupRequests: [])
+        let rf2 = Restfile(variables: [:], requests: [r3, r4], restfiles: [], setupRequests: [], mode: .sequential)
         // MUT
         let res = aggregate(keyPath: \.requests, from: [rf1, rf2])
         // assert

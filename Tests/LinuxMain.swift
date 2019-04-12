@@ -93,6 +93,7 @@ extension RestfileTests {
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
       ("test_parse_complex_form", test_parse_complex_form),
       ("test_parse_set_up", test_parse_set_up),
+      ("test_parse_mode", test_parse_mode),
   ]
 }
 extension StatsTests {
