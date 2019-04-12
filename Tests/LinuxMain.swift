@@ -74,6 +74,7 @@ extension ResterTests {
       ("test_delay_env_var_substitution", test_delay_env_var_substitution),
       ("test_timeout_error", test_timeout_error),
       ("test_set_up", test_set_up),
+      ("test_mode_random", test_mode_random),
   ]
 }
 extension RestfileTests {

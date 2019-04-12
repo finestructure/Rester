@@ -74,6 +74,15 @@
         }
       },
       {
+        "package": "Gen",
+        "repositoryURL": "https://github.com/pointfreeco/swift-gen.git",
+        "state": {
+          "branch": null,
+          "revision": "b5e9f0130dcf1ba3dcbb2a64c322e1556ca71eca",
+          "version": "0.2.0"
+        }
+      },
+      {
         "package": "SnapshotTesting",
         "repositoryURL": "https://github.com/pointfreeco/swift-snapshot-testing.git",
         "state": {
