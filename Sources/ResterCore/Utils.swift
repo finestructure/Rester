@@ -32,25 +32,42 @@ public func format(_ timeInterval: TimeInterval) -> String? {
 }
 
 
-public enum Duration {
+public enum LoopCondition {
     case forever
-    case seconds(Double)
+    case end(Date)
+    case times(Int)
 
-    var end: Date? {
+    public init(seconds: Double) {
+        self = .end(Date().addingTimeInterval(TimeInterval(seconds)))
+    }
+
+    public var done: Bool {
         switch self {
         case .forever:
-            return nil
-        case .seconds(let sec):
-            return Date().addingTimeInterval(TimeInterval(sec))
+            return false
+        case .end(let date):
+            return Date().timeIntervalSince(date) > 0
+        case .times(let count):
+            return count == 0
+        }
+    }
+
+    public var incremented: LoopCondition {
+        switch self {
+        case .times(let count):
+            return .times(count - 1)
+        case .forever, .end:
+            return self
         }
     }
 }
 
 
-public func run<T>(_ duration: Duration, interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
-    let end = duration.end
+public func run<T>(_ until: LoopCondition, interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
+    var until = until
     func loop() -> Promise<T> {
-        if let end = end, Date().timeIntervalSince(end) > 0 {
+        until = until.incremented
+        if until.done {
             return body()
         }
         return body().then { res in

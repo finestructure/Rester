@@ -68,13 +68,14 @@ func read(restfile: String, timeout: TimeInterval, verbose: Bool, workdir: Strin
 public let app = command(
     Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
     Option<Double?>("duration", default: .none, flag: "d", description: "duration <seconds> to loop for"),
+    Option<Int?>("iterations", default: .none, flag: "i", description: "number of iterations to loop for"),
     Option<Double?>("loop", default: .none, flag: "l", description: "keep executing file every <loop> seconds"),
     Flag("stats", flag: "s", description: "Show stats"),
     Option<TimeInterval>("timeout", default: Request.defaultTimeout, flag: "t", description: "Request timeout"),
     Flag("verbose", flag: "v", description: "Verbose output"),
     Option<String>("workdir", default: "", flag: "w", description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
     Argument<String>("filename", description: "A Restfile")
-) { insecure, duration, loop, stats, timeout, verbose, workdir, filename in
+) { insecure, duration, iterations, loop, stats, timeout, verbose, workdir, filename in
 
     signal(SIGINT) { s in
         print("\nInterrupted by user, terminating ...")
@@ -101,12 +102,23 @@ public let app = command(
     }
 
     if let loop = loop {
+        let until: LoopCondition
+        switch (iterations, duration) {
+        case let (i?, .some):
+            Current.console.display("⚠️  Both iterations and duration specified, using iterations.\n")
+            until = .times(i)
+        case let (i?, .none):
+            until = .times(i)
+        case let (.none, d?):
+            until = LoopCondition(seconds: d)
+        default:
+            until = .forever
+        }
+
         print("Running every \(loop) seconds ...\n")
         var grandTotal = 0
         var failedTotal = 0
         var runSetup = true
-
-        let until = duration.map { Duration.seconds($0) } ?? .forever
 
         run(until, interval: loop.seconds) {
             Current.console.display("🚀  Resting \(filename.bold) ...\n")
