@@ -10,6 +10,6 @@ import Foundation
 
 extension Double {
     public var seconds: DispatchTimeInterval {
-        return .nanoseconds(Int(self * 10e9))
+        return .nanoseconds(Int(self * 1e9))
     }
 }
