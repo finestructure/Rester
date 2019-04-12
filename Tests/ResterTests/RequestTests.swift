@@ -14,6 +14,171 @@ import Yams
 
 class RequestTests: XCTestCase {
 
+    func test_post_json() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            method: POST
+            body:
+              json:
+                foo: bar
+            validation:
+              status: 200
+              json:
+                method: POST
+                json:
+                  foo: bar
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_post_form() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            method: POST
+            body:
+              form:
+                foo: bar
+            validation:
+              status: 200
+              json:
+                method: POST
+                form:
+                  foo: bar
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_post_multipart() throws {
+        let testFile = path(fixture: "test.jpg")!
+        let s = """
+            url: https://httpbin.org/anything
+            method: POST
+            body:
+              multipart:
+                file: .file(\(testFile))
+            validation:
+              status: 200
+              json:
+                method: POST
+                headers:
+                  Content-Type: multipart/form-data; charset=utf-8; boundary=__X_RESTER_BOUNDARY__
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_post_text() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            method: POST
+            body:
+              text: foobar
+            validation:
+              status: 200
+              json:
+                method: POST
+                headers:
+                  Content-Type: text/plain; charset=utf-8
+                data: foobar
+        """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_post_file() throws {
+        let testFile = path(fixture: "test.jpg")!
+        let s = """
+             url: https://httpbin.org/anything
+             method: POST
+             body:
+               file: .file(\(testFile))
+             validation:
+               status: 200
+               json:
+                 method: POST
+                 headers:
+                   Content-Type: image/jpeg
+                 data: dummy data
+         """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_put_json() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            method: PUT
+            body:
+              json:
+                foo: bar
+            validation:
+              status: 200
+              json:
+                method: PUT
+                json:
+                  foo: bar
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_delete() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            method: DELETE
+            validation:
+              status: 200
+              json:
+                method: DELETE
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
     func test_parse_headers() throws {
         let s = """
             url: https://foo.bar
@@ -48,6 +213,27 @@ class RequestTests: XCTestCase {
                 expectation.fulfill()
         }
 
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_validate_headers() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            validation:
+              status: 200
+              headers:
+                Content-Type: application/json
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
         waitForExpectations(timeout: 5)
     }
 
@@ -138,52 +324,30 @@ class RequestTests: XCTestCase {
         }
     }
 
-    func test_parse_log() throws {
-        do {  // true
-            let s = """
-                url: https://httpbin.org/anything
-                log: true
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, .bool(true))
-        }
-        do {  // array
-            let s = """
-                url: https://httpbin.org/anything
-                log:
-                  - status
-                  - headers
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, .array(["status", "headers"]))
-        }
-        do {  // dict
-            let s = """
-                url: https://httpbin.org/anything
-                log: json
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, "json")
-        }
-        do {  // file
-            let s = """
-                url: https://httpbin.org/anything
-                log: .file(response.out)
-            """
-            let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-            XCTAssertEqual(r.log, ".file(response.out)")
-            XCTAssertEqual(try r.log?.path(), Current.workDir/"response.out")
-        }
-    }
-
-    func test_parse_log_keypath() throws {
+    func test_delay_execution() throws {
+        let console = TestConsole()
+        Current.console = console
         let s = """
+            delay: 2
             url: https://httpbin.org/anything
-            log:
-              - json.data.property
-        """
-        let r = try YAMLDecoder().decode(Request.Details.self, from: s)
-        XCTAssertEqual(r.log, .array(["json.data.property"]))
+            validation:
+              status: 200
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        let start = Date()
+        _ = try r.test().map {
+            XCTAssertEqual($0, ValidationResult.valid)
+            XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
+            expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+        let elapsed = Date().timeIntervalSince(start)
+        XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
     func test_request_execute_elapsed() throws {

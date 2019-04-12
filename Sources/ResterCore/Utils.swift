@@ -32,25 +32,73 @@ public func format(_ timeInterval: TimeInterval) -> String? {
 }
 
 
-public enum Duration {
-    case forever
-    case seconds(Int)
-
-    var end: Date? {
-        switch self {
-        case .forever:
-            return nil
-        case .seconds(let sec):
-            return Date().addingTimeInterval(TimeInterval(sec))
-        }
+func iterationParameters(count: Int?, duration: Double?) -> Iteration? {
+    switch (count, duration) {
+    case let (i?, .some):
+        return .times(i)
+    case let (i?, .none):
+        return .times(i)
+    case let (.none, d?):
+        return Iteration(seconds: d)
+    case (.none, .none):
+        return nil
     }
 }
 
 
-public func run<T>(_ duration: Duration, interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
-    let end = duration.end
+func loopParameters(count: Int?, duration: Double?, loop: Double?) -> (iteration: Iteration, delay: Double)? {
+    let iter = iterationParameters(count: count, duration: duration)
+    switch (iter, loop) {
+    case (.none, .none):
+        return nil
+    case let (.none, d?):
+        return (.forever, d)
+    case let (i?, .none):
+        return (i, 0)
+    case let (i?, d?):
+        return (i, d)
+    }
+}
+
+
+public enum Iteration {
+    case forever
+    case until(Date)
+    case times(Int)
+
+    public init(seconds: Double) {
+        self = .until(Date().addingTimeInterval(TimeInterval(seconds)))
+    }
+
+    public var done: Bool {
+        switch self {
+        case .forever:
+            return false
+        case .until(let date):
+            return Date().timeIntervalSince(date) > 0
+        case .times(let count):
+            return count == 0
+        }
+    }
+
+    public var incremented: Iteration {
+        switch self {
+        case .times(let count):
+            return .times(count - 1)
+        case .forever, .until:
+            return self
+        }
+    }
+}
+
+extension Iteration: Equatable {}
+
+
+public func run<T>(_ interation: Iteration, interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
+    var iteration = interation
     func loop() -> Promise<T> {
-        if let end = end, Date().timeIntervalSince(end) > 0 {
+        iteration = iteration.incremented
+        if iteration.done {
             return body()
         }
         return body().then { res in

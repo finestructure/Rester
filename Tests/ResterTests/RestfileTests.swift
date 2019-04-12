@@ -5,7 +5,7 @@ import Yams
 @testable import ResterCore
 
 
-class RestfileDecodingTests: XCTestCase {
+class RestfileTests: XCTestCase {
 
     func test_decode_variables() throws {
         let s = """
@@ -257,6 +257,18 @@ class RestfileDecodingTests: XCTestCase {
             return
         }
         XCTAssert(encodedForm.contains("username=foo.bar.baz%40example.com"), "was: \(encodedForm)")
+    }
+
+    func test_parse_set_up() throws {
+        let s = """
+            set_up:
+              basic:
+                url: https://httpbin.org/anything
+                validation:
+                  status: 200
+            """
+        let rest = try YAMLDecoder().decode(Restfile.self, from: s)
+        XCTAssertEqual(rest.setupRequests["basic"]?.details.url, "https://httpbin.org/anything")
     }
 
 }
