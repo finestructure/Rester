@@ -21,7 +21,12 @@ public class Rester {
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
     let _variables: [Key: Value]
+
+    /// Parsed data returned from all responses, keyed by request name
     var responses = [Key: Value]()
+
+    /// Execution mode, determined by top level restfile
+    var mode: Mode { return restfile.mode }
 
     public convenience init(path: Path, workDir: Path = Path.cwd) throws {
         if !path.exists {
@@ -77,8 +82,6 @@ extension Rester {
 
         let toProcess: [Request]
 
-        #warning("pass in mode")
-        let mode = Mode.random
         if mode == .random {
             let rnd = Gen.element(of: requests)
             guard let chosenRequest = rnd.run(using: &Current.rng) else {
