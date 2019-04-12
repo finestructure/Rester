@@ -121,6 +121,9 @@ extension TestUtilsTests {
 extension UtilsTests {
   static var allTests: [(String, (UtilsTests) -> () throws -> Void)] = [
       ("test_format", test_format),
+      ("test_iterationParameters", test_iterationParameters),
+      ("test_loopParameters", test_loopParameters),
+      ("test_Iteration_incremented_done", test_Iteration_incremented_done),
   ]
 }
 extension ValidationTests {
@@ -158,7 +161,7 @@ extension LaunchTests {
       ("test_launch_binary_verbose", test_launch_binary_verbose),
       ("test_launch_binary_malformed", test_launch_binary_malformed),
       ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
-      ("test_launch_loop_duration", test_launch_loop_duration),
+      ("test_launch_loop_count", test_launch_loop_count),
       ("test_launch_stats", test_launch_stats),
       ("test_launch_set_up", test_launch_set_up),
   ]

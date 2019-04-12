@@ -153,11 +153,7 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
     let pipe = Pipe()
     process.standardOutput = pipe
 
-    #if os(Linux)
-    process.launch()
-    #else
     try process.run()
-    #endif
 
     process.waitUntilExit()
 
