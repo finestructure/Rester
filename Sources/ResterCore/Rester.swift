@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Gen
 import Path
 import PromiseKit
 import Yams
@@ -20,7 +21,12 @@ public class Rester {
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
     let _variables: [Key: Value]
+
+    /// Parsed data returned from all responses, keyed by request name
     var responses = [Key: Value]()
+
+    /// Execution mode, determined by top level restfile
+    var mode: Mode { return restfile.mode }
 
     public convenience init(path: Path, workDir: Path = Path.cwd) throws {
         if !path.exists {
@@ -74,12 +80,25 @@ extension Rester {
             return chain.map { results }
         }
 
+        let toProcess: [Request]
+
+        if mode == .random {
+            let rnd = Gen.element(of: requests)
+            guard let chosenRequest = rnd.run(using: &Current.rng) else {
+                let err = ResterError.internalError("failed to choose random request")
+                return Promise(error: err)
+            }
+            toProcess = [chosenRequest]
+        } else {
+            toProcess = requests
+        }
+
         if runSetup {
             return process(requests: setupRequests).then { _ in
-                process(requests: self.requests)
+                process(requests: toProcess)
             }
         } else {
-            return process(requests: requests)
+            return process(requests: toProcess)
         }
     }
 

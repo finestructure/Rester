@@ -9,7 +9,9 @@ FROM finestructure/rester:base-${VERSION} as build
 RUN make version
 
 RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so* /build/lib
-RUN swift build -c release && mv `swift build -c release --show-bin-path` /build/bin
+# Can't use -c release for the moment: https://github.com/pointfreeco/swift-gen/issues/8
+# RUN swift build -c release && mv `swift build -c release --show-bin-path` /build/bin
+RUN swift build && mv `swift build --show-bin-path` /build/bin
 
 # deployment image
 

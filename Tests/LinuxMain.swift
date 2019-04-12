@@ -74,6 +74,7 @@ extension ResterTests {
       ("test_delay_env_var_substitution", test_delay_env_var_substitution),
       ("test_timeout_error", test_timeout_error),
       ("test_set_up", test_set_up),
+      ("test_mode_random", test_mode_random),
   ]
 }
 extension RestfileTests {
@@ -93,6 +94,7 @@ extension RestfileTests {
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
       ("test_parse_complex_form", test_parse_complex_form),
       ("test_parse_set_up", test_parse_set_up),
+      ("test_parse_mode", test_parse_mode),
   ]
 }
 extension StatsTests {
@@ -116,6 +118,7 @@ extension TestUtilsTests {
       ("test_maskPath", test_maskPath),
       ("test_maskLine", test_maskLine),
       ("test_examplesDataDir", test_examplesDataDir),
+      ("test_RNG", test_RNG),
   ]
 }
 extension UtilsTests {

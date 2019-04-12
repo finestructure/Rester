@@ -4,11 +4,18 @@ import PromiseKit
 import Yams
 
 
+enum Mode: String, Decodable {
+    case sequential
+    case random
+}
+
+
 public struct Restfile {
     public let variables: [Key: Value]
     let requests: [Request]
     let restfiles: [Restfile]
     let setupRequests: [Request]
+    let mode: Mode
 }
 
 
@@ -22,6 +29,7 @@ extension Restfile: Decodable {
             restfiles = try paths?.map { try Restfile(path: $0) } ?? []
         }
         setupRequests = try container.decodeRequests(for: .setupRequests)
+        mode = (try? container.decode(Mode.self, forKey: .mode)) ?? .sequential
     }
 
     enum CodingKeys: String, CodingKey {
@@ -29,6 +37,7 @@ extension Restfile: Decodable {
         case requests
         case restfiles
         case setupRequests = "set_up"
+        case mode
     }
 }
 

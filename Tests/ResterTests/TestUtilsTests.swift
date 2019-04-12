@@ -5,7 +5,9 @@
 //  Created by Sven A. Schmidt on 17/03/2019.
 //
 
+import Gen
 import Path
+@testable import ResterCore
 import XCTest
 
 
@@ -53,6 +55,28 @@ class TestUtilsTests: XCTestCase {
     func test_examplesDataDir() throws {
         XCTAssertEqual(examplesDirectory()?.basename(), "examples")
         XCTAssert((examplesDirectory()!/"array.yml").exists)
+    }
+
+    func test_RNG() {
+        // ensure we get stable random number so the other tests pass
+        do {
+            Current.rng = AnyRandomNumberGenerator(LCRNG(seed: 0))
+            let g = Gen.int(in: 0...10)
+            XCTAssertEqual(g.run(using: &Current.rng), 10)
+            XCTAssertEqual(g.run(using: &Current.rng), 10)
+            XCTAssertEqual(g.run(using: &Current.rng), 6)
+            XCTAssertEqual(g.run(using: &Current.rng), 3)
+            XCTAssertEqual(g.run(using: &Current.rng), 10)
+        }
+        do {
+            Current.rng = AnyRandomNumberGenerator(LCRNG(seed: 0))
+            let g = Gen.element(of: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+            XCTAssertEqual(g.run(using: &Current.rng), 4)
+            XCTAssertEqual(g.run(using: &Current.rng), 9)
+            XCTAssertEqual(g.run(using: &Current.rng), 4)
+            XCTAssertEqual(g.run(using: &Current.rng), 5)
+            XCTAssertEqual(g.run(using: &Current.rng), 6)
+        }
     }
 
 }
