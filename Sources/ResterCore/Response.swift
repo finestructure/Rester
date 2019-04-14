@@ -12,6 +12,16 @@ public struct Response: Equatable {
     public let elapsed: TimeInterval
     let data: Data
     let response: HTTPURLResponse
+    let json: Value?
+    let variables: [Key: Value]
+
+    init(elapsed: TimeInterval, data: Data, response: HTTPURLResponse, variables: [Key: Value]) throws {
+        self.elapsed = elapsed
+        self.data = data
+        self.response = response
+        self.json = data.json
+        self.variables = try self.json.map { try variables.substitute(variables: ["json": $0]) } ?? [:]
+    }
 
     var status: Int {
         return response.statusCode
@@ -27,16 +37,6 @@ public struct Response: Equatable {
             return (key, Value.string(value))
         }
         return Dictionary(uniqueKeysWithValues: res)
-    }
-
-    var json: Value? {
-        if let data = try? JSONDecoder().decode([Key: Value].self, from: data) {
-            return .dictionary(data)
-        } else if let data = try? JSONDecoder().decode([Value].self, from: data) {
-            return .array(data)
-        } else {
-            return nil
-        }
     }
 
 }

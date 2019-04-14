@@ -406,11 +406,39 @@ class RequestTests: XCTestCase {
         #endif
     }
 
+    func test_parse_variables() throws {
+        let s = """
+            url: https://httpbin.org/anything
+            variables:
+              foo: bar
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(d.variables, ["foo": "bar"])
+    }
+
+    func test_variable_definition() throws {
+        // tests defining a new variable within a request body
+        let s = """
+            url: https://httpbin.org/anything
+            variables:
+              foo: ${json.method}
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.execute().map { response in
+            XCTAssertEqual(response.status, 200)
+            XCTAssertEqual(response.variables, ["foo": "GET"])
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
 }
 
 
 extension Request.Details {
     init(url: String) {
-        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil)
+        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil, variables: nil)
     }
 }

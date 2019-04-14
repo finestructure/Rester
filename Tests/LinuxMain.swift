@@ -52,6 +52,8 @@ extension RequestTests {
       ("test_delay_execution", test_delay_execution),
       ("test_request_execute_elapsed", test_request_execute_elapsed),
       ("test_execute_validateCertificate", test_execute_validateCertificate),
+      ("test_parse_variables", test_parse_variables),
+      ("test_variable_definition", test_variable_definition),
   ]
 }
 extension RequestValidationTests {
