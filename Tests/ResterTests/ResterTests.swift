@@ -360,4 +360,38 @@ class ResterTests: XCTestCase {
         waitForExpectations(timeout: 500)
     }
 
+    func test_request_variable_definition_pick_up() throws {
+        // Tests that a request variable defintion can be picked up in subsequent requests
+        let s = """
+            requests:
+              r1:
+                url: https://httpbin.org/anything
+                validation:
+                  status: 200
+                variables:
+                  foo: ${json.method}
+              r2:
+                url: https://httpbin.org/anything
+                #method: ${r1.foo}
+                validation:
+                  status: 200
+                  json:
+                    method: GET
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 500)
+    }
+
+
 }

@@ -70,6 +70,14 @@ extension Request {
 
 extension Request: Substitutable {
     func substitute(variables: [Key: Value]) throws -> Request {
+        let variables: [Key: Value] = {
+            // Duplicate references to variables for key request name
+            // also for the key `json`. This is mainly to allow referencing
+            // response values in a request's variables section without
+            // using the request name.
+            guard let local = variables[name] else { return variables }
+            return variables.merging(["json": local], strategy: .lastWins)
+        }()
         let _url = try ResterCore.substitute(string: details.url, with: variables)
         let _headers = try headers.substitute(variables: variables)
         let _query = try query.substitute(variables: variables)

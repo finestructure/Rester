@@ -77,6 +77,7 @@ extension ResterTests {
       ("test_timeout_error", test_timeout_error),
       ("test_set_up", test_set_up),
       ("test_mode_random", test_mode_random),
+      ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
   ]
 }
 extension RestfileTests {
@@ -110,7 +111,8 @@ extension StatsTests {
 extension SubstitutableTests {
   static var allTests: [(String, (SubstitutableTests) -> () throws -> Void)] = [
       ("test_substitute", test_substitute),
-      ("test_substitute_Body", test_substitute_Body),
+      ("test_Request", test_Request),
+      ("test_Body", test_Body),
   ]
 }
 extension TestUtilsTests {

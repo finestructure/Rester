@@ -5,9 +5,9 @@
 //  Created by Sven A. Schmidt on 31/01/2019.
 //
 
-import XCTest
-
 @testable import ResterCore
+import XCTest
+import Yams
 
 
 class SubstitutableTests: XCTestCase {
@@ -18,7 +18,28 @@ class SubstitutableTests: XCTestCase {
         XCTAssertEqual(sub, "https://foo.bar/baz/5/5")
     }
 
-    func test_substitute_Body() throws {
+    func test_Request() throws {
+        let yml = """
+            url: https://httpbin.org/anything
+            variables:
+              foo: ${json.method}
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: yml)
+        let r = Request(name: "r1", details: d)
+        do {
+            let sub = try r.substitute(variables: ["json": ["method": "GET"]])
+            XCTAssertEqual(sub.variables, ["foo": "GET"])
+        }
+        do {
+            // Also accept r1.foo for substitution. This is how the request's
+            // response values will come back from substitution at the request
+            // level.
+            let sub = try r.substitute(variables: ["r1": ["method": "GET"]])
+            XCTAssertEqual(sub.variables, ["foo": "GET"])
+        }
+    }
+
+    func test_Body() throws {
         let vars: [Key: Value] = ["a": "1", "b": 2]
         let values: [Key: Value] = ["data": "values: ${a} ${b}"]
 
@@ -28,5 +49,5 @@ class SubstitutableTests: XCTestCase {
         XCTAssertEqual(try Body.text("${a} ${b}").substitute(variables: vars).text, "1 2")
         XCTAssertEqual(try Body.file("${a} ${b}").substitute(variables: vars).file, "1 2")
     }
-    
+
 }
