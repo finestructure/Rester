@@ -8,7 +8,9 @@ Arguments:
 
 Options:
     --insecure [default: false] - do not validate SSL certificate (macOS only)
+    --duration - duration <seconds> to loop for
     --loop - keep executing file every <loop> seconds
+    --stats [default: false] - Show stats
     --timeout - Request timeout
     --verbose [default: false] - Verbose output
     --workdir [default: ] - Working directory (for the purpose of resolving relative paths in Restfiles)
