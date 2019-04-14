@@ -369,14 +369,17 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
                 variables:
-                  foo: ${json.method}
+                  foo: json.method
               r2:
                 url: https://httpbin.org/anything
-                #method: ${r1.foo}
+                method: POST
+                body:
+                  json:
+                    value: ${r1.foo}
                 validation:
                   status: 200
                   json:
-                    method: GET
+                    value: GET
             """
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
@@ -390,7 +393,7 @@ class ResterTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 500)
+        waitForExpectations(timeout: 5)
     }
 
 

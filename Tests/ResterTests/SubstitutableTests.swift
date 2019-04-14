@@ -30,13 +30,13 @@ class SubstitutableTests: XCTestCase {
             let sub = try r.substitute(variables: ["json": ["method": "GET"]])
             XCTAssertEqual(sub.variables, ["foo": "GET"])
         }
-        do {
-            // Also accept r1.foo for substitution. This is how the request's
-            // response values will come back from substitution at the request
-            // level.
-            let sub = try r.substitute(variables: ["r1": ["method": "GET"]])
-            XCTAssertEqual(sub.variables, ["foo": "GET"])
-        }
+//        do {
+//            // Also accept r1.foo for substitution. This is how the request's
+//            // response values will come back from substitution at the request
+//            // level.
+//            let sub = try r.substitute(variables: ["r1": ["method": "GET"]])
+//            XCTAssertEqual(sub.variables, ["foo": "GET"])
+//        }
     }
 
     func test_Body() throws {

@@ -421,14 +421,14 @@ class RequestTests: XCTestCase {
         let s = """
             url: https://httpbin.org/anything
             variables:
-              foo: ${json.method}
+              foo: json.method
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
         let expectation = self.expectation(description: #function)
         _ = try r.execute().map { response in
             XCTAssertEqual(response.status, 200)
-            XCTAssertEqual(response.variables, ["foo": "GET"])
+            XCTAssertEqual(response.variables, ["foo": "json.method"])
             expectation.fulfill()
         }
         waitForExpectations(timeout: 5)
