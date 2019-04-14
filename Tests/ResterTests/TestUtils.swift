@@ -135,10 +135,13 @@ extension String {
             return self
         }
     }
+
+    func mask(_ string: String, with replacement: String) -> String {
+        return string.r?.replaceAll(in: self, with: replacement) ?? self
+    }
 }
 
-
-func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (status: Int32, output: String) {
+func launch(arguments: [String] = []) throws -> (status: Int32, output: String) {
     // Some of the APIs that we use below are available in macOS 10.13 and above.
     guard #available(macOS 10.13, *) else {
         throw TestError.runtimeError("unsupported OS")
@@ -148,10 +151,11 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
 
     let process = Process()
     process.executableURL = binary
-    process.arguments = [requestFile.string] + extraArguments
+    process.arguments = arguments
 
     let pipe = Pipe()
     process.standardOutput = pipe
+    process.standardError = pipe
 
     #if os(Linux)
     process.launch()
@@ -164,8 +168,7 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     let output = (String(data: data, encoding: .utf8) ?? "no output")
         .maskTime
-        .maskPath(requestFile)
-        .maskPath(requestFile.parent)  // this is the workDir we're replacing
+        .mask(binary.path, with: "rester")
         .maskLine(prefix: "JSON: ")
         .maskLine(prefix: "Headers: ")
         .maskLine(prefix: "tag_name: ")
@@ -173,6 +176,17 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
     let status = process.terminationStatus
 
     return (status, output)
+}
+
+func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (status: Int32, output: String) {
+    let arguments = [requestFile.string] + extraArguments
+    let (status, output) = try launch(arguments: arguments)
+    return (
+        status,
+        output
+            .maskPath(requestFile)
+            .maskPath(requestFile.parent)  // this is the workDir we're replacing
+    )
 }
 
 
