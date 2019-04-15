@@ -412,6 +412,9 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
                 variables:
+                  # json.json - first json references json response decoding
+                  #             second json references the field 'json' returned
+                  #             from httpbin
                   docs: .append(json.json.value)
               r2:
                 url: https://httpbin.org/anything
