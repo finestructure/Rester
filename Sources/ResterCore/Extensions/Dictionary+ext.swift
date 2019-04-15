@@ -86,4 +86,9 @@ extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
             }
         )
     }
+
+    public func append(values: Value?) -> [Key: Value] {
+        guard case let .dictionary(dict)? = values else { return self }
+        return append(variables: dict)
+    }
 }

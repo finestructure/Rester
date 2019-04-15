@@ -412,7 +412,7 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
                 variables:
-                  docs: .append(json.value)
+                  docs: .append(json.json.value)
               r2:
                 url: https://httpbin.org/anything
                 method: POST
@@ -422,7 +422,7 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
                 variables:
-                  docs: .append(json.value)
+                  docs: .append(json.json.value)
             """
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
@@ -441,9 +441,16 @@ class ResterTests: XCTestCase {
     }
 
     func test_append() throws {
-        let global: [Key: Value] = ["docs": .array([])]
-        let vars: [Key: Value] = ["docs": ".append(foo)"]
-        XCTAssertEqual(global.append(variables: vars), ["docs": .array(["foo"])])
+        do {
+            let global: [Key: Value] = ["docs": .array([])]
+            let vars: [Key: Value] = ["docs": ".append(foo)"]
+            XCTAssertEqual(global.append(variables: vars), ["docs": .array(["foo"])])
+        }
+        do {
+            let global: [Key: Value] = ["docs": .array([])]
+            let values: Value = .dictionary(["docs": ".append(foo)"])
+            XCTAssertEqual(global.append(values: values), ["docs": .array(["foo"])])
+        }
     }
 
 }

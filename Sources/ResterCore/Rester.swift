@@ -63,11 +63,8 @@ extension Rester {
                     return try resolved
                         .execute(timeout: timeout, validateCertificate: validateCertificate)
                         .map { response -> (Response, ValidationResult) in
-//                            if let vars = response.variables {
-//                                self._variables = self.variables.merging([req.name: vars], strategy: .lastWins)
-//                            }
+                            self._variables = self._variables.append(values: response.variables)
                             self._variables[req.name] = response.variables
-
                             return (response, resolved.validate(response))
                         }.map { response, result in
                             let res = after(req.name, response, result)
