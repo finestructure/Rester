@@ -52,6 +52,9 @@ extension RequestTests {
       ("test_delay_execution", test_delay_execution),
       ("test_request_execute_elapsed", test_request_execute_elapsed),
       ("test_execute_validateCertificate", test_execute_validateCertificate),
+      ("test_parse_variables", test_parse_variables),
+      ("test_variable_definition", test_variable_definition),
+      ("test_variable_definition_append", test_variable_definition_append),
   ]
 }
 extension RequestValidationTests {
@@ -59,6 +62,14 @@ extension RequestValidationTests {
       ("test_validate_status", test_validate_status),
       ("test_validate_json", test_validate_json),
       ("test_validate_json_regex", test_validate_json_regex),
+  ]
+}
+extension ResponseTests {
+  static var allTests: [(String, (ResponseTests) -> () throws -> Void)] = [
+      ("test_merge", test_merge),
+      ("test_merge_json_nil", test_merge_json_nil),
+      ("test_merge_json_array", test_merge_json_array),
+      ("test_merge_no_variables_json_array", test_merge_no_variables_json_array),
   ]
 }
 extension ResterTests {
@@ -75,6 +86,9 @@ extension ResterTests {
       ("test_timeout_error", test_timeout_error),
       ("test_set_up", test_set_up),
       ("test_mode_random", test_mode_random),
+      ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
+      ("test_request_variable_append", test_request_variable_append),
+      ("test_append", test_append),
   ]
 }
 extension RestfileTests {
@@ -108,7 +122,8 @@ extension StatsTests {
 extension SubstitutableTests {
   static var allTests: [(String, (SubstitutableTests) -> () throws -> Void)] = [
       ("test_substitute", test_substitute),
-      ("test_substitute_Body", test_substitute_Body),
+      ("test_Request", test_Request),
+      ("test_Body", test_Body),
   ]
 }
 extension TestUtilsTests {
@@ -147,6 +162,8 @@ extension ValueTests {
       ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
       ("test_path", test_path),
+      ("test_appendValue", test_appendValue),
+      ("test_isJSONReference", test_isJSONReference),
   ]
 }
 
@@ -180,6 +197,7 @@ XCTMain([
   testCase(RequestLoggingTests.allTests),
   testCase(RequestTests.allTests),
   testCase(RequestValidationTests.allTests),
+  testCase(ResponseTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileTests.allTests),
   testCase(StatsTests.allTests),

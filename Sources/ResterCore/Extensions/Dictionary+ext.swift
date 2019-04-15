@@ -66,3 +66,29 @@ extension Dictionary: MultipartEncoding where Key == ResterCore.Key, Value == Re
         return payloads[0] + tail + lineBreak + boundary + endMarker
     }
 }
+
+
+extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
+    /// Append variables to values of the same key if they are "append values",
+    /// i.e. if they are defined as `.append(value)`.
+    ///
+    /// - Parameter variables: Dictionary to search for append values
+    /// - Returns: Dictionary with appended values
+    public func append(variables: [Key: Value]) -> [Key: Value] {
+        return Dictionary(uniqueKeysWithValues:
+            map { (item) -> (Key, Value) in
+                if let value = variables[item.key],
+                    let appendValue = value.appendValue,
+                    case let .array(arr) = item.value {
+                    return (item.key, .array(arr + [.string(appendValue)]))
+                }
+                return (item.key, item.value)
+            }
+        )
+    }
+
+    public func append(values: Value?) -> [Key: Value] {
+        guard case let .dictionary(dict)? = values else { return self }
+        return append(variables: dict)
+    }
+}

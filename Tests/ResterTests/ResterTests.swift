@@ -360,4 +360,102 @@ class ResterTests: XCTestCase {
         waitForExpectations(timeout: 500)
     }
 
+    func test_request_variable_definition_pick_up() throws {
+        // Tests that a request variable defintion can be picked up in subsequent requests
+        let s = """
+            requests:
+              r1:
+                url: https://httpbin.org/anything
+                validation:
+                  status: 200
+                variables:
+                  foo: json.method
+              r2:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    value: ${r1.foo}
+                validation:
+                  status: 200
+                  json:
+                    json:
+                      value: GET
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].result, .valid)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_request_variable_append() throws {
+        // Tests that a request variable can append to a global
+        let s = """
+            variables:
+              docs: []
+            requests:
+              r1:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    value: r1
+                validation:
+                  status: 200
+                variables:
+                  # json.json - first json references json response decoding
+                  #             second json references the field 'json' returned
+                  #             from httpbin
+                  docs: .append(json.json.value)
+              r2:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    value: r2
+                validation:
+                  status: 200
+                variables:
+                  docs: .append(json.json.value)
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].result, .valid)
+                XCTAssertEqual(rester.variables["docs"], .array(["r1", "r2"]), "\(rester.variables)")
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 555)
+    }
+
+    func test_append() throws {
+        do {
+            let global: [Key: Value] = ["docs": .array([])]
+            let vars: [Key: Value] = ["docs": ".append(foo)"]
+            XCTAssertEqual(global.append(variables: vars), ["docs": .array(["foo"])])
+        }
+        do {
+            let global: [Key: Value] = ["docs": .array([])]
+            let values: Value = .dictionary(["docs": ".append(foo)"])
+            XCTAssertEqual(global.append(values: values), ["docs": .array(["foo"])])
+        }
+    }
+
 }
+
+

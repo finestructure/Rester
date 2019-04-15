@@ -77,4 +77,16 @@ class ValueTests: XCTestCase {
         // TODO: add test for path with spaces and parenthesis
     }
 
+    func test_appendValue() throws {
+        XCTAssertEqual(Value.string(".append(foo)").appendValue, "foo")
+        XCTAssertEqual(Value.string("foo").appendValue, nil)
+        XCTAssertEqual(Value.bool(true).appendValue, nil)
+    }
+
+    func test_isJSONReference() throws {
+        XCTAssert(Value.string("json.foo").isJSONReference)
+        XCTAssert(Value.string("json[0].foo").isJSONReference)
+        XCTAssert(!Value.bool(true).isJSONReference)
+    }
+
 }
