@@ -397,5 +397,55 @@ class ResterTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_request_variable_append() throws {
+        // Tests that a request variable can append to a global
+        let s = """
+            variables:
+              docs: []
+            requests:
+              r1:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    value: r1
+                validation:
+                  status: 200
+                variables:
+                  docs: .append(json.value)
+              r2:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    value: r2
+                validation:
+                  status: 200
+                variables:
+                  docs: .append(json.value)
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].result, .valid)
+                XCTAssertEqual(rester.variables["docs"], .array(["r1", "r2"]), "\(rester.variables)")
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 555)
+    }
+
+    func test_append() throws {
+        let global: [Key: Value] = ["docs": .array([])]
+        let vars: [Key: Value] = ["docs": ".append(foo)"]
+        XCTAssertEqual(global.append(variables: vars), ["docs": .array(["foo"])])
+    }
 
 }
+
+

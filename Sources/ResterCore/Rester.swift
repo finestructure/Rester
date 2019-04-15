@@ -20,7 +20,7 @@ public class Rester {
     let _requests: [Request]
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
-    var _variables: [Key: Value]
+    var _variables = [Key: Value]()
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -63,7 +63,11 @@ extension Rester {
                     return try resolved
                         .execute(timeout: timeout, validateCertificate: validateCertificate)
                         .map { response -> (Response, ValidationResult) in
+//                            if let vars = response.variables {
+//                                self._variables = self.variables.merging([req.name: vars], strategy: .lastWins)
+//                            }
                             self._variables[req.name] = response.variables
+
                             return (response, resolved.validate(response))
                         }.map { response, result in
                             let res = after(req.name, response, result)

@@ -86,6 +86,8 @@ extension ResterTests {
       ("test_set_up", test_set_up),
       ("test_mode_random", test_mode_random),
       ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
+      ("test_request_variable_append", test_request_variable_append),
+      ("test_append", test_append),
   ]
 }
 extension RestfileTests {
@@ -159,6 +161,7 @@ extension ValueTests {
       ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
       ("test_path", test_path),
+      ("test_appendValue", test_appendValue),
   ]
 }
 
