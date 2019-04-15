@@ -13,7 +13,7 @@ public struct Response: Equatable {
     let data: Data
     let response: HTTPURLResponse
     let json: Value?
-    let variables: [Key: Value]
+    let variables: Value?
 
     init(elapsed: TimeInterval, data: Data, response: URLResponse, variables: [Key: Value]) throws {
         self.elapsed = elapsed
@@ -23,7 +23,7 @@ public struct Response: Equatable {
         }
         self.response = resp
         self.json = data.json
-        self.variables = try resolve(variables: variables, json: json)
+        self.variables = try merge(variables: variables, json: json)
     }
 
     var status: Int {
@@ -56,28 +56,44 @@ extension Response: CustomStringConvertible {
 }
 
 
-func resolve(variables: [Key: Value], json: Value?) throws -> [Key: Value] {
-    // request r1:
+
+/// Attempts to merge request variables with the request response values. As part of
+/// this it also resolves references to response values, like `json.value` that are
+/// being referenced in the variables.
+///
+/// - Parameters:
+///   - variables: Variables defined in the `variables:` section of a request
+///   - json: JSON response of the request
+/// - Returns: Value containing the merged variables and JSON response
+/// - Throws: If variables are defined but the response is not a JSON object they
+///   cannot be merged into the reponse.
+func merge(variables: [Key: Value], json: Value?) throws -> Value? {
     // variables:
     //    foo: json.method
     // -> variables = [foo: GET]
-    guard let json = json else { return variables }
-    let res: [Key: Value] = variables.mapValues { value in
-        switch value {
-        case .string(let s):
-            if s.starts(with: "json.") || s.starts(with: "json[") {
-                let dict: Value = ["json": json]
-                if let v = dict[s] {
-                    return v
+
+    switch (variables, json) {
+    case (_, .none):
+        return .dictionary(variables)
+    case (_, json?) where variables.isEmpty:
+        return json
+    case (_, .dictionary(let dict)?):
+        let res: [Key: Value] = variables.mapValues { value in
+            switch value {
+            case .string(let s):
+                if s.starts(with: "json.") || s.starts(with: "json[") {
+                    let d: Value = ["json": .dictionary(dict)]
+                    if let v = d[s] {
+                        return v
+                    }
                 }
+            default:
+                break
             }
-        default:
-            break
+            return value
         }
-        return value
+        return .dictionary(res.merging(dict, strategy: .lastWins))
+    case (_, .array(_)?), (_, .bool(_)?), (_, .string(_)?), (_, .int(_)?), (_, .double(_)?), (_, .null?):
+        throw ResterError.internalError("Cannot merge variables unless response is a JSON object")
     }
-    guard case let .dictionary(dict) = json else {
-        throw ResterError.internalError("Cannot resolve variables unless response is a JSON object")
-    }
-    return res.merging(dict, strategy: .lastWins)
 }

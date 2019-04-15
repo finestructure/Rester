@@ -65,8 +65,10 @@ extension RequestValidationTests {
 }
 extension ResponseTests {
   static var allTests: [(String, (ResponseTests) -> () throws -> Void)] = [
-      ("test_resolve", test_resolve),
-      ("test_resolve_json_array", test_resolve_json_array),
+      ("test_merge", test_merge),
+      ("test_merge_json_nil", test_merge_json_nil),
+      ("test_merge_json_array", test_merge_json_array),
+      ("test_merge_no_variables_json_array", test_merge_no_variables_json_array),
   ]
 }
 extension ResterTests {
