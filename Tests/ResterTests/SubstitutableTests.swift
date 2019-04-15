@@ -22,21 +22,14 @@ class SubstitutableTests: XCTestCase {
         let yml = """
             url: https://httpbin.org/anything
             variables:
-              foo: ${json.method}
+              foo: ${var.foo}
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: yml)
         let r = Request(name: "r1", details: d)
         do {
-            let sub = try r.substitute(variables: ["json": ["method": "GET"]])
-            XCTAssertEqual(sub.variables, ["foo": "GET"])
+            let sub = try r.substitute(variables: ["var": ["foo": "bar"]])
+            XCTAssertEqual(sub.variables, ["foo": "bar"])
         }
-//        do {
-//            // Also accept r1.foo for substitution. This is how the request's
-//            // response values will come back from substitution at the request
-//            // level.
-//            let sub = try r.substitute(variables: ["r1": ["method": "GET"]])
-//            XCTAssertEqual(sub.variables, ["foo": "GET"])
-//        }
     }
 
     func test_Body() throws {
