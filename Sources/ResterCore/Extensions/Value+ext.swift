@@ -72,6 +72,11 @@ extension Value {
 
 
 extension Value {
+    var isJSONReference: Bool {
+        guard case let .string(string) = self else { return false }
+        return string.starts(with: "json.") || string.starts(with: "json[")
+    }
+
     var appendValue: String? {
         if
             case let .string(string) = self,

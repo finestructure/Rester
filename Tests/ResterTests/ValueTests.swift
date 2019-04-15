@@ -83,4 +83,10 @@ class ValueTests: XCTestCase {
         XCTAssertEqual(Value.bool(true).appendValue, nil)
     }
 
+    func test_isJSONReference() throws {
+        XCTAssert(Value.string("json.foo").isJSONReference)
+        XCTAssert(Value.string("json[0].foo").isJSONReference)
+        XCTAssert(!Value.bool(true).isJSONReference)
+    }
+
 }

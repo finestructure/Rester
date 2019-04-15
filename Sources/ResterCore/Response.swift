@@ -68,9 +68,17 @@ extension Response: CustomStringConvertible {
 /// - Throws: If variables are defined but the response is not a JSON object they
 ///   cannot be merged into the reponse.
 func merge(variables: [Key: Value], json: Value?) throws -> Value? {
+    // TODO: The whole notion of this method smells - needs cleaning up.
     // variables:
     //    foo: json.method
     // -> variables = [foo: GET]
+
+    func resolveJSONReference(responses: [Key: Value], value: Value) -> Value {
+        let dict: Value = ["json": .dictionary(responses)]
+        // FIXME: maybe allow subscript[value: Value] instead of referencing string here
+        guard let resolved = dict[value.string] else { return value }
+        return resolved
+    }
 
     switch (variables, json) {
     case (_, .none):
@@ -79,18 +87,11 @@ func merge(variables: [Key: Value], json: Value?) throws -> Value? {
         return json
     case (_, .dictionary(let dict)?):
         let res: [Key: Value] = variables.mapValues { value in
-            switch value {
-            case .string(let s):
-                if s.starts(with: "json.") || s.starts(with: "json[") {
-                    let d: Value = ["json": .dictionary(dict)]
-                    if let v = d[s] {
-                        return v
-                    }
-                }
-            default:
-                break
+            if let appendValue = value.appendValue {
+                let resolved = resolveJSONReference(responses: dict, value: .string(appendValue))
+                return .string(".append(\(resolved.string))")
             }
-            return value
+            return resolveJSONReference(responses: dict, value: value)
         }
         return .dictionary(res.merging(dict, strategy: .lastWins))
     case (_, .array(_)?), (_, .bool(_)?), (_, .string(_)?), (_, .int(_)?), (_, .double(_)?), (_, .null?):

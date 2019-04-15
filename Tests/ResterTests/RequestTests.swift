@@ -434,6 +434,24 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_variable_definition_append() throws {
+        // tests defining a new variable with append syntax
+        let s = """
+            url: https://httpbin.org/anything
+            variables:
+              foo: .append(json.method)
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.execute().map { response in
+            XCTAssertEqual(response.status, 200)
+            XCTAssertEqual(response.variables?["foo"], ".append(GET)")
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
 }
 
 

@@ -54,6 +54,7 @@ extension RequestTests {
       ("test_execute_validateCertificate", test_execute_validateCertificate),
       ("test_parse_variables", test_parse_variables),
       ("test_variable_definition", test_variable_definition),
+      ("test_variable_definition_append", test_variable_definition_append),
   ]
 }
 extension RequestValidationTests {
@@ -162,6 +163,7 @@ extension ValueTests {
       ("test_key_substitution", test_key_substitution),
       ("test_path", test_path),
       ("test_appendValue", test_appendValue),
+      ("test_isJSONReference", test_isJSONReference),
   ]
 }
 
