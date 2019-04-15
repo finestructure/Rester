@@ -63,6 +63,12 @@ extension RequestValidationTests {
       ("test_validate_json_regex", test_validate_json_regex),
   ]
 }
+extension ResponseTests {
+  static var allTests: [(String, (ResponseTests) -> () throws -> Void)] = [
+      ("test_resolve", test_resolve),
+      ("test_resolve_json_array", test_resolve_json_array),
+  ]
+}
 extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
       ("test_aggregate_variables", test_aggregate_variables),
@@ -184,6 +190,7 @@ XCTMain([
   testCase(RequestLoggingTests.allTests),
   testCase(RequestTests.allTests),
   testCase(RequestValidationTests.allTests),
+  testCase(ResponseTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileTests.allTests),
   testCase(StatsTests.allTests),

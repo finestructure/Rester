@@ -63,10 +63,7 @@ extension Rester {
                     return try resolved
                         .execute(timeout: timeout, validateCertificate: validateCertificate)
                         .map { response -> (Response, ValidationResult) in
-                            if let json = response.json {
-                                self._variables[req.name] = json
-                            }
-                            self._variables = self._variables.merging(response.variables, strategy: .lastWins)
+                            self._variables[req.name] = .dictionary(response.variables)
                             return (response, resolved.validate(response))
                         }.map { response, result in
                             let res = after(req.name, response, result)

@@ -379,7 +379,8 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
                   json:
-                    value: GET
+                    json:
+                      value: GET
             """
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)

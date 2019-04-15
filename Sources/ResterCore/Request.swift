@@ -145,7 +145,7 @@ extension Request {
                 try Response(
                     elapsed: Date().timeIntervalSince($0.start),
                     data: $0.response.data,
-                    response: $0.response.response as! HTTPURLResponse,
+                    response: $0.response.response,
                     variables: self.variables
                 )
             }.map { Result<Response>.fulfilled($0) }

@@ -15,12 +15,15 @@ public struct Response: Equatable {
     let json: Value?
     let variables: [Key: Value]
 
-    init(elapsed: TimeInterval, data: Data, response: HTTPURLResponse, variables: [Key: Value]) throws {
+    init(elapsed: TimeInterval, data: Data, response: URLResponse, variables: [Key: Value]) throws {
         self.elapsed = elapsed
         self.data = data
-        self.response = response
+        guard let resp = response as? HTTPURLResponse else {
+            throw ResterError.internalError("Failed to convert \(response) to HTTPURLResponse")
+        }
+        self.response = resp
         self.json = data.json
-        self.variables = try self.json.map { try variables.substitute(variables: ["json": $0]) } ?? [:]
+        self.variables = try resolve(variables: variables, json: json)
     }
 
     var status: Int {
@@ -50,4 +53,31 @@ extension Response: CustomStringConvertible {
         Data:     \(data.count) bytes
         """
     }
+}
+
+
+func resolve(variables: [Key: Value], json: Value?) throws -> [Key: Value] {
+    // request r1:
+    // variables:
+    //    foo: json.method
+    // -> variables = [foo: GET]
+    guard let json = json else { return variables }
+    let res: [Key: Value] = variables.mapValues { value in
+        switch value {
+        case .string(let s):
+            if s.starts(with: "json.") || s.starts(with: "json[") {
+                let dict: Value = ["json": json]
+                if let v = dict[s] {
+                    return v
+                }
+            }
+        default:
+            break
+        }
+        return value
+    }
+    guard case let .dictionary(dict) = json else {
+        throw ResterError.internalError("Cannot resolve variables unless response is a JSON object")
+    }
+    return res.merging(dict, strategy: .lastWins)
 }

@@ -428,7 +428,7 @@ class RequestTests: XCTestCase {
         let expectation = self.expectation(description: #function)
         _ = try r.execute().map { response in
             XCTAssertEqual(response.status, 200)
-            XCTAssertEqual(response.variables, ["foo": "json.method"])
+            XCTAssertEqual(response.variables["foo"], "GET")
             expectation.fulfill()
         }
         waitForExpectations(timeout: 5)
