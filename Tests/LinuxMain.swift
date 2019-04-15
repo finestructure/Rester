@@ -63,6 +63,14 @@ extension RequestValidationTests {
       ("test_validate_json_regex", test_validate_json_regex),
   ]
 }
+extension ResponseTests {
+  static var allTests: [(String, (ResponseTests) -> () throws -> Void)] = [
+      ("test_merge", test_merge),
+      ("test_merge_json_nil", test_merge_json_nil),
+      ("test_merge_json_array", test_merge_json_array),
+      ("test_merge_no_variables_json_array", test_merge_no_variables_json_array),
+  ]
+}
 extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
       ("test_aggregate_variables", test_aggregate_variables),
@@ -77,6 +85,7 @@ extension ResterTests {
       ("test_timeout_error", test_timeout_error),
       ("test_set_up", test_set_up),
       ("test_mode_random", test_mode_random),
+      ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
   ]
 }
 extension RestfileTests {
@@ -110,7 +119,8 @@ extension StatsTests {
 extension SubstitutableTests {
   static var allTests: [(String, (SubstitutableTests) -> () throws -> Void)] = [
       ("test_substitute", test_substitute),
-      ("test_substitute_Body", test_substitute_Body),
+      ("test_Request", test_Request),
+      ("test_Body", test_Body),
   ]
 }
 extension TestUtilsTests {
@@ -182,6 +192,7 @@ XCTMain([
   testCase(RequestLoggingTests.allTests),
   testCase(RequestTests.allTests),
   testCase(RequestValidationTests.allTests),
+  testCase(ResponseTests.allTests),
   testCase(ResterTests.allTests),
   testCase(RestfileTests.allTests),
   testCase(StatsTests.allTests),

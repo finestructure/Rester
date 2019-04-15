@@ -20,10 +20,7 @@ public class Rester {
     let _requests: [Request]
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
-    let _variables: [Key: Value]
-
-    /// Parsed data returned from all responses, keyed by request name
-    var responses = [Key: Value]()
+    var _variables: [Key: Value]
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -62,14 +59,11 @@ extension Rester {
             for req in requests {
                 chain = chain.then { _ -> Promise<Void> in
                     before(req.name)
-                    let variables = self.variables.merging(self.responses, strategy: .lastWins)
-                    let resolved = try req.substitute(variables: variables)
+                    let resolved = try req.substitute(variables: self.variables)
                     return try resolved
                         .execute(timeout: timeout, validateCertificate: validateCertificate)
                         .map { response -> (Response, ValidationResult) in
-                            if let json = response.json {
-                                self.responses[req.name] = json
-                            }
+                            self._variables[req.name] = response.variables
                             return (response, resolved.validate(response))
                         }.map { response, result in
                             let res = after(req.name, response, result)
