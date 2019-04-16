@@ -69,6 +69,11 @@ extension Response: CustomStringConvertible {
 ///   cannot be merged into the reponse.
 func merge(variables: [Key: Value], json: Value?) throws -> Value? {
     // TODO: The whole notion of this method smells - needs cleaning up.
+    // This should perhaps just be another form of substitution but on a local scope,
+    // without the ${...} syntax. Or the ${...} syntax needs to be applied and we'll
+    // need to stop throwing when there are unresolved variables (as they will be
+    // resolved later.
+    //
     // variables:
     //    foo: json.method
     // -> variables = [foo: GET]
