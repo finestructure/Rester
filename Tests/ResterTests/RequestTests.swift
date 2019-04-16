@@ -470,11 +470,21 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_parse_if() throws {
+        let s = """
+            if:
+              foo: bar
+            url: https://httpbin.org/anything
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(d.if, ["foo": .equals("bar")])
+    }
+
 }
 
 
 extension Request.Details {
     init(url: String) {
-        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil, variables: nil)
+        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil, variables: nil, if: nil)
     }
 }

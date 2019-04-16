@@ -28,6 +28,7 @@ public struct Request: Decodable {
         let delay: Value?
         let log: Value?
         let variables: [Key: Value]?
+        let `if`: [Key: Matcher]?
     }
 
     let name: Name
@@ -86,7 +87,8 @@ extension Request: Substitutable {
             validation: _validation,
             delay: _delay,
             log: log,
-            variables: _variables
+            variables: _variables,
+            if: details.if
         )
         return Request(name: name, details: _details)
     }

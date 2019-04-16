@@ -68,6 +68,7 @@ extension RequestTests {
       ("test_variable_definition", test_variable_definition),
       ("test_variable_definition_append", test_variable_definition_append),
       ("test_variable_definition_remove", test_variable_definition_remove),
+      ("test_parse_if", test_parse_if),
   ]
 }
 extension RequestValidationTests {
