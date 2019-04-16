@@ -62,7 +62,7 @@ extension Rester {
                     return try resolved
                         .execute(timeout: timeout, validateCertificate: validateCertificate)
                         .map { response -> (Response, ValidationResult) in
-                            self.variables = self.variables.append(values: response.variables)
+                            self.variables = self.variables.processMutations(values: response.variables)
                             self.variables[req.name] = response.variables
                             return (response, resolved.validate(response))
                         }.map { response, result in

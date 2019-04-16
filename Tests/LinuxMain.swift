@@ -12,6 +12,7 @@ extension Dictionary_extTests {
   static var allTests: [(String, (Dictionary_extTests) -> () throws -> Void)] = [
       ("test_append", test_append),
       ("test_remove", test_remove),
+      ("test_processMutations", test_processMutations),
   ]
 }
 extension IssuesTests {

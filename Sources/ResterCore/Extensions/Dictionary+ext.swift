@@ -69,12 +69,12 @@ extension Dictionary: MultipartEncoding where Key == ResterCore.Key, Value == Re
 
 
 extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
-    /// Append variables to values of the same key if they are "append values",
+    /// Append variables to array values of the same key if they are "append values",
     /// i.e. if they are defined as `.append(value)`.
     ///
     /// - Parameter variables: Dictionary to search for append values
     /// - Returns: Dictionary with appended values
-    public func append(variables: [Key: Value]) -> [Key: Value] {
+    func _append(variables: [Key: Value]) -> [Key: Value] {
         return Dictionary(uniqueKeysWithValues:
             map { (item) -> (Key, Value) in
                 if let value = variables[item.key],
@@ -88,12 +88,12 @@ extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
         )
     }
 
-    public func append(values: Value?) -> [Key: Value] {
-        guard case let .dictionary(dict)? = values else { return self }
-        return append(variables: dict)
-    }
-
-    public func remove(variables: [Key: Value]) -> [Key: Value] {
+    /// Remove variables from array values of the same key if they are "remove values",
+    /// i.e. if they are defined as `.remove(value)`.
+    ///
+    /// - Parameter variables: Dictionary to search for append values
+    /// - Returns: Dictionary with removed values
+    func _remove(variables: [Key: Value]) -> [Key: Value] {
         return Dictionary(uniqueKeysWithValues:
             map { (item) -> (Key, Value) in
                 if let value = variables[item.key],
@@ -110,9 +110,13 @@ extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
         )
     }
 
-    public func remove(values: Value?) -> [Key: Value] {
+    public func processMutations(variables: [Key: Value]) -> [Key: Value] {
+        return _remove(variables: variables)._append(variables: variables)
+    }
+
+    public func processMutations(values: Value?) -> [Key: Value] {
         guard case let .dictionary(dict)? = values else { return self }
-        return remove(variables: dict)
+        return processMutations(variables: dict)
     }
 
 }
