@@ -13,14 +13,13 @@ import Yams
 
 
 public class Rester {
-    public var variables: [Key: Value] { return _variables }
     public var requests: [Request] { return _requests }
 
     let restfile: Restfile
+    var variables = [Key: Value]()
     let _requests: [Request]
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
-    var _variables = [Key: Value]()
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -36,7 +35,7 @@ public class Rester {
     init(yml: String, workDir: Path = Path.cwd) throws {
         let r = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
 
-        _variables = aggregate(variables: r.variables, from: r.restfiles)
+        variables = aggregate(variables: r.variables, from: r.restfiles)
         _requests = r.requests + aggregate(keyPath: \.requests, from: r.restfiles)
         _setupRequests = r.setupRequests + aggregate(keyPath: \.setupRequests, from: r.restfiles)
 
@@ -63,8 +62,8 @@ extension Rester {
                     return try resolved
                         .execute(timeout: timeout, validateCertificate: validateCertificate)
                         .map { response -> (Response, ValidationResult) in
-                            self._variables = self._variables.append(values: response.variables)
-                            self._variables[req.name] = response.variables
+                            self.variables = self.variables.processMutations(values: response.variables)
+                            self.variables[req.name] = response.variables
                             return (response, resolved.validate(response))
                         }.map { response, result in
                             let res = after(req.name, response, result)

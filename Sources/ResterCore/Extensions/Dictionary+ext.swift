@@ -69,26 +69,40 @@ extension Dictionary: MultipartEncoding where Key == ResterCore.Key, Value == Re
 
 
 extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
-    /// Append variables to values of the same key if they are "append values",
-    /// i.e. if they are defined as `.append(value)`.
+    /// Process mutations to array values of the same key if the values are
+    /// defined as `.append(value)` or `.remove(value)`.
     ///
-    /// - Parameter variables: Dictionary to search for append values
-    /// - Returns: Dictionary with appended values
-    public func append(variables: [Key: Value]) -> [Key: Value] {
+    /// - Parameter variables: Dictionary to search for mutation values
+    /// - Returns: Dictionary with mutated values
+    public func processMutations(variables: [Key: Value]) -> [Key: Value] {
         return Dictionary(uniqueKeysWithValues:
             map { (item) -> (Key, Value) in
-                if let value = variables[item.key],
-                    let appendValue = value.appendValue,
-                    case let .array(arr) = item.value {
-                    return (item.key, .array(arr + [.string(appendValue)]))
+                if let value = variables[item.key], case var .array(arr) = item.value {
+                    if let appendValue = value.appendValue {
+                        return (item.key, .array(arr + [.string(appendValue)]))
+                    }
+                    if let removeValue = value.removeValue {
+                        if let idx = arr.firstIndex(of: .string(removeValue)) {
+                            arr.remove(at: idx)
+                            return (item.key, .array(arr))
+                        }
+                    }
                 }
                 return (item.key, item.value)
             }
         )
+
     }
 
-    public func append(values: Value?) -> [Key: Value] {
+    /// Process mutations to array values of the same key if the values are
+    /// defined as `.append(value)` or `.remove(value)`.
+    ///
+    /// - Parameter values: Value object to search for mutation values. Ignored
+    ///   if `nil` or not a `Value.dictionary`.
+    /// - Returns: Dictionary with mutated values
+    public func processMutations(values: Value?) -> [Key: Value] {
         guard case let .dictionary(dict)? = values else { return self }
-        return append(variables: dict)
+        return processMutations(variables: dict)
     }
+
 }

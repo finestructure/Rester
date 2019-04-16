@@ -8,6 +8,13 @@ import XCTest
 
 // swiftlint:disable trailing_comma
 
+extension Dictionary_extTests {
+  static var allTests: [(String, (Dictionary_extTests) -> () throws -> Void)] = [
+      ("test_processMutations_append", test_processMutations_append),
+      ("test_processMutations_remove", test_processMutations_remove),
+      ("test_processMutations_combined", test_processMutations_combined),
+  ]
+}
 extension IssuesTests {
   static var allTests: [(String, (IssuesTests) -> () throws -> Void)] = [
       ("test_issue_39_referencing_into_empty_array", test_issue_39_referencing_into_empty_array),
@@ -55,6 +62,7 @@ extension RequestTests {
       ("test_parse_variables", test_parse_variables),
       ("test_variable_definition", test_variable_definition),
       ("test_variable_definition_append", test_variable_definition_append),
+      ("test_variable_definition_remove", test_variable_definition_remove),
   ]
 }
 extension RequestValidationTests {
@@ -70,6 +78,8 @@ extension ResponseTests {
       ("test_merge_json_nil", test_merge_json_nil),
       ("test_merge_json_array", test_merge_json_array),
       ("test_merge_no_variables_json_array", test_merge_no_variables_json_array),
+      ("test_merge_append_variable", test_merge_append_variable),
+      ("test_merge_remove_variable", test_merge_remove_variable),
   ]
 }
 extension ResterTests {
@@ -88,7 +98,7 @@ extension ResterTests {
       ("test_mode_random", test_mode_random),
       ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
       ("test_request_variable_append", test_request_variable_append),
-      ("test_append", test_append),
+      ("test_request_variable_remove", test_request_variable_remove),
   ]
 }
 extension RestfileTests {
@@ -162,8 +172,9 @@ extension ValueTests {
       ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
       ("test_path", test_path),
-      ("test_appendValue", test_appendValue),
       ("test_isJSONReference", test_isJSONReference),
+      ("test_appendValue", test_appendValue),
+      ("test_removeValue", test_removeValue),
   ]
 }
 
@@ -191,6 +202,7 @@ extension LaunchTests {
 }
 
 XCTMain([
+  testCase(Dictionary_extTests.allTests),
   testCase(IssuesTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
