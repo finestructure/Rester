@@ -20,6 +20,11 @@ extension IssuesTests {
       ("test_issue_39_referencing_into_empty_array", test_issue_39_referencing_into_empty_array),
   ]
 }
+extension MatcherTests {
+  static var allTests: [(String, (MatcherTests) -> () throws -> Void)] = [
+      ("test_decodable", test_decodable),
+  ]
+}
 extension ParameterTests {
   static var allTests: [(String, (ParameterTests) -> () throws -> Void)] = [
       ("test_multipartEncode_file", test_multipartEncode_file),
@@ -204,6 +209,7 @@ extension LaunchTests {
 XCTMain([
   testCase(Dictionary_extTests.allTests),
   testCase(IssuesTests.allTests),
+  testCase(MatcherTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
   testCase(RequestLoggingTests.allTests),

@@ -80,6 +80,15 @@ extension Matcher {
 }
 
 
+extension Matcher: Decodable {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let value = try container.decode(Value.self)
+        self = try Matcher(value: value)
+    }
+}
+
+
 extension Matcher: Equatable {
     public static func == (lhs: Matcher, rhs: Matcher) -> Bool {
         switch (lhs, rhs) {
