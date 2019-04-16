@@ -77,10 +77,25 @@ extension Value {
         return string.starts(with: "json.") || string.starts(with: "json[")
     }
 
+    private func pattern(command: String, groupName: String = "variable") throws -> Regex {
+        return try Regex(pattern: #".\#(command)\((.*?)\)"#, groupNames: groupName)
+    }
+
     var appendValue: String? {
         if
             case let .string(string) = self,
-            let regex = try? Regex(pattern: #".append\((.*?)\)"#, groupNames: "variable"),
+            let regex = try? pattern(command: "append"),
+            let match = regex.findFirst(in: string),
+            let varName = match.group(named: "variable") {
+            return varName
+        }
+        return nil
+    }
+
+    var removeValue: String? {
+        if
+            case let .string(string) = self,
+            let regex = try? pattern(command: "remove"),
             let match = regex.findFirst(in: string),
             let varName = match.group(named: "variable") {
             return varName

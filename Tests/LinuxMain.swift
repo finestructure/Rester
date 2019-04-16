@@ -162,8 +162,9 @@ extension ValueTests {
       ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
       ("test_path", test_path),
-      ("test_appendValue", test_appendValue),
       ("test_isJSONReference", test_isJSONReference),
+      ("test_appendValue", test_appendValue),
+      ("test_removeValue", test_removeValue),
   ]
 }
 
