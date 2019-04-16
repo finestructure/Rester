@@ -398,10 +398,10 @@ class ResterTests: XCTestCase {
     }
 
     func test_request_variable_append() throws {
-        // Tests that a request variable can append to a global
+        // Tests that a request variable can appended to a global
         let s = """
             variables:
-              docs: []
+              values: []
             requests:
               r1:
                 url: https://httpbin.org/anything
@@ -415,7 +415,7 @@ class ResterTests: XCTestCase {
                   # json.json - first json references json response decoding
                   #             second json references the field 'json' returned
                   #             from httpbin
-                  docs: .append(json.json.value)
+                  values: .append(json.json.value)
               r2:
                 url: https://httpbin.org/anything
                 method: POST
@@ -425,7 +425,7 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
                 variables:
-                  docs: .append(json.json.value)
+                  values: .append(json.json.value)
             """
         let rester = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
@@ -434,7 +434,53 @@ class ResterTests: XCTestCase {
                 XCTAssertEqual(results.count, 2)
                 XCTAssertEqual(results[0].result, .valid)
                 XCTAssertEqual(results[1].result, .valid)
-                XCTAssertEqual(rester.variables["docs"], .array(["r1", "r2"]), "\(rester.variables)")
+                XCTAssertEqual(rester.variables["values"], .array(["r1", "r2"]))
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 555)
+    }
+
+    func test_request_variable_remove() throws {
+        // Tests that a request variable can removed from a global
+        let s = """
+            variables:
+              values: [r0, r1, r2, r3]
+            requests:
+              r1:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    value: r1
+                validation:
+                  status: 200
+                variables:
+                  # json.json - first json references json response decoding
+                  #             second json references the field 'json' returned
+                  #             from httpbin
+                  values: .remove(json.json.value)
+              r2:
+                url: https://httpbin.org/anything
+                method: POST
+                body:
+                  json:
+                    value: r2
+                validation:
+                  status: 200
+                variables:
+                  values: .remove(json.json.value)
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 2)
+                XCTAssertEqual(results[0].result, .valid)
+                XCTAssertEqual(results[1].result, .valid)
+                XCTAssertEqual(rester.variables["values"], .array(["r0", "r3"]))
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)

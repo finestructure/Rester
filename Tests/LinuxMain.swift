@@ -98,6 +98,7 @@ extension ResterTests {
       ("test_mode_random", test_mode_random),
       ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
       ("test_request_variable_append", test_request_variable_append),
+      ("test_request_variable_remove", test_request_variable_remove),
   ]
 }
 extension RestfileTests {
