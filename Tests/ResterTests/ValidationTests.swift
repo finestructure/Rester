@@ -43,7 +43,7 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(try Matcher(value: dict), .contains(["foo" : .equals("bar")]))
     }
 
-    func test_parse_Validation() throws {
+    func test_decode() throws {
         struct Test: Decodable {
             let validation: Validation
         }
@@ -67,6 +67,23 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(containing?["object"], .contains(["foo": .equals("bar")]))
     }
 
+    func test_decode_key_typo() throws {
+        // We want to be sure to raise when there are typos in `validation:`
+        struct Test: Decodable {
+            let validation: Validation
+        }
+        let s = """
+        validation:
+          states: 200
+          json:
+            int: 42
+        """
+        XCTAssertThrowsError(try YAMLDecoder().decode(Test.self, from: s)) { error in
+            XCTAssert(error.legibleLocalizedDescription.contains(#"unexpectedKeyFound("states")"#),
+                      "was: \(error.legibleLocalizedDescription)")
+        }
+    }
+
     func test_validate() throws {
         XCTAssertEqual(try Matcher(200).validate(200), .valid)
         XCTAssertEqual(try Matcher(200).validate(404), .invalid("(404) is not equal to (200)"))
@@ -87,7 +104,7 @@ class ValidationTests: XCTestCase {
         XCTAssertEqual(try Matcher(".regex(\\d+)").validate("15698703"), .valid)
     }
 
-    func test_parse_json_array() throws {
+    func test_decode_json_array() throws {
         struct Test: Decodable {
             let validation: Validation
         }
