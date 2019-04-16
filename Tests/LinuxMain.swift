@@ -29,6 +29,7 @@ extension MatcherTests {
       ("test_validate_json_array", test_validate_json_array),
       ("test_substitute", test_substitute),
       ("test_doesNotEqual", test_doesNotEqual),
+      ("test_decodable_doesNotEqual", test_decodable_doesNotEqual),
   ]
 }
 extension ParameterTests {

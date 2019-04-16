@@ -105,4 +105,18 @@ class MatcherTests: XCTestCase {
         XCTAssertEqual(Matcher.doesNotEqual(42).validate(42), .invalid("(42) does equal (42)"))
     }
 
+    func test_decodable_doesNotEqual() throws {
+        let s = """
+           value: .doesNotEqual(5)
+           array: .doesNotEqual([])
+        """
+        struct Test: Decodable {
+            let value: Matcher
+            let array: Matcher
+        }
+        let t = try YAMLDecoder().decode(Test.self, from: s)
+        XCTAssertEqual(t.value, .doesNotEqual(5))
+        XCTAssertEqual(t.array, .doesNotEqual(.array([])))
+    }
+
 }

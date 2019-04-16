@@ -7,6 +7,7 @@
 
 import Foundation
 import Regex
+import Yams
 
 
 enum Matcher {
@@ -14,6 +15,17 @@ enum Matcher {
     case doesNotEqual(Value)
     case regex(Regex)
     case contains([Key: Matcher])
+}
+
+
+func findFirst(operator: String, in string: String) -> String? {
+    guard
+        let match = try? Regex(pattern: #"\.\#(`operator`)\((.*?)\)"#, groupNames: "value").findFirst(in: string),
+        let value = match?.group(named: "value")
+        else {
+            return nil
+    }
+    return value
 }
 
 
@@ -38,6 +50,10 @@ extension Matcher {
                 throw ResterError.decodingError("invalid .regex in '\(regexString)'")
             }
             return .regex(regex)
+        }
+        if let value = findFirst(operator: "doesNotEqual", in: string) {
+            let decoded = try YAMLDecoder().decode(Value.self, from: value)
+            return .doesNotEqual(decoded)
         }
 
         return .equals(.string(string))
@@ -102,6 +118,8 @@ extension Matcher: Equatable {
         case let (.regex(x), .regex(y)):
             return x.pattern == y.pattern
         case let (.contains(x), .contains(y)):
+            return x == y
+        case let (.doesNotEqual(x), .doesNotEqual(y)):
             return x == y
         default:
             return false
