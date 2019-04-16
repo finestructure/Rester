@@ -11,23 +11,23 @@ import XCTest
 
 class Dictionary_extTests: XCTestCase {
 
-    func test_append() throws {
+    func test_processMutations_append() throws {
         do {
             let global: [Key: Value] = ["docs": .array([1])]
             let vars: [Key: Value] = ["docs": ".append(foo)"]
-            XCTAssertEqual(global._append(variables: vars), ["docs": .array([1, "foo"])])
+            XCTAssertEqual(global.processMutations(variables: vars), ["docs": .array([1, "foo"])])
         }
     }
 
-    func test_remove() throws {
+    func test_processMutations_remove() throws {
         do {
             let global: [Key: Value] = ["docs": .array(["foo", 1])]
             let vars: [Key: Value] = ["docs": ".remove(foo)"]
-            XCTAssertEqual(global._remove(variables: vars), ["docs": .array([1])])
+            XCTAssertEqual(global.processMutations(variables: vars), ["docs": .array([1])])
         }
     }
 
-    func test_processMutations() throws {
+    func test_processMutations_combined() throws {
         do {  // test variables: [Key: Value] signature
             var global: [Key: Value] = ["docs1": .array(["foo", 1]), "docs2": .array([2])]
             global = global.processMutations(variables: ["docs1": ".remove(foo)", "docs2": ".append(b)"])
