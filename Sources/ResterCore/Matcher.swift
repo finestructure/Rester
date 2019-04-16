@@ -43,15 +43,14 @@ extension Matcher {
     }
 
     static func parse(string: String) throws -> Matcher {
-        if  // .regex(...)
-            let match = try? Regex(pattern: ".regex\\((.*?)\\)", groupNames: "regex").findFirst(in: string),
-            let regexString = match?.group(named: "regex") {
-            guard let regex = regexString.r else {
-                throw ResterError.decodingError("invalid .regex in '\(regexString)'")
+        if let value = findFirst(operator: "regex", in: string) {
+            guard let regex = value.r else {
+                throw ResterError.decodingError("invalid .regex in '\(value)'")
             }
             return .regex(regex)
         }
         if let value = findFirst(operator: "doesNotEqual", in: string) {
+            // Use YAMLDecoder to parse Value from string representation
             let decoded = try YAMLDecoder().decode(Value.self, from: value)
             return .doesNotEqual(decoded)
         }
