@@ -489,6 +489,33 @@ class ResterTests: XCTestCase {
         waitForExpectations(timeout: 555)
     }
 
+    func test_request_if() throws {
+        // Tests that a request variable can removed from a global
+        let s = """
+            variables:
+              values: []
+            requests:
+              r1:
+                if:
+                  values: .doesNotEqual([])
+                url: https://httpbin.org/anything
+                validation:
+                  status: 500  # deliberately invalid, as this test must not run
+            """
+        let rester = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+            .done { results in
+                XCTAssertEqual(results.count, 1)
+                XCTAssertEqual(results[0].result, .skipped)
+                expectation.fulfill()
+            }.catch {
+                XCTFail($0.legibleLocalizedDescription)
+                expectation.fulfill()
+        }
+        waitForExpectations(timeout: 555)
+    }
+
 }
 
 

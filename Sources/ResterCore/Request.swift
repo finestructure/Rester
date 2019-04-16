@@ -44,6 +44,7 @@ extension Request {
     var body: Body? { return details.body }
     var validation: Validation? { return details.validation }
     var variables: [Key: Value] { return details.variables ?? [:] }
+    var `if`: [Key: Matcher] { return details.if ?? [:] }
     var delay: TimeInterval {
         guard let value = details.delay else { return 0 }
         switch value {
@@ -201,6 +202,14 @@ extension Request {
         }
         
         return .valid
+    }
+
+    func shouldExecute(given variables: [Key: Value]) -> Bool {
+        for (key, matcher) in `if` {
+            guard let input = variables[key] else { return false }
+            guard case .valid = matcher.validate(input) else { return false }
+        }
+        return true
     }
 }
 

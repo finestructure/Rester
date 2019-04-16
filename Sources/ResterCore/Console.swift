@@ -32,6 +32,7 @@ extension Console {
     }
 
     mutating func display(summary total: Int, failed: Int) {
+        #warning("handle skipped tests")
         let testLabel = (total == 1) ? "test" : "tests"
         let failure = failed == 0 ? "0".green.bold : String(failed).red.bold
         let failureLabel = (failed == 1) ? "failure" : "failures"

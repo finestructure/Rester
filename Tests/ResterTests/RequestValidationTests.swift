@@ -108,11 +108,11 @@ class RequestValidationTests: XCTestCase {
             _ = try rester.expandedRequest("json-regex-failure").test()
                 .map {
                     switch $0 {
-                    case .valid:
-                        XCTFail("expected failure but received success")
                     case let .invalid(message):
                         XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
                         XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
+                    default:
+                        XCTFail("expected failure, received: \($0)")
                     }
                     expectation.fulfill()
             }

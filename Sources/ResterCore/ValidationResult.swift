@@ -11,4 +11,5 @@ import Foundation
 public enum ValidationResult {
     case valid
     case invalid(_ message: String)
+    case skipped
 }
