@@ -58,13 +58,13 @@ extension Rester {
             for req in requests {
                 chain = chain.then { _ -> Promise<Void> in
                     before(req.name)
-                    let resolved = try req.substitute(variables: self.variables)
-                    guard resolved.shouldExecute(given: self.variables) else {
+                    guard req.shouldExecute(given: self.variables) else {
                         // FIXME: after(..., Response?, ...) ?
                         let res = after(req.name, nil, .skipped)
                         results.append(res)
                         return Promise()
                     }
+                    let resolved = try req.substitute(variables: self.variables)
                     return try resolved
                         .execute(timeout: timeout, validateCertificate: validateCertificate)
                         .map { response -> (Response, ValidationResult) in

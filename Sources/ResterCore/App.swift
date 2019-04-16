@@ -48,6 +48,7 @@ func after(name: Request.Name, response: Response?, result: ValidationResult) ->
         }
         return .failure
     case .skipped:
+        Current.console.display("↪️  \(name.blue) \("SKIPPED".yellow)\n")
         return .skipped
     }
 }
