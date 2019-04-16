@@ -37,4 +37,16 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(try merge(variables: vars, json: json), json)
     }
 
+    func test_merge_append_variable() throws {
+        let vars: [Key: Value] = ["foo": ".append(json.method)"]
+        let json: Value? = ["method": "GET"]
+        XCTAssertEqual(try merge(variables: vars, json: json), ["method": "GET", "foo": ".append(GET)"])
+    }
+
+    func test_merge_remove_variable() throws {
+        let vars: [Key: Value] = ["foo": ".remove(json.method)"]
+        let json: Value? = ["method": "GET"]
+        XCTAssertEqual(try merge(variables: vars, json: json), ["method": "GET", "foo": ".remove(GET)"])
+    }
+
 }

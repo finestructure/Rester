@@ -91,6 +91,10 @@ func merge(variables: [Key: Value], json: Value?) throws -> Value? {
                 let resolved = resolveJSONReference(responses: dict, value: .string(appendValue))
                 return .string(".append(\(resolved.string))")
             }
+            if let removeValue = value.removeValue {
+                let resolved = resolveJSONReference(responses: dict, value: .string(removeValue))
+                return .string(".remove(\(resolved.string))")
+            }
             return resolveJSONReference(responses: dict, value: value)
         }
         return .dictionary(res.merging(dict, strategy: .lastWins))

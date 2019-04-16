@@ -62,6 +62,7 @@ extension RequestTests {
       ("test_parse_variables", test_parse_variables),
       ("test_variable_definition", test_variable_definition),
       ("test_variable_definition_append", test_variable_definition_append),
+      ("test_variable_definition_remove", test_variable_definition_remove),
   ]
 }
 extension RequestValidationTests {
@@ -77,6 +78,8 @@ extension ResponseTests {
       ("test_merge_json_nil", test_merge_json_nil),
       ("test_merge_json_array", test_merge_json_array),
       ("test_merge_no_variables_json_array", test_merge_no_variables_json_array),
+      ("test_merge_append_variable", test_merge_append_variable),
+      ("test_merge_remove_variable", test_merge_remove_variable),
   ]
 }
 extension ResterTests {

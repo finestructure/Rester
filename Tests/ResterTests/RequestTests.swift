@@ -435,7 +435,7 @@ class RequestTests: XCTestCase {
     }
 
     func test_variable_definition_append() throws {
-        // tests defining a new variable with append syntax
+        // tests substitution for variable with append syntax
         let s = """
             url: https://httpbin.org/anything
             variables:
@@ -447,6 +447,24 @@ class RequestTests: XCTestCase {
         _ = try r.execute().map { response in
             XCTAssertEqual(response.status, 200)
             XCTAssertEqual(response.variables?["foo"], ".append(GET)")
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_variable_definition_remove() throws {
+        // tests substitution for variable with remove syntax
+        let s = """
+            url: https://httpbin.org/anything
+            variables:
+              foo: .remove(json.method)
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        let r = Request(name: "request", details: d)
+        let expectation = self.expectation(description: #function)
+        _ = try r.execute().map { response in
+            XCTAssertEqual(response.status, 200)
+            XCTAssertEqual(response.variables?["foo"], ".remove(GET)")
             expectation.fulfill()
         }
         waitForExpectations(timeout: 5)
