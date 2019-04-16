@@ -11,6 +11,7 @@ import Regex
 
 enum Matcher {
     case equals(Value)
+    case doesNotEqual(Value)
     case regex(Regex)
     case contains([Key: Matcher])
 }
@@ -48,6 +49,10 @@ extension Matcher {
             return expected == value
                 ? .valid
                 : .invalid("(\(value)) is not equal to (\(expected))")
+        case let (.doesNotEqual(expected), value):
+            return expected != value
+                ? .valid
+                : .invalid("(\(value)) does equal (\(expected))")
         case let (.regex(expected), _):
             return expected ~= value.string
                 ? .valid

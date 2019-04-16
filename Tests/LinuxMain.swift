@@ -22,7 +22,13 @@ extension IssuesTests {
 }
 extension MatcherTests {
   static var allTests: [(String, (MatcherTests) -> () throws -> Void)] = [
+      ("test_init_with_value", test_init_with_value),
       ("test_decodable", test_decodable),
+      ("test_validate", test_validate),
+      ("test_validate_regex", test_validate_regex),
+      ("test_validate_json_array", test_validate_json_array),
+      ("test_substitute", test_substitute),
+      ("test_doesNotEqual", test_doesNotEqual),
   ]
 }
 extension ParameterTests {
@@ -162,14 +168,9 @@ extension UtilsTests {
 }
 extension ValidationTests {
   static var allTests: [(String, (ValidationTests) -> () throws -> Void)] = [
-      ("test_convertMatcher", test_convertMatcher),
       ("test_decode", test_decode),
       ("test_decode_key_typo", test_decode_key_typo),
-      ("test_validate", test_validate),
-      ("test_validate_regex", test_validate_regex),
       ("test_decode_json_array", test_decode_json_array),
-      ("test_validate_json_array", test_validate_json_array),
-      ("test_Matcher_substitute", test_Matcher_substitute),
       ("test_Validation_substitute", test_Validation_substitute),
   ]
 }
