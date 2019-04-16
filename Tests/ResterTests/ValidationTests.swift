@@ -90,7 +90,7 @@ class ValidationTests: XCTestCase {
         )
     }
 
-    func test_Validation_substitute() throws {
+    func test_substitute() throws {
         let validation = Validation(status: nil, headers: nil, json: .contains(["data": .equals("${test}")]))
 
         XCTAssertEqual(validation.json,

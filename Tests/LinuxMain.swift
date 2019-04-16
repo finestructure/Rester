@@ -171,7 +171,7 @@ extension ValidationTests {
       ("test_decode", test_decode),
       ("test_decode_key_typo", test_decode_key_typo),
       ("test_decode_json_array", test_decode_json_array),
-      ("test_Validation_substitute", test_Validation_substitute),
+      ("test_substitute", test_substitute),
   ]
 }
 extension ValueTests {
