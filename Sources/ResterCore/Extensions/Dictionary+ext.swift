@@ -80,6 +80,7 @@ extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
                 if let value = variables[item.key],
                     let appendValue = value.appendValue,
                     case let .array(arr) = item.value {
+
                     return (item.key, .array(arr + [.string(appendValue)]))
                 }
                 return (item.key, item.value)
@@ -91,4 +92,27 @@ extension Dictionary where Key == ResterCore.Key, Value == ResterCore.Value {
         guard case let .dictionary(dict)? = values else { return self }
         return append(variables: dict)
     }
+
+    public func remove(variables: [Key: Value]) -> [Key: Value] {
+        return Dictionary(uniqueKeysWithValues:
+            map { (item) -> (Key, Value) in
+                if let value = variables[item.key],
+                    let removeValue = value.removeValue,
+                    case var .array(arr) = item.value {
+
+                    if let idx = arr.firstIndex(of: .string(removeValue)) {
+                        arr.remove(at: idx)
+                        return (item.key, .array(arr))
+                    }
+                }
+                return (item.key, item.value)
+            }
+        )
+    }
+
+    public func remove(values: Value?) -> [Key: Value] {
+        guard case let .dictionary(dict)? = values else { return self }
+        return remove(variables: dict)
+    }
+
 }

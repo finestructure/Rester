@@ -8,9 +8,10 @@ import XCTest
 
 // swiftlint:disable trailing_comma
 
-extension Dict_extTests {
-  static var allTests: [(String, (Dict_extTests) -> () throws -> Void)] = [
+extension Dictionary_extTests {
+  static var allTests: [(String, (Dictionary_extTests) -> () throws -> Void)] = [
       ("test_append", test_append),
+      ("test_remove", test_remove),
   ]
 }
 extension IssuesTests {
@@ -196,7 +197,7 @@ extension LaunchTests {
 }
 
 XCTMain([
-  testCase(Dict_extTests.allTests),
+  testCase(Dictionary_extTests.allTests),
   testCase(IssuesTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
