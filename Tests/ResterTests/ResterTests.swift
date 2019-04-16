@@ -443,19 +443,6 @@ class ResterTests: XCTestCase {
         waitForExpectations(timeout: 555)
     }
 
-    func test_append() throws {
-        do {
-            let global: [Key: Value] = ["docs": .array([])]
-            let vars: [Key: Value] = ["docs": ".append(foo)"]
-            XCTAssertEqual(global.append(variables: vars), ["docs": .array(["foo"])])
-        }
-        do {
-            let global: [Key: Value] = ["docs": .array([])]
-            let values: Value = .dictionary(["docs": ".append(foo)"])
-            XCTAssertEqual(global.append(values: values), ["docs": .array(["foo"])])
-        }
-    }
-
 }
 
 

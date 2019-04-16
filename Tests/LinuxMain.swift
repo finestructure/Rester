@@ -8,6 +8,11 @@ import XCTest
 
 // swiftlint:disable trailing_comma
 
+extension Dict_extTests {
+  static var allTests: [(String, (Dict_extTests) -> () throws -> Void)] = [
+      ("test_append", test_append),
+  ]
+}
 extension IssuesTests {
   static var allTests: [(String, (IssuesTests) -> () throws -> Void)] = [
       ("test_issue_39_referencing_into_empty_array", test_issue_39_referencing_into_empty_array),
@@ -88,7 +93,6 @@ extension ResterTests {
       ("test_mode_random", test_mode_random),
       ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
       ("test_request_variable_append", test_request_variable_append),
-      ("test_append", test_append),
   ]
 }
 extension RestfileTests {
@@ -192,6 +196,7 @@ extension LaunchTests {
 }
 
 XCTMain([
+  testCase(Dict_extTests.allTests),
   testCase(IssuesTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
