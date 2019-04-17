@@ -3,6 +3,9 @@
 export VERSION=$(shell git rev-parse HEAD)
 
 clean:
+	swift package clean
+
+force-clean:
 	rm -rf .build
 
 xcodeproj:
