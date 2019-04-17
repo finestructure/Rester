@@ -5,4 +5,4 @@ requests:
   r1:
     when:
       execute: true
-    url: http:/foo.com
+    url: http://foo.com
