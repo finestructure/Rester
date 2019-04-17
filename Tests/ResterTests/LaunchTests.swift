@@ -35,10 +35,12 @@ class LaunchTests: SnapshotTestCase {
     func test_launch_no_requests() throws {
         // TODO: improve this error message
         let requestFile = try path(fixture: "no-requests.yml").unwrapped()
-        let (status, _) = try launch(with: requestFile)
+        let (status, output) = try launch(with: requestFile)
         XCTAssertEqual(status, 1)
         // macOS and Linux have slightly different error messages
-        //        assertSnapshot(matching: output, as: .description)
+        #if os(macOS)
+            assertSnapshot(matching: output, as: .description)
+        #endif
     }
 
     func test_launch_no_restfiles() throws {

@@ -31,13 +31,17 @@ extension Console {
         display(verbose: "")
     }
 
-    mutating func display(summary total: Int, failed: Int, skipped: Int) {
+    mutating func display(results: [TestResult]) {
+        let total = results.count
+        let failed = results.failureCount
+        let skipped = results.skippedCount
+
         let testLabel = (total == 1) ? "test" : "tests"
         let failure = failed == 0 ? "0".green.bold : String(failed).red.bold
         let failureLabel = (failed == 1) ? "failure" : "failures"
         display(
             "Executed \(String(total).bold) \(testLabel), with \(failure) \(failureLabel)"
-            + ((skipped == 0) ? "" : ", \(String(skipped).yellow) skipped")
+                + ((skipped == 0) ? "" : ", \(String(skipped).yellow) skipped")
         )
     }
 
