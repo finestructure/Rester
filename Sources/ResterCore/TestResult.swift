@@ -37,3 +37,10 @@ public enum TestResult {
         return false
     }
 }
+
+
+extension Array where Element == TestResult {
+    var successCount: Int { return filter { $0.isSuccess }.count }
+    var failureCount: Int { return filter { $0.isFailure }.count }
+    var skippedCount: Int { return filter { $0.isSkipped }.count }
+}

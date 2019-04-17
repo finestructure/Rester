@@ -112,9 +112,7 @@ public let app = command(
 
     if let loop = loopParameters(count: count, duration: duration, loop: loop) {
         print("Running every \(loop.delay) seconds ...\n")
-        var grandTotal = 0
-        var failedTotal = 0
-        var skippedTotal = 0
+        var globalResults = [TestResult]()
         var runSetup = true
 
         run(loop.iteration, interval: loop.delay.seconds) {
@@ -122,20 +120,16 @@ public let app = command(
 
             return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure, runSetup: runSetup)
                 .done { results in
-                    let failureCount = results.filter { $0.isFailure }.count
-                    let skippedCount = results.filter { $0.isSkipped }.count
-                    grandTotal += results.count
-                    failedTotal += failureCount
-                    skippedTotal += skippedCount
-                    Current.console.display(summary: results.count, failed: failureCount, skipped: skippedCount)
+                    globalResults += results
+                    Current.console.display(results: results)
                     Current.console.display("")
                     Current.console.display("TOTAL: ", terminator: "")
-                    Current.console.display(summary: grandTotal, failed: failedTotal, skipped: skippedTotal)
+                    Current.console.display(results: globalResults)
                     Current.console.display("")
                     runSetup = false
             }
             }.done {
-                exit(failedTotal == 0 ? 0 : 1)
+                exit(globalResults.failureCount == 0 ? 0 : 1)
             }.catch { error in
                 Current.console.display(error)
                 exit(1)
@@ -145,10 +139,8 @@ public let app = command(
 
         _ = rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
             .done { results in
-                let failureCount = results.filter { $0.isFailure }.count
-                let skippedCount = results.filter { $0.isSkipped }.count
-                Current.console.display(summary: results.count, failed: failureCount, skipped: skippedCount)
-                exit(failureCount == 0 ? 0 : 1)
+                Current.console.display(results: results)
+                exit(results.failureCount == 0 ? 0 : 1)
             }.catch { error in
                 Current.console.display(error)
                 exit(1)
