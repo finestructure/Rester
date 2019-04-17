@@ -75,7 +75,7 @@ extension RequestTests {
       ("test_variable_definition", test_variable_definition),
       ("test_variable_definition_append", test_variable_definition_append),
       ("test_variable_definition_remove", test_variable_definition_remove),
-      ("test_parse_if", test_parse_if),
+      ("test_parse_when", test_parse_when),
       ("test_shouldExecute", test_shouldExecute),
   ]
 }
@@ -113,7 +113,7 @@ extension ResterTests {
       ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
       ("test_request_variable_append", test_request_variable_append),
       ("test_request_variable_remove", test_request_variable_remove),
-      ("test_request_if", test_request_if),
+      ("test_request_when", test_request_when),
   ]
 }
 extension RestfileTests {

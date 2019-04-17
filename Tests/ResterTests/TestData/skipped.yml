@@ -3,6 +3,6 @@ variables:
 
 requests:
   r1:
-    if:
+    when:
       execute: true
     url: http:/foo.com

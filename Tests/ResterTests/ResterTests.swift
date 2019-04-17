@@ -489,14 +489,13 @@ class ResterTests: XCTestCase {
         waitForExpectations(timeout: 555)
     }
 
-    func test_request_if() throws {
-        // Tests that a request variable can removed from a global
+    func test_request_when() throws {
         let s = """
             variables:
               values: []
             requests:
               r1:
-                if:
+                when:
                   values: .doesNotEqual([])
                 url: https://httpbin.org/anything
                 validation:

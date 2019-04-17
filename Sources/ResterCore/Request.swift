@@ -28,7 +28,7 @@ public struct Request: Decodable {
         let delay: Value?
         let log: Value?
         let variables: [Key: Value]?
-        let `if`: [Key: Matcher]?
+        let when: [Key: Matcher]?
     }
 
     let name: Name
@@ -44,7 +44,7 @@ extension Request {
     var body: Body? { return details.body }
     var validation: Validation? { return details.validation }
     var variables: [Key: Value] { return details.variables ?? [:] }
-    var `if`: [Key: Matcher] { return details.if ?? [:] }
+    var when: [Key: Matcher] { return details.when ?? [:] }
     var delay: TimeInterval {
         guard let value = details.delay else { return 0 }
         switch value {
@@ -89,7 +89,7 @@ extension Request: Substitutable {
             delay: _delay,
             log: log,
             variables: _variables,
-            if: details.if
+            when: details.when
         )
         return Request(name: name, details: _details)
     }
@@ -205,7 +205,7 @@ extension Request {
     }
 
     func shouldExecute(given variables: [Key: Value]) -> Bool {
-        for (key, matcher) in `if` {
+        for (key, matcher) in when {
             guard let input = variables[key] else { return false }
             guard case .valid = matcher.validate(input) else { return false }
         }
