@@ -19,21 +19,37 @@ func before(name: Request.Name) {
 }
 
 
-func after(name: Request.Name, response: Response, result: ValidationResult) -> Bool {
+enum TestResult {
+    case success
+    case failure
+    case skipped
+}
+
+
+// FIXME: Response? is not ideal - it must not be nil for .valid and .invalid
+// go back to using associated values?
+func after(name: Request.Name, response: Response?, result: ValidationResult) -> TestResult {
     switch result {
     case .valid:
-        let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
-        Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
-        if statistics != nil {
-            statistics?[name, default: Stats()].add(response.elapsed)
-            Current.console.display(statistics)
+        if let response = response {
+            let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
+            Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
+            if statistics != nil {
+                statistics?[name, default: Stats()].add(response.elapsed)
+                Current.console.display(statistics)
+            }
         }
-        return true
+        return .success
     case let .invalid(message):
-        Current.console.display(verbose: "Response:".bold)
-        Current.console.display(verbose: "\(response)\n")
-        Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
-        return false
+        if let response = response {
+            Current.console.display(verbose: "Response:".bold)
+            Current.console.display(verbose: "\(response)\n")
+            Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
+        }
+        return .failure
+    case .skipped:
+        Current.console.display("↪️   \(name.blue) \("SKIPPED".yellow)\n")
+        return .skipped
     }
 }
 
@@ -113,6 +129,7 @@ public let app = command(
         print("Running every \(loop.delay) seconds ...\n")
         var grandTotal = 0
         var failedTotal = 0
+        var skippedTotal = 0
         var runSetup = true
 
         run(loop.iteration, interval: loop.delay.seconds) {
@@ -120,13 +137,15 @@ public let app = command(
 
             return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure, runSetup: runSetup)
                 .done { results in
-                    let failureCount = results.filter { !$0 }.count
+                    let failureCount = results.filter { $0 == .failure }.count
+                    let skippedCount = results.filter { $0 == .skipped }.count
                     grandTotal += results.count
                     failedTotal += failureCount
-                    Current.console.display(summary: results.count, failed: failureCount)
+                    skippedTotal += skippedCount
+                    Current.console.display(summary: results.count, failed: failureCount, skipped: skippedCount)
                     Current.console.display("")
                     Current.console.display("TOTAL: ", terminator: "")
-                    Current.console.display(summary: grandTotal, failed: failedTotal)
+                    Current.console.display(summary: grandTotal, failed: failedTotal, skipped: skippedTotal)
                     Current.console.display("")
                     runSetup = false
             }
@@ -141,8 +160,9 @@ public let app = command(
 
         _ = rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
             .done { results in
-                let failureCount = results.filter { !$0 }.count
-                Current.console.display(summary: results.count, failed: failureCount)
+                let failureCount = results.filter { $0 == .failure }.count
+                let skippedCount = results.filter { $0 == .skipped }.count
+                Current.console.display(summary: results.count, failed: failureCount, skipped: skippedCount)
                 exit(failureCount == 0 ? 0 : 1)
             }.catch { error in
                 Current.console.display(error)

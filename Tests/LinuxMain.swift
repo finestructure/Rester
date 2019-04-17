@@ -20,6 +20,18 @@ extension IssuesTests {
       ("test_issue_39_referencing_into_empty_array", test_issue_39_referencing_into_empty_array),
   ]
 }
+extension MatcherTests {
+  static var allTests: [(String, (MatcherTests) -> () throws -> Void)] = [
+      ("test_init_with_value", test_init_with_value),
+      ("test_decodable", test_decodable),
+      ("test_validate", test_validate),
+      ("test_validate_regex", test_validate_regex),
+      ("test_validate_json_array", test_validate_json_array),
+      ("test_substitute", test_substitute),
+      ("test_doesNotEqual", test_doesNotEqual),
+      ("test_decodable_doesNotEqual", test_decodable_doesNotEqual),
+  ]
+}
 extension ParameterTests {
   static var allTests: [(String, (ParameterTests) -> () throws -> Void)] = [
       ("test_multipartEncode_file", test_multipartEncode_file),
@@ -63,6 +75,8 @@ extension RequestTests {
       ("test_variable_definition", test_variable_definition),
       ("test_variable_definition_append", test_variable_definition_append),
       ("test_variable_definition_remove", test_variable_definition_remove),
+      ("test_parse_when", test_parse_when),
+      ("test_shouldExecute", test_shouldExecute),
   ]
 }
 extension RequestValidationTests {
@@ -99,6 +113,7 @@ extension ResterTests {
       ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
       ("test_request_variable_append", test_request_variable_append),
       ("test_request_variable_remove", test_request_variable_remove),
+      ("test_request_when", test_request_when),
   ]
 }
 extension RestfileTests {
@@ -156,14 +171,10 @@ extension UtilsTests {
 }
 extension ValidationTests {
   static var allTests: [(String, (ValidationTests) -> () throws -> Void)] = [
-      ("test_convertMatcher", test_convertMatcher),
-      ("test_parse_Validation", test_parse_Validation),
-      ("test_validate", test_validate),
-      ("test_validate_regex", test_validate_regex),
-      ("test_parse_json_array", test_parse_json_array),
-      ("test_validate_json_array", test_validate_json_array),
-      ("test_Matcher_substitute", test_Matcher_substitute),
-      ("test_Validation_substitute", test_Validation_substitute),
+      ("test_decode", test_decode),
+      ("test_decode_key_typo", test_decode_key_typo),
+      ("test_decode_json_array", test_decode_json_array),
+      ("test_substitute", test_substitute),
   ]
 }
 extension ValueTests {
@@ -198,12 +209,14 @@ extension LaunchTests {
       ("test_launch_stats", test_launch_stats),
       ("test_launch_set_up", test_launch_set_up),
       ("test_launch_binary_help", test_launch_binary_help),
+      ("test_launch_skipped", test_launch_skipped),
   ]
 }
 
 XCTMain([
   testCase(Dictionary_extTests.allTests),
   testCase(IssuesTests.allTests),
+  testCase(MatcherTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
   testCase(RequestLoggingTests.allTests),

@@ -470,11 +470,42 @@ class RequestTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    func test_parse_when() throws {
+        let s = """
+            when:
+              foo: .doesNotEqual([])
+            url: https://httpbin.org/anything
+            """
+        let d = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(d.when, ["foo": .doesNotEqual(.array([]))])
+    }
+
+    func test_shouldExecute() throws {
+        do {
+            let d = Request.Details(
+                url: "http://foo",
+                when: ["values": .equals(1)]
+            )
+            let r = Request(name: "basic", details: d)
+            XCTAssert(r.shouldExecute(given: ["values": 1]))
+            XCTAssert(!r.shouldExecute(given: ["values": 2]))
+        }
+        do {
+            let d = Request.Details(
+                url: "http://foo",
+                when: ["values": Matcher.doesNotEqual(.array([]))]
+            )
+            let r = Request(name: "basic", details: d)
+            XCTAssert(r.shouldExecute(given: ["values": .array([1])]))
+            XCTAssert(!r.shouldExecute(given: ["values": .array([])]))
+        }
+    }
+
 }
 
 
 extension Request.Details {
-    init(url: String) {
-        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil, variables: nil)
+    init(url: String, when: [Key: Matcher]? = nil) {
+        self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil, variables: nil, when: when)
     }
 }
