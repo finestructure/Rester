@@ -58,9 +58,23 @@ func examplesDirectory(path: String = #file) -> Path? {
 extension ValidationResult: Equatable {
     public static func == (lhs: ValidationResult, rhs: ValidationResult) -> Bool {
         switch (lhs, rhs) {
-        case (.valid, .valid), (.skipped, .skipped):
+        case (.valid, .valid):
             return true
         case (.invalid(let x), .invalid(let y)):
+            return x == y
+        default:
+            return false
+        }
+    }
+}
+
+
+extension TestResult: Equatable {
+    public static func == (lhs: TestResult, rhs: TestResult) -> Bool {
+        switch (lhs, rhs) {
+        case (.success, .success), (.skipped, .skipped):
+            return true
+        case (.failure(_, let x), .failure(_, let y)):
             return x == y
         default:
             return false

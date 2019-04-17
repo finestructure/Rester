@@ -8,8 +8,10 @@
 import Foundation
 
 
+public typealias Reason = String
+
+
 public enum ValidationResult {
     case valid
-    case invalid(_ message: String)
-    case skipped
+    case invalid(Reason)
 }

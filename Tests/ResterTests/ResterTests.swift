@@ -71,12 +71,12 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
-                XCTAssertEqual(results[0].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
                 expectation.fulfill()
         }
         waitForExpectations(timeout: 5)
@@ -101,13 +101,13 @@ class ResterTests: XCTestCase {
                       value1: v1 foo
                       value2: v2 ${TEST_ID}
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
                 XCTAssertEqual(results[0].name, "post")
-                XCTAssertEqual(results[0].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
                 expectation.fulfill()
             }
             .catch {
@@ -142,11 +142,11 @@ class ResterTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
                 XCTAssertEqual(results[0].name, "post-array")
-                XCTAssertEqual(results[0].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -178,13 +178,13 @@ class ResterTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 2)
                 XCTAssertEqual(results[0].name, "post-array")
-                XCTAssertEqual(results[0].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
                 XCTAssertEqual(results[1].name, "reference")
-                XCTAssertEqual(results[1].result, .valid)
+                XCTAssert(results[1].result.isSuccess)
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -216,13 +216,13 @@ class ResterTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 2)
                 XCTAssertEqual(results[0].name, "post-array")
-                XCTAssertEqual(results[0].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
                 XCTAssertEqual(results[1].name, "reference")
-                XCTAssertEqual(results[1].result, .valid)
+                XCTAssert(results[1].result.isSuccess)
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -243,13 +243,13 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
         let start = Date()
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
-                XCTAssertEqual(results[0].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
                 XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
                 expectation.fulfill()
             }.catch {
@@ -285,7 +285,7 @@ class ResterTests: XCTestCase {
             """
         let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, response: $1, result: $2) }, timeout: 0.1)
+        _ = r.test(before: {_ in }, after: { (name: $0, result: $1) }, timeout: 0.1)
             .done { _ in
                 XCTFail("expected timeout to be raised")
                 expectation.fulfill()
@@ -318,12 +318,12 @@ class ResterTests: XCTestCase {
                   json:  # url is mirrored back in json response
                     url: https://httpbin.org/anything/foo
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
-                XCTAssertEqual(results[0].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -347,9 +347,9 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.map { $0.name }, ["r2"])
                 expectation.fulfill()
@@ -382,13 +382,13 @@ class ResterTests: XCTestCase {
                     json:
                       value: GET
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 2)
-                XCTAssertEqual(results[0].result, .valid)
-                XCTAssertEqual(results[1].result, .valid)
+                XCTAssert(results[0].result.isSuccess)
+                XCTAssert(results[1].result.isSuccess)
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -427,14 +427,14 @@ class ResterTests: XCTestCase {
                 variables:
                   values: .append(json.json.value)
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 2)
-                XCTAssertEqual(results[0].result, .valid)
-                XCTAssertEqual(results[1].result, .valid)
-                XCTAssertEqual(rester.variables["values"], .array(["r1", "r2"]))
+                XCTAssert(results[0].result.isSuccess)
+                XCTAssert(results[1].result.isSuccess)
+                XCTAssertEqual(r.variables["values"], .array(["r1", "r2"]))
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -473,14 +473,14 @@ class ResterTests: XCTestCase {
                 variables:
                   values: .remove(json.json.value)
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 2)
-                XCTAssertEqual(results[0].result, .valid)
-                XCTAssertEqual(results[1].result, .valid)
-                XCTAssertEqual(rester.variables["values"], .array(["r0", "r3"]))
+                XCTAssert(results[0].result.isSuccess)
+                XCTAssert(results[1].result.isSuccess)
+                XCTAssertEqual(r.variables["values"], .array(["r0", "r3"]))
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -501,9 +501,9 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 500  # deliberately invalid, as this test must not run
             """
-        let rester = try Rester(yml: s)
+        let r = try Rester(yml: s)
         let expectation = self.expectation(description: #function)
-        _ = rester.test(before: {_ in}, after: { (name: $0, response: $1, result: $2) })
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
                 XCTAssertEqual(results.count, 1)
                 XCTAssertEqual(results[0].result, .skipped)

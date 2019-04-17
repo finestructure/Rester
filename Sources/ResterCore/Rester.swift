@@ -46,7 +46,7 @@ public class Rester {
 
 extension Rester {
     public func test<T>(before: @escaping (Request.Name) -> (),
-                        after: @escaping (Request.Name, Response?, ValidationResult) -> T,
+                        after: @escaping (Request.Name, TestResult) -> T,
                         timeout: TimeInterval = Request.defaultTimeout,
                         validateCertificate: Bool = true,
                         runSetup: Bool = true
@@ -60,7 +60,7 @@ extension Rester {
                     before(req.name)
                     guard req.shouldExecute(given: self.variables) else {
                         // FIXME: after(..., Response?, ...) ?
-                        let res = after(req.name, nil, .skipped)
+                        let res = after(req.name, .skipped)
                         results.append(res)
                         return Promise()
                     }
@@ -72,7 +72,8 @@ extension Rester {
                             self.variables[req.name] = response.variables
                             return (response, resolved.validate(response))
                         }.map { response, result in
-                            let res = after(req.name, response, result)
+                            let testResult = TestResult(validationResult: result, response: response)
+                            let res = after(req.name, testResult)
                             results.append(res)
                     }
                 }

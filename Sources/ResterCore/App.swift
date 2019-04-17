@@ -19,38 +19,23 @@ func before(name: Request.Name) {
 }
 
 
-enum TestResult {
-    case success
-    case failure
-    case skipped
-}
-
-
-// FIXME: Response? is not ideal - it must not be nil for .valid and .invalid
-// go back to using associated values?
-func after(name: Request.Name, response: Response?, result: ValidationResult) -> TestResult {
+func after(name: Request.Name, result: TestResult) -> TestResult {
     switch result {
-    case .valid:
-        if let response = response {
-            let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
-            Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
-            if statistics != nil {
-                statistics?[name, default: Stats()].add(response.elapsed)
-                Current.console.display(statistics)
-            }
+    case .success(let response):
+        let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
+        Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
+        if statistics != nil {
+            statistics?[name, default: Stats()].add(response.elapsed)
+            Current.console.display(statistics)
         }
-        return .success
-    case let .invalid(message):
-        if let response = response {
-            Current.console.display(verbose: "Response:".bold)
-            Current.console.display(verbose: "\(response)\n")
-            Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(message.red)\n")
-        }
-        return .failure
+    case let .failure(response, reason):
+        Current.console.display(verbose: "Response:".bold)
+        Current.console.display(verbose: "\(response)\n")
+        Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(reason.red)\n")
     case .skipped:
         Current.console.display("↪️   \(name.blue) \("SKIPPED".yellow)\n")
-        return .skipped
     }
+    return result
 }
 
 
@@ -137,8 +122,8 @@ public let app = command(
 
             return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure, runSetup: runSetup)
                 .done { results in
-                    let failureCount = results.filter { $0 == .failure }.count
-                    let skippedCount = results.filter { $0 == .skipped }.count
+                    let failureCount = results.filter { $0.isFailure }.count
+                    let skippedCount = results.filter { $0.isSkipped }.count
                     grandTotal += results.count
                     failedTotal += failureCount
                     skippedTotal += skippedCount
@@ -160,8 +145,8 @@ public let app = command(
 
         _ = rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
             .done { results in
-                let failureCount = results.filter { $0 == .failure }.count
-                let skippedCount = results.filter { $0 == .skipped }.count
+                let failureCount = results.filter { $0.isFailure }.count
+                let skippedCount = results.filter { $0.isSkipped }.count
                 Current.console.display(summary: results.count, failed: failureCount, skipped: skippedCount)
                 exit(failureCount == 0 ? 0 : 1)
             }.catch { error in
