@@ -209,6 +209,7 @@ extension LaunchTests {
       ("test_launch_stats", test_launch_stats),
       ("test_launch_set_up", test_launch_set_up),
       ("test_launch_binary_help", test_launch_binary_help),
+      ("test_launch_skipped", test_launch_skipped),
   ]
 }
 

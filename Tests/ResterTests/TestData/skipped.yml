@@ -1,0 +1,8 @@
+variables:
+  execute: false
+
+requests:
+  r1:
+    if:
+      execute: true
+    url: http:/foo.com

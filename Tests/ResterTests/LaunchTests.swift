@@ -83,4 +83,11 @@ class LaunchTests: SnapshotTestCase {
         assertSnapshot(matching: output, as: .description)
     }
 
+    func test_launch_skipped() throws {
+        let requestFile = try path(fixture: "skipped.yml").unwrapped()
+        let (status, output) = try launch(with: requestFile)
+        XCTAssertEqual(status, 0)
+        assertSnapshot(matching: output, as: .description)
+    }
+
 }
