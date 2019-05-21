@@ -8,9 +8,28 @@ import XCTest
 
 // swiftlint:disable trailing_comma
 
+extension Dictionary_extTests {
+  static var allTests: [(String, (Dictionary_extTests) -> () throws -> Void)] = [
+      ("test_processMutations_append", test_processMutations_append),
+      ("test_processMutations_remove", test_processMutations_remove),
+      ("test_processMutations_combined", test_processMutations_combined),
+  ]
+}
 extension IssuesTests {
   static var allTests: [(String, (IssuesTests) -> () throws -> Void)] = [
       ("test_issue_39_referencing_into_empty_array", test_issue_39_referencing_into_empty_array),
+  ]
+}
+extension MatcherTests {
+  static var allTests: [(String, (MatcherTests) -> () throws -> Void)] = [
+      ("test_init_with_value", test_init_with_value),
+      ("test_decodable", test_decodable),
+      ("test_validate", test_validate),
+      ("test_validate_regex", test_validate_regex),
+      ("test_validate_json_array", test_validate_json_array),
+      ("test_substitute", test_substitute),
+      ("test_doesNotEqual", test_doesNotEqual),
+      ("test_decodable_doesNotEqual", test_decodable_doesNotEqual),
   ]
 }
 extension ParameterTests {
@@ -24,54 +43,81 @@ extension PathTests {
       ("test_mimeType", test_mimeType),
   ]
 }
-extension RequestExecutionTests {
-  static var allTests: [(String, (RequestExecutionTests) -> () throws -> Void)] = [
-      ("test_request_execute", test_request_execute),
-      ("test_validate_status", test_validate_status),
-      ("test_validate_json", test_validate_json),
-      ("test_validate_json_regex", test_validate_json_regex),
-      ("test_request_order", test_request_order),
+extension RequestLoggingTests {
+  static var allTests: [(String, (RequestLoggingTests) -> () throws -> Void)] = [
+      ("test_parse_log", test_parse_log),
+      ("test_parse_log_keypath", test_parse_log_keypath),
+      ("test_log_request", test_log_request),
+      ("test_log_request_json_keypath", test_log_request_json_keypath),
+      ("test_log_request_file", test_log_request_file),
+  ]
+}
+extension RequestTests {
+  static var allTests: [(String, (RequestTests) -> () throws -> Void)] = [
       ("test_post_json", test_post_json),
       ("test_post_form", test_post_form),
       ("test_post_multipart", test_post_multipart),
       ("test_post_text", test_post_text),
       ("test_post_file", test_post_file),
-      ("test_substitute_env", test_substitute_env),
-      ("test_put_request_json", test_put_request_json),
-      ("test_validate_headers", test_validate_headers),
-      ("test_delete_request", test_delete_request),
-      ("test_delay_request", test_delay_request),
-      ("test_delay_request_substitution", test_delay_request_substitution),
-      ("test_log_request", test_log_request),
-      ("test_log_request_json_keypath", test_log_request_json_keypath),
-      ("test_log_request_file", test_log_request_file),
-      ("test_response_array_validation", test_response_array_validation),
-      ("test_response_variable_legacy", test_response_variable_legacy),
-      ("test_response_variable", test_response_variable),
-      ("test_timeout_error", test_timeout_error),
-  ]
-}
-extension RequestTests {
-  static var allTests: [(String, (RequestTests) -> () throws -> Void)] = [
+      ("test_put_json", test_put_json),
+      ("test_delete", test_delete),
       ("test_parse_headers", test_parse_headers),
       ("test_request_execute_with_headers", test_request_execute_with_headers),
+      ("test_validate_headers", test_validate_headers),
       ("test_parse_query", test_parse_query),
       ("test_request_execute_with_query", test_request_execute_with_query),
       ("test_parse_delay", test_parse_delay),
       ("test_delay_substitution", test_delay_substitution),
-      ("test_parse_log", test_parse_log),
-      ("test_parse_log_keypath", test_parse_log_keypath),
+      ("test_delay_execution", test_delay_execution),
       ("test_request_execute_elapsed", test_request_execute_elapsed),
       ("test_execute_validateCertificate", test_execute_validateCertificate),
+      ("test_parse_variables", test_parse_variables),
+      ("test_variable_definition", test_variable_definition),
+      ("test_variable_definition_append", test_variable_definition_append),
+      ("test_variable_definition_remove", test_variable_definition_remove),
+      ("test_parse_when", test_parse_when),
+      ("test_shouldExecute", test_shouldExecute),
+  ]
+}
+extension RequestValidationTests {
+  static var allTests: [(String, (RequestValidationTests) -> () throws -> Void)] = [
+      ("test_validate_status", test_validate_status),
+      ("test_validate_json", test_validate_json),
+      ("test_validate_json_regex", test_validate_json_regex),
+  ]
+}
+extension ResponseTests {
+  static var allTests: [(String, (ResponseTests) -> () throws -> Void)] = [
+      ("test_merge", test_merge),
+      ("test_merge_json_nil", test_merge_json_nil),
+      ("test_merge_json_array", test_merge_json_array),
+      ("test_merge_no_variables_json_array", test_merge_no_variables_json_array),
+      ("test_merge_append_variable", test_merge_append_variable),
+      ("test_merge_remove_variable", test_merge_remove_variable),
   ]
 }
 extension ResterTests {
   static var allTests: [(String, (ResterTests) -> () throws -> Void)] = [
+      ("test_aggregate_variables", test_aggregate_variables),
+      ("test_aggregate_requests", test_aggregate_requests),
       ("test_init", test_init),
+      ("test_basic", test_basic),
+      ("test_substitute_env", test_substitute_env),
+      ("test_response_array_validation", test_response_array_validation),
+      ("test_response_variable_legacy", test_response_variable_legacy),
+      ("test_response_variable", test_response_variable),
+      ("test_delay_env_var_substitution", test_delay_env_var_substitution),
+      ("test_timeout_error", test_timeout_error),
+      ("test_set_up", test_set_up),
+      ("test_mode_random", test_mode_random),
+      ("test_request_variable_definition_pick_up", test_request_variable_definition_pick_up),
+      ("test_request_variable_append", test_request_variable_append),
+      ("test_request_variable_remove", test_request_variable_remove),
+      ("test_request_when", test_request_when),
   ]
 }
-extension RestfileDecodingTests {
-  static var allTests: [(String, (RestfileDecodingTests) -> () throws -> Void)] = [
+extension RestfileTests {
+  static var allTests: [(String, (RestfileTests) -> () throws -> Void)] = [
       ("test_decode_variables", test_decode_variables),
       ("test_parse_basic", test_parse_basic),
       ("test_parse_malformed_request", test_parse_malformed_request),
@@ -86,6 +132,8 @@ extension RestfileDecodingTests {
       ("test_parse_restfiles_basic", test_parse_restfiles_basic),
       ("test_parse_restfiles_invalid_path", test_parse_restfiles_invalid_path),
       ("test_parse_complex_form", test_parse_complex_form),
+      ("test_parse_set_up", test_parse_set_up),
+      ("test_parse_mode", test_parse_mode),
   ]
 }
 extension StatsTests {
@@ -99,7 +147,8 @@ extension StatsTests {
 extension SubstitutableTests {
   static var allTests: [(String, (SubstitutableTests) -> () throws -> Void)] = [
       ("test_substitute", test_substitute),
-      ("test_substitute_Body", test_substitute_Body),
+      ("test_Request", test_Request),
+      ("test_Body", test_Body),
   ]
 }
 extension TestUtilsTests {
@@ -109,23 +158,23 @@ extension TestUtilsTests {
       ("test_maskPath", test_maskPath),
       ("test_maskLine", test_maskLine),
       ("test_examplesDataDir", test_examplesDataDir),
+      ("test_RNG", test_RNG),
   ]
 }
 extension UtilsTests {
   static var allTests: [(String, (UtilsTests) -> () throws -> Void)] = [
       ("test_format", test_format),
+      ("test_iterationParameters", test_iterationParameters),
+      ("test_loopParameters", test_loopParameters),
+      ("test_Iteration_incremented_done", test_Iteration_incremented_done),
   ]
 }
 extension ValidationTests {
   static var allTests: [(String, (ValidationTests) -> () throws -> Void)] = [
-      ("test_convertMatcher", test_convertMatcher),
-      ("test_parse_Validation", test_parse_Validation),
-      ("test_validate", test_validate),
-      ("test_validate_regex", test_validate_regex),
-      ("test_parse_json_array", test_parse_json_array),
-      ("test_validate_json_array", test_validate_json_array),
-      ("test_Matcher_substitute", test_Matcher_substitute),
-      ("test_Validation_substitute", test_Validation_substitute),
+      ("test_decode", test_decode),
+      ("test_decode_key_typo", test_decode_key_typo),
+      ("test_decode_json_array", test_decode_json_array),
+      ("test_substitute", test_substitute),
   ]
 }
 extension ValueTests {
@@ -134,6 +183,9 @@ extension ValueTests {
       ("test_multipartEncoded", test_multipartEncoded),
       ("test_key_substitution", test_key_substitution),
       ("test_path", test_path),
+      ("test_isJSONReference", test_isJSONReference),
+      ("test_appendValue", test_appendValue),
+      ("test_removeValue", test_removeValue),
   ]
 }
 
@@ -150,21 +202,29 @@ extension LaunchTests {
       ("test_launch_binary", test_launch_binary),
       ("test_launch_binary_verbose", test_launch_binary_verbose),
       ("test_launch_binary_malformed", test_launch_binary_malformed),
+      ("test_launch_no_requests", test_launch_no_requests),
+      ("test_launch_no_restfiles", test_launch_no_restfiles),
       ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
-      ("test_launch_loop_duration", test_launch_loop_duration),
+      ("test_launch_loop_count", test_launch_loop_count),
       ("test_launch_stats", test_launch_stats),
+      ("test_launch_set_up", test_launch_set_up),
       ("test_launch_binary_help", test_launch_binary_help),
+      ("test_launch_skipped", test_launch_skipped),
   ]
 }
 
 XCTMain([
+  testCase(Dictionary_extTests.allTests),
   testCase(IssuesTests.allTests),
+  testCase(MatcherTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
-  testCase(RequestExecutionTests.allTests),
+  testCase(RequestLoggingTests.allTests),
   testCase(RequestTests.allTests),
+  testCase(RequestValidationTests.allTests),
+  testCase(ResponseTests.allTests),
   testCase(ResterTests.allTests),
-  testCase(RestfileDecodingTests.allTests),
+  testCase(RestfileTests.allTests),
   testCase(StatsTests.allTests),
   testCase(SubstitutableTests.allTests),
   testCase(TestUtilsTests.allTests),

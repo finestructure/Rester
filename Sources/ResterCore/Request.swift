@@ -27,6 +27,8 @@ public struct Request: Decodable {
         let validation: Validation?
         let delay: Value?
         let log: Value?
+        let variables: [Key: Value]?
+        let when: [Key: Matcher]?
     }
 
     let name: Name
@@ -41,6 +43,8 @@ extension Request {
     var query: QueryParameters { return details.query ?? [:] }
     var body: Body? { return details.body }
     var validation: Validation? { return details.validation }
+    var variables: [Key: Value] { return details.variables ?? [:] }
+    var when: [Key: Matcher] { return details.when ?? [:] }
     var delay: TimeInterval {
         guard let value = details.delay else { return 0 }
         switch value {
@@ -74,6 +78,7 @@ extension Request: Substitutable {
         let _body = try body?.substitute(variables: variables)
         let _validation = try validation?.substitute(variables: variables)
         let _delay = try details.delay?.substitute(variables: variables)
+        let _variables = try details.variables?.substitute(variables: variables)
         let _details = Details(
             url: _url,
             method: method,
@@ -82,7 +87,9 @@ extension Request: Substitutable {
             body: _body,
             validation: _validation,
             delay: _delay,
-            log: log
+            log: log,
+            variables: _variables,
+            when: details.when
         )
         return Request(name: name, details: _details)
     }
@@ -138,10 +145,11 @@ extension Request {
                 let start = Date()
                 return session.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
             }.map {
-                Response(
+                try Response(
                     elapsed: Date().timeIntervalSince($0.start),
                     data: $0.response.data,
-                    response: $0.response.response as! HTTPURLResponse
+                    response: $0.response.response,
+                    variables: self.variables
                 )
             }.map { Result<Response>.fulfilled($0) }
 
@@ -163,9 +171,12 @@ extension Request {
         }
     }
 
+
+    // TODO: remove - it's only used in tests
     public func test() throws -> Promise<ValidationResult> {
         return try execute().map { self.validate($0) }
     }
+
 
     public func validate(_ response: Response) -> ValidationResult {
         if
@@ -191,6 +202,14 @@ extension Request {
         }
         
         return .valid
+    }
+
+    func shouldExecute(given variables: [Key: Value]) -> Bool {
+        for (key, matcher) in when {
+            guard let input = variables[key] else { return false }
+            guard case .valid = matcher.validate(input) else { return false }
+        }
+        return true
     }
 }
 

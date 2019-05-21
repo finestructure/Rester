@@ -7,12 +7,25 @@
 
 import Foundation
 import Regex
+import Yams
 
 
 enum Matcher {
     case equals(Value)
+    case doesNotEqual(Value)
     case regex(Regex)
     case contains([Key: Matcher])
+}
+
+
+func findFirst(operator: String, in string: String) -> String? {
+    guard
+        let match = try? Regex(pattern: #"\.\#(`operator`)\((.*?)\)"#, groupNames: "value").findFirst(in: string),
+        let value = match?.group(named: "value")
+        else {
+            return nil
+    }
+    return value
 }
 
 
@@ -30,13 +43,16 @@ extension Matcher {
     }
 
     static func parse(string: String) throws -> Matcher {
-        if  // .regex(...)
-            let match = try? Regex(pattern: ".regex\\((.*?)\\)", groupNames: "regex").findFirst(in: string),
-            let regexString = match?.group(named: "regex") {
-            guard let regex = regexString.r else {
-                throw ResterError.decodingError("invalid .regex in '\(regexString)'")
+        if let value = findFirst(operator: "regex", in: string) {
+            guard let regex = value.r else {
+                throw ResterError.decodingError("invalid .regex in '\(value)'")
             }
             return .regex(regex)
+        }
+        if let value = findFirst(operator: "doesNotEqual", in: string) {
+            // Use YAMLDecoder to parse Value from string representation
+            let decoded = try YAMLDecoder().decode(Value.self, from: value)
+            return .doesNotEqual(decoded)
         }
 
         return .equals(.string(string))
@@ -48,6 +64,10 @@ extension Matcher {
             return expected == value
                 ? .valid
                 : .invalid("(\(value)) is not equal to (\(expected))")
+        case let (.doesNotEqual(expected), value):
+            return expected != value
+                ? .valid
+                : .invalid("(\(value)) does equal (\(expected))")
         case let (.regex(expected), _):
             return expected ~= value.string
                 ? .valid
@@ -80,6 +100,15 @@ extension Matcher {
 }
 
 
+extension Matcher: Decodable {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let value = try container.decode(Value.self)
+        self = try Matcher(value: value)
+    }
+}
+
+
 extension Matcher: Equatable {
     public static func == (lhs: Matcher, rhs: Matcher) -> Bool {
         switch (lhs, rhs) {
@@ -88,6 +117,8 @@ extension Matcher: Equatable {
         case let (.regex(x), .regex(y)):
             return x.pattern == y.pattern
         case let (.contains(x), .contains(y)):
+            return x == y
+        case let (.doesNotEqual(x), .doesNotEqual(y)):
             return x == y
         default:
             return false

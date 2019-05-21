@@ -69,6 +69,20 @@ extension ValidationResult: Equatable {
 }
 
 
+extension TestResult: Equatable {
+    public static func == (lhs: TestResult, rhs: TestResult) -> Bool {
+        switch (lhs, rhs) {
+        case (.success, .success), (.skipped, .skipped):
+            return true
+        case (.failure(_, let x), .failure(_, let y)):
+            return x == y
+        default:
+            return false
+        }
+    }
+}
+
+
 class TestConsole: Console {
     var messages = [String]()
     var keys = [String]()
@@ -157,11 +171,7 @@ func launch(arguments: [String] = []) throws -> (status: Int32, output: String) 
     process.standardOutput = pipe
     process.standardError = pipe
 
-    #if os(Linux)
-    process.launch()
-    #else
     try process.run()
-    #endif
 
     process.waitUntilExit()
 
@@ -199,4 +209,3 @@ extension Optional {
         }
     }
 }
-

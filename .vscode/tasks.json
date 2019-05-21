@@ -30,7 +30,9 @@
                 "isDefault": true
             },
             "args": [
-                "test"
+                "test",
+                "--parallel",
+                "--enable-code-coverage"
             ]
         },
         {
@@ -41,7 +43,7 @@
                 "run",
                 "Rester",
                 // "test.yml"
-                "./Tests/ResterTests/TestData/httpbin.yml"
+                "./examples/basic.yml"
             ],
             "problemMatcher": []
         }

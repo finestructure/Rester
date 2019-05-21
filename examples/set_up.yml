@@ -1,0 +1,19 @@
+variables:
+  API_URL: https://httpbin.org
+set_up:
+  setup request:
+    url: ${API_URL}/anything
+    method: POST
+    body:
+      json:
+        values:
+          - foo
+    validation:
+      status: 200
+requests:
+  other request:
+    url: ${API_URL}/anything/${setup request.json.values[0]}
+    validation:
+      status: 200
+      json:  # url is mirrored back in json response
+        url: https://httpbin.org/anything/foo
