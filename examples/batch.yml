@@ -1,0 +1,4 @@
+restfiles:
+  - batch/env.yml
+  - batch/basic.yml
+  - batch/basic2.yml

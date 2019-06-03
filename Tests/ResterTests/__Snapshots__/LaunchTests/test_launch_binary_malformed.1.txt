@@ -1,3 +1,1 @@
-🚀  Resting malformed.yml ...
-
 ❌  Restfile syntax error: key not found: url

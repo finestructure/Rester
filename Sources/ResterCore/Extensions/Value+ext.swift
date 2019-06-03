@@ -69,3 +69,37 @@ extension Value {
         throw ResterError.internalError("extracting file requires string value, found: \(self)")
     }
 }
+
+
+extension Value {
+    var isJSONReference: Bool {
+        guard case let .string(string) = self else { return false }
+        return string.starts(with: "json.") || string.starts(with: "json[")
+    }
+
+    private func pattern(command: String, groupName: String = "variable") throws -> Regex {
+        return try Regex(pattern: #".\#(command)\((.*?)\)"#, groupNames: groupName)
+    }
+
+    var appendValue: String? {
+        if
+            case let .string(string) = self,
+            let regex = try? pattern(command: "append"),
+            let match = regex.findFirst(in: string),
+            let varName = match.group(named: "variable") {
+            return varName
+        }
+        return nil
+    }
+
+    var removeValue: String? {
+        if
+            case let .string(string) = self,
+            let regex = try? pattern(command: "remove"),
+            let match = regex.findFirst(in: string),
+            let varName = match.group(named: "variable") {
+            return varName
+        }
+        return nil
+    }
+}

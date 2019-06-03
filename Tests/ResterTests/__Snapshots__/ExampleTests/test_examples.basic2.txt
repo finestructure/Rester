@@ -1,0 +1,11 @@
+🚀  Resting basic2.yml ...
+
+🎬  request 1 started ...
+
+✅  request 1 PASSED (X.XXXs)
+
+🎬  request 2 started ...
+
+✅  request 2 PASSED (X.XXXs)
+
+Executed 2 tests, with 0 failures

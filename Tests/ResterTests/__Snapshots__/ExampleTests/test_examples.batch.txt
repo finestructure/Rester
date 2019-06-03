@@ -1,0 +1,11 @@
+🚀  Resting batch.yml ...
+
+🎬  basic started ...
+
+✅  basic PASSED (X.XXXs)
+
+🎬  basic2 started ...
+
+✅  basic2 PASSED (X.XXXs)
+
+Executed 2 tests, with 0 failures

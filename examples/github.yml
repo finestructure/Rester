@@ -5,8 +5,14 @@ requests:
   releases:
     url: ${BASE_URL}/releases
     headers:
-      # you can run this exampe without a token, it's just here to avoid rate limiting issues with automated tests
-      Authorization: token ${GITHUB_TOKEN}
+      # If you're getting rate limited by the Github API, run this
+      # restfile with a Github token.
+      # Uncomment the line starting with "Authorization:" below and
+      # - if you are running the binary set a GITHUB_TOKEN environment
+      #   variable with your token
+      # - if running via docker, pass in the token as follows:
+      #   `docker run -e GITHUB_TOKEN=<token> ...`
+      # Authorization: token ${GITHUB_TOKEN}
     validation:
       status: 200
       json:
@@ -21,8 +27,14 @@ requests:
     # use the release id to request release details
     url: ${BASE_URL}/releases/${releases[0].id}
     headers:
-      # you can run this exampe without a token, it's just here to avoid rate limiting issues with automated tests
-      Authorization: token ${GITHUB_TOKEN}
+      # If you're getting rate limited by the Github API, run this
+      # restfile with a Github token.
+      # Uncomment the line starting with "Authorization:" below and
+      # - if you are running the binary set a GITHUB_TOKEN environment
+      #   variable with your token
+      # - if running via docker, pass in the token as follows:
+      #   `docker run -e GITHUB_TOKEN=<token> ...`
+      # Authorization: token ${GITHUB_TOKEN}
     validation:
       status: 200
     log:

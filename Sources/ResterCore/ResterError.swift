@@ -11,6 +11,7 @@ import Rainbow
 
 
 public enum ResterError: LocalizedError {
+    case genericError(String)
     case decodingError(String)
     case undefinedVariable(String)
     case invalidURL(String)
@@ -23,6 +24,8 @@ public enum ResterError: LocalizedError {
 
     public var localizedDescription: String {
         switch self {
+        case .genericError(let msg):
+            return msg
         case .decodingError(let msg):
             return "decoding error: \(msg)"
         case .undefinedVariable(let variable):
