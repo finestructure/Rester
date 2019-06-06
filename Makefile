@@ -42,7 +42,9 @@ magic:
 	sourcery --templates ./.sourcery --sources Tests --args testimports='@testable import '"ResterTests" --output Tests/LinuxMain.swift
 
 release-macos:
-	swift build --static-swift-stdlib -c release
+	# FIXME: release build fails for 5.0.1 when compiling Gen.swift
+	# swift build --static-swift-stdlib -c release
+	swift build --static-swift-stdlib
 
 release-linux: build-docker-base
 	docker run --rm -v $(PWD):/host -w /host rester-base swift build --static-swift-stdlib
