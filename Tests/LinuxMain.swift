@@ -157,6 +157,7 @@ extension TestUtilsTests {
       ("test_maskTime", test_maskTime),
       ("test_maskPath", test_maskPath),
       ("test_maskLine", test_maskLine),
+      ("test_skipLine", test_skipLine),
       ("test_examplesDataDir", test_examplesDataDir),
       ("test_RNG", test_RNG),
   ]

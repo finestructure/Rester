@@ -141,10 +141,8 @@ extension String {
     }
 
     func maskLine(prefix: String) -> String {
-        // Should really use '^' instead of '\n' at the start of the pattern but
-        // it fails to match anything in that case
-        if let regex = try? Regex(pattern: "\n\(prefix)[^\n]*") {
-            return regex.replaceAll(in: self, with: "\n\(prefix)<non-deterministic output masked>")
+        if let regex = try? Regex(pattern: "^\(prefix)[^\n]*", options: [.anchorsMatchLines]) {
+            return regex.replaceAll(in: self, with: "\(prefix)<non-deterministic output masked>")
         } else {
             return self
         }
@@ -152,6 +150,14 @@ extension String {
 
     func mask(_ string: String, with replacement: String) -> String {
         return string.r?.replaceAll(in: self, with: replacement) ?? self
+    }
+
+    func skipLine(containing string: String) -> String {
+        if let regex = try? Regex(pattern: "(^.*\(string).*\n)", options: [.anchorsMatchLines]) {
+            return regex.replaceAll(in: self, with: "")
+        } else {
+            return self
+        }
     }
 }
 
@@ -183,6 +189,9 @@ func launch(arguments: [String] = []) throws -> (status: Int32, output: String) 
         .maskLine(prefix: "Headers: ")
         .maskLine(prefix: "tag_name: ")
         .maskLine(prefix: "\\[0\\].id: ")
+        // TODO: the following started appearing in Xcode 11b1 - review and remove
+        .skipLine(containing: "_socketStreamProperties is a connection property")
+        .skipLine(containing: "nw_protocol_get_quic_image_block_invoke")
     let status = process.terminationStatus
 
     return (status, output)
