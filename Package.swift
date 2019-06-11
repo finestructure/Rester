@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "Rester",
     products: [
-        .executable(name: "rester", targets: ["Rester"])
+        .executable(name: "rester", targets: ["Rester"]),
+        .library(name: "ResterKit", targets: ["ResterCore"])
     ],
     dependencies: [
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
