@@ -32,7 +32,7 @@ public class Rester {
         try self.init(yml: s, workDir: workDir)
     }
 
-    init(yml: String, workDir: Path = Path.cwd) throws {
+    public init(yml: String, workDir: Path = Path.cwd) throws {
         let r = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
 
         variables = aggregate(variables: r.variables, from: r.restfiles)
