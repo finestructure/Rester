@@ -9,7 +9,7 @@ import XCTest
 import SnapshotTesting
 
 
-#if os(macOS)
+#if !os(iOS)
 class LaunchTests: XCTestCase {
 
     func test_launch_binary() throws {
