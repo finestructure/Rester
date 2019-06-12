@@ -15,9 +15,32 @@ extension Dictionary_extTests {
       ("test_processMutations_combined", test_processMutations_combined),
   ]
 }
+extension ExampleTests {
+  static var allTests: [(String, (ExampleTests) -> () throws -> Void)] = [
+      ("test_examples", test_examples),
+      ("test_error_example", test_error_example),
+      ("test_delay_example", test_delay_example),
+      ("test_github_example", test_github_example),
+  ]
+}
 extension IssuesTests {
   static var allTests: [(String, (IssuesTests) -> () throws -> Void)] = [
       ("test_issue_39_referencing_into_empty_array", test_issue_39_referencing_into_empty_array),
+  ]
+}
+extension LaunchTests {
+  static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
+      ("test_launch_binary", test_launch_binary),
+      ("test_launch_binary_verbose", test_launch_binary_verbose),
+      ("test_launch_binary_malformed", test_launch_binary_malformed),
+      ("test_launch_no_requests", test_launch_no_requests),
+      ("test_launch_no_restfiles", test_launch_no_restfiles),
+      ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
+      ("test_launch_loop_count", test_launch_loop_count),
+      ("test_launch_stats", test_launch_stats),
+      ("test_launch_set_up", test_launch_set_up),
+      ("test_launch_binary_help", test_launch_binary_help),
+      ("test_launch_skipped", test_launch_skipped),
   ]
 }
 extension MatcherTests {
@@ -190,33 +213,12 @@ extension ValueTests {
   ]
 }
 
-extension ExampleTests {
-  static var allTests: [(String, (ExampleTests) -> () throws -> Void)] = [
-      ("test_examples", test_examples),
-      ("test_error_example", test_error_example),
-      ("test_delay_example", test_delay_example),
-      ("test_github_example", test_github_example),
-  ]
-}
-extension LaunchTests {
-  static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
-      ("test_launch_binary", test_launch_binary),
-      ("test_launch_binary_verbose", test_launch_binary_verbose),
-      ("test_launch_binary_malformed", test_launch_binary_malformed),
-      ("test_launch_no_requests", test_launch_no_requests),
-      ("test_launch_no_restfiles", test_launch_no_restfiles),
-      ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
-      ("test_launch_loop_count", test_launch_loop_count),
-      ("test_launch_stats", test_launch_stats),
-      ("test_launch_set_up", test_launch_set_up),
-      ("test_launch_binary_help", test_launch_binary_help),
-      ("test_launch_skipped", test_launch_skipped),
-  ]
-}
 
 XCTMain([
   testCase(Dictionary_extTests.allTests),
+  testCase(ExampleTests.allTests),
   testCase(IssuesTests.allTests),
+  testCase(LaunchTests.allTests),
   testCase(MatcherTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
@@ -232,8 +234,6 @@ XCTMain([
   testCase(UtilsTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
-  testCase(ExampleTests.allTests),
-  testCase(LaunchTests.allTests),
 ])
 
 // swiftlint:enable trailing_comma

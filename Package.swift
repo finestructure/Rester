@@ -1,13 +1,16 @@
-// swift-tools-version:4.2
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version:5.0
 import PackageDescription
 
 let package = Package(
     name: "Rester",
+    platforms: [
+        .iOS(.v10),
+        .macOS(.v10_10),
+    ],
     products: [
         .executable(name: "rester", targets: ["Rester"]),
-        .library(name: "ResterKit", targets: ["ResterCore"])
+        //        .library(name: "ResterCoreStatic", type: .static, targets: ["ResterCore"]),
+        .library(name: "ResterCore", targets: ["ResterCore"])
     ],
     dependencies: [
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
@@ -19,7 +22,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.3.0"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .revision("950c0dc422ee26a82dcdc03d965b470e35edf1f2")),
         .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.0.0"),
     ],
     targets: [
