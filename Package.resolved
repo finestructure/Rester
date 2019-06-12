@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/kylef/Commander.git",
         "state": {
           "branch": null,
-          "revision": "e5b50ad7b2e91eeb828393e89b03577b16be7db9",
-          "version": "0.8.0"
+          "revision": "dc97e80a1cf5df6c5768528f039c65ad8c564712",
+          "version": "0.9.0"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
           "branch": null,
-          "revision": "fe1e9c5b62465227cceb7b0e6e79489ba7b824af",
-          "version": "6.8.4"
+          "revision": "1c296a8637838901d2b01e4c46875ee749506133",
+          "version": "6.8.5"
         }
       },
       {
