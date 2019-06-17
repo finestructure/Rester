@@ -11,7 +11,7 @@ import PromiseKit
 import Regex
 
 
-public struct Request: Decodable {
+public struct Request {
     public static let defaultTimeout: TimeInterval = 10
 
     public typealias Name = String
@@ -33,6 +33,15 @@ public struct Request: Decodable {
 
     let name: Name
     let details: Details
+    private let session: URLSession
+    private let sessionDelegate: SessionDelegate
+
+    init(name: Name, details: Details) {
+        self.name = name
+        self.details = details
+        self.sessionDelegate = SessionDelegate()
+        self.session = URLSession(configuration: .default, delegate: sessionDelegate, delegateQueue: .main)
+    }
 }
 
 
@@ -98,9 +107,14 @@ extension Request: Substitutable {
 
 extension Request {
     public func execute(timeout: TimeInterval = Request.defaultTimeout, validateCertificate: Bool = true) throws -> Promise<Response> {
+
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
+
+        self.sessionDelegate.validateCertificate = validateCertificate
+
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
+
         if [.post, .put].contains(method), let body = body {
             switch body {
             case let .json(body):
@@ -136,14 +150,10 @@ extension Request {
             Current.console.display(verbose: "Delaying for \(delay)s")
         }
 
-        // NB: URLSession keeps a strong reference to the delegate, so we don't need to keep it around ourselves
-        let delegate = SessionDelegate(validateCertificate: validateCertificate)
-        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: .main)
-
         let request = after(seconds: delay)
             .then { () -> Promise<(start: Date, response: (data: Data, response: URLResponse))> in
                 let start = Date()
-                return session.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
+                return self.session.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
             }.map {
                 try Response(
                     elapsed: Date().timeIntervalSince($0.start),
@@ -169,6 +179,11 @@ extension Request {
                 if let value = self.log { try _log(value: value, of: response) }
                 return response
         }
+    }
+
+
+    public func cancel() {
+        session.invalidateAndCancel()
     }
 
 
@@ -255,7 +270,7 @@ func _log(value: Value, of response: Response) throws {
 
 extension Request {
     class SessionDelegate: NSObject, URLSessionDelegate {
-        let validateCertificate: Bool
+        var validateCertificate: Bool
 
         init(validateCertificate: Bool = true) {
             self.validateCertificate = validateCertificate

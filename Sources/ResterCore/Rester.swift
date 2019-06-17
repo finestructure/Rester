@@ -20,6 +20,7 @@ public class Rester {
     let _requests: [Request]
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
+    private var _cancel: Bool = false
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -57,6 +58,10 @@ extension Rester {
             var chain = Promise()
             for req in requests {
                 chain = chain.then { _ -> Promise<Void> in
+                    guard !self._cancel else {
+                        requests.forEach({ $0.cancel() })
+                        return Promise<Void> { seal in seal.reject(PMKError.cancelled) }
+                    }
                     before(req.name)
                     guard req.shouldExecute(given: self.variables) else {
                         // FIXME: after(..., Response?, ...) ?
@@ -103,6 +108,9 @@ extension Rester {
         }
     }
 
+    func cancel() {
+        _cancel = true
+    }
 }
 
 

@@ -137,6 +137,7 @@ extension ResterTests {
       ("test_request_variable_append", test_request_variable_append),
       ("test_request_variable_remove", test_request_variable_remove),
       ("test_request_when", test_request_when),
+      ("test_cancel", test_cancel),
   ]
 }
 extension RestfileTests {
