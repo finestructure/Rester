@@ -108,7 +108,7 @@ extension Rester {
         }
     }
 
-    func cancel() {
+    public func cancel() {
         _cancel = true
     }
 }
