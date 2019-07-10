@@ -1,1 +1,1 @@
-public let ResterVersion = "0.7.0"
+public let ResterVersion = "VERSION"
