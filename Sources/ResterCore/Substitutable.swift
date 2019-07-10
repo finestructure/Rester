@@ -14,6 +14,11 @@ protocol Substitutable {
 }
 
 
+enum Operators: String {
+    case base64
+}
+
+
 func substitute(string: String, with variables: [Key: Value]) throws -> String {
     let regex = try Regex(pattern: "\\$\\{(.*?)\\}", groupNames: "variable")
     let res = regex.replaceAll(in: string) { match in

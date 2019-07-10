@@ -173,6 +173,7 @@ extension SubstitutableTests {
       ("test_substitute", test_substitute),
       ("test_Request", test_Request),
       ("test_Body", test_Body),
+      ("test_base64_operator", test_base64_operator),
   ]
 }
 extension TestUtilsTests {

@@ -43,4 +43,10 @@ class SubstitutableTests: XCTestCase {
         XCTAssertEqual(try Body.file("${a} ${b}").substitute(variables: vars).file, "1 2")
     }
 
+    func test_base64_operator() throws {
+        let vars: [Key: Value] = ["STRING": "foobar123"]
+        let s = try substitute(string: ".base64(${STRING})", with: vars)
+        XCTAssertEqual(s, "Zm9vYmFyMTIz")
+    }
+
 }
