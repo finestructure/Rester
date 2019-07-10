@@ -192,6 +192,7 @@ extension UtilsTests {
       ("test_iterationParameters", test_iterationParameters),
       ("test_loopParameters", test_loopParameters),
       ("test_Iteration_incremented_done", test_Iteration_incremented_done),
+      ("test_base64", test_base64),
   ]
 }
 extension ValidationTests {
