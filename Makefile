@@ -45,8 +45,7 @@ release-macos: version
 	swift build -c release
 
 release-linux: build-docker-base
-	docker run --rm -v $(PWD):/host -w /host rester-base swift build --static-swift-stdlib
-	# -c release
+	docker run --rm -v $(PWD):/host -w /host rester-base swift build
 
 version:
 	@echo VERSION: $(VERSION)
