@@ -100,6 +100,7 @@ extension RequestTests {
       ("test_variable_definition_remove", test_variable_definition_remove),
       ("test_parse_when", test_parse_when),
       ("test_shouldExecute", test_shouldExecute),
+      ("test_basic_auth_header", test_basic_auth_header),
   ]
 }
 extension RequestValidationTests {
@@ -173,6 +174,8 @@ extension SubstitutableTests {
       ("test_substitute", test_substitute),
       ("test_Request", test_Request),
       ("test_Body", test_Body),
+      ("test_Operators_apply", test_Operators_apply),
+      ("test_substitute_with_Operator", test_substitute_with_Operator),
   ]
 }
 extension TestUtilsTests {
@@ -192,6 +195,7 @@ extension UtilsTests {
       ("test_iterationParameters", test_iterationParameters),
       ("test_loopParameters", test_loopParameters),
       ("test_Iteration_incremented_done", test_Iteration_incremented_done),
+      ("test_base64", test_base64),
   ]
 }
 extension ValidationTests {

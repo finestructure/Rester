@@ -75,6 +75,11 @@ class UtilsTests: XCTestCase {
             XCTAssertEqual(count, 3)
         }
     }
+
+    func test_base64() {
+        XCTAssertEqual("foobar123".base64, "Zm9vYmFyMTIz")
+    }
+
 }
 
 

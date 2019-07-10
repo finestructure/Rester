@@ -501,6 +501,22 @@ class RequestTests: XCTestCase {
         }
     }
 
+    func test_basic_auth_header() throws {
+        let s = """
+            url: https://foo.bar
+            headers:
+              Authorization: Basic .base64(${USER}:${PASS})
+        """
+        let details = try YAMLDecoder().decode(Request.Details.self, from: s)
+        XCTAssertEqual(details.headers, ["Authorization": "Basic .base64(${USER}:${PASS})"])
+
+        // Ensure substitution works as expected
+        let req = Request(name: "req", details: details)
+        let resolved = try req.substitute(variables: ["USER": "foo", "PASS": "bar"])
+        XCTAssertEqual(resolved.headers, ["Authorization": "Basic Zm9vOmJhcg=="])
+    }
+
+
 }
 
 
