@@ -100,6 +100,7 @@ extension RequestTests {
       ("test_variable_definition_remove", test_variable_definition_remove),
       ("test_parse_when", test_parse_when),
       ("test_shouldExecute", test_shouldExecute),
+      ("test_basic_auth_header", test_basic_auth_header),
   ]
 }
 extension RequestValidationTests {
