@@ -1,4 +1,4 @@
-FROM finestructure/swift:swift-DEVELOPMENT-SNAPSHOT-2019-05-19-a
+FROM finestructure/swift:swift-5.1-RELEASE
 
 WORKDIR /package
 
