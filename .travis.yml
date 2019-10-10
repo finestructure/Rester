@@ -40,7 +40,7 @@ jobs:
         VERSION=${TRAVIS_TAG:-$TRAVIS_COMMIT}
         IMAGE=finestructure/rester:base-$VERSION
         docker build --pull -t $IMAGE -f Dockerfile.base .
-        docker run --rm -e GITHUB_TOKEN=$GITHUB_TOKEN $IMAGE swift test
+        docker run --rm -e GITHUB_TOKEN=$GITHUB_TOKEN $IMAGE swift test --parallel
         docker push $IMAGE
 
     - name: push app image
