@@ -12,11 +12,11 @@
       },
       {
         "package": "PMKFoundation",
-        "repositoryURL": "https://github.com/PromiseKit/Foundation.git",
+        "repositoryURL": "https://github.com/finestructure/Foundation.git",
         "state": {
-          "branch": null,
-          "revision": "ee06d95342a5007de2fffd898f4f35de026842ac",
-          "version": "3.3.3"
+          "branch": "swift-5.1",
+          "revision": "2be3e66a76fddba2ef50de777cb2bb0372be2068",
+          "version": null
         }
       },
       {
