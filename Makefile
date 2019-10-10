@@ -8,9 +8,6 @@ clean:
 force-clean:
 	rm -rf .build
 
-xcodeproj:
-	swift package generate-xcodeproj
-
 build-docker-base:
 	docker build --tag rester-base -f Dockerfile.base .
 
@@ -22,10 +19,10 @@ build-docker-app: build-docker-base
 test-linux-spm: build-docker-base
 	docker run --rm rester-base swift test --parallel
 
-test-macos-xcode: xcodeproj
+test-macos-xcode:
 	set -o pipefail && \
 	xcodebuild test \
-		-scheme Rester \
+		-scheme Rester-Package \
 		-destination platform="macOS" \
 		-parallel-testing-enabled YES \
 		-enableCodeCoverage YES \
