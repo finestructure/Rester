@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/kylef/Commander.git",
         "state": {
           "branch": null,
-          "revision": "dc97e80a1cf5df6c5768528f039c65ad8c564712",
-          "version": "0.9.0"
+          "revision": "4b6133c3071d521489a80c38fb92d7983f19d438",
+          "version": "0.9.1"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-snapshot-testing.git",
         "state": {
           "branch": null,
-          "revision": "950c0dc422ee26a82dcdc03d965b470e35edf1f2",
-          "version": null
+          "revision": "35aac0fbc74cdb0848923d42ddbdd3400c938f72",
+          "version": "1.6.0"
         }
       },
       {
