@@ -22,7 +22,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.6.0"),
+        .package(url: "https://github.com/finestructure/swift-snapshot-testing.git", .branch("swift-5.1-linux")),
         .package(url: "https://github.com/finestructure/Foundation.git", .branch("swift-5.1")),
     ],
     targets: [
