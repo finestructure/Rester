@@ -191,9 +191,6 @@ func launch(arguments: [String] = []) throws -> (status: Int32, output: String) 
         .maskLine(prefix: "Headers: ")
         .maskLine(prefix: "tag_name: ")
         .maskLine(prefix: "\\[0\\].id: ")
-        // TODO: the following started appearing in Xcode 11b1 - review and remove
-        .skipLine(containing: "_socketStreamProperties is a connection property")
-        .skipLine(containing: "nw_protocol_get_quic_image_block_invoke")
     let status = process.terminationStatus
 
     return (status, output)
