@@ -44,6 +44,9 @@ release-macos: version
 release-linux: build-docker-base
 	docker run --rm -v $(PWD):/host -w /host rester-base swift build
 
+install-macos: test-macos-spm release-macos
+	install .build/release/rester /usr/local/bin/
+
 version:
 	@echo VERSION: $(VERSION)
 	@echo "public let ResterVersion = \"$(VERSION)\"" > Sources/ResterCore/Version.swift
