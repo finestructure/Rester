@@ -49,6 +49,7 @@ extension Console {
         guard let stats = stats else { return }
         for (name, stats) in stats.sorted(by: { $0.key < $1.key }) {
             print(name.blue)
+            print("-----------------")
             print(stats)
             print()
         }

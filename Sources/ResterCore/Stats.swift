@@ -20,6 +20,7 @@ public struct Stats {
 extension Stats: CustomStringConvertible {
     public var description: String {
         return """
+        Count:     \(durations.count)
         Average:   \(durations.average.fmt)
         Median:    \(durations.median.fmt)
         Min:       \(durations.min()?.fmt ?? "-")
