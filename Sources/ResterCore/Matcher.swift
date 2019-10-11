@@ -21,7 +21,7 @@ enum Matcher {
 func findFirst(operator: String, in string: String) -> String? {
     guard
         let match = try? Regex(pattern: #"\.\#(`operator`)\((.*?)\)"#, groupNames: "value").findFirst(in: string),
-        let value = match?.group(named: "value")
+        let value = match.group(named: "value")
         else {
             return nil
     }

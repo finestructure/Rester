@@ -1,25 +1,28 @@
-// swift-tools-version:4.2
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version:5.0
 import PackageDescription
 
 let package = Package(
     name: "Rester",
+    platforms: [
+        .iOS(.v10),
+        .macOS(.v10_10),
+    ],
     products: [
-        .executable(name: "rester", targets: ["Rester"])
+        .executable(name: "rester", targets: ["Rester"]),
+        .library(name: "ResterCore", targets: ["ResterCore"])
     ],
     dependencies: [
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
-        .package(url: "https://github.com/finestructure/ValueCodable", from: "0.0.2"),
-        .package(url: "https://github.com/jpsim/Yams.git", from: "1.0.0"),
+        .package(url: "https://github.com/finestructure/ValueCodable", from: "0.0.5"),
+        .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
         .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
         .package(url: "https://github.com/mxcl/LegibleError.git", from: "1.0.0"),
         .package(url: "https://github.com/mxcl/Path.swift.git", from: "0.0.0"),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.3.0"),
-        .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.0.0"),
+        .package(url: "https://github.com/finestructure/swift-snapshot-testing.git", .branch("swift-5.1-linux")),
+        .package(url: "https://github.com/finestructure/Foundation.git", .branch("swift-5.1")),
     ],
     targets: [
         .target(

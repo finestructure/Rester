@@ -9,7 +9,7 @@ import Foundation
 
 
 extension String {
-    func deletingPrefix(_ prefix: String) -> String {
+    public func deletingPrefix(_ prefix: String) -> String {
         guard self.hasPrefix(prefix) else { return self }
         return String(self.dropFirst(prefix.count))
     }
@@ -17,8 +17,15 @@ extension String {
 
 
 extension String: URLEncoding {
-    var urlEncoded: String? {
+    public var urlEncoded: String? {
         let allowed = CharacterSet.urlHostAllowed.subtracting(CharacterSet(charactersIn: "+"))
         return addingPercentEncoding(withAllowedCharacters: allowed)
+    }
+}
+
+
+extension String {
+    public var base64: String {
+        return Data(self.utf8).base64EncodedString()
     }
 }

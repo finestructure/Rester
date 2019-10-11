@@ -141,10 +141,8 @@ extension String {
     }
 
     func maskLine(prefix: String) -> String {
-        // Should really use '^' instead of '\n' at the start of the pattern but
-        // it fails to match anything in that case
-        if let regex = try? Regex(pattern: "\n\(prefix)[^\n]*") {
-            return regex.replaceAll(in: self, with: "\n\(prefix)<non-deterministic output masked>")
+        if let regex = try? Regex(pattern: "^\(prefix)[^\n]*", options: [.anchorsMatchLines]) {
+            return regex.replaceAll(in: self, with: "\(prefix)<non-deterministic output masked>")
         } else {
             return self
         }
@@ -153,8 +151,18 @@ extension String {
     func mask(_ string: String, with replacement: String) -> String {
         return string.r?.replaceAll(in: self, with: replacement) ?? self
     }
+
+    func skipLine(containing string: String) -> String {
+        if let regex = try? Regex(pattern: "(^.*\(string).*\n)", options: [.anchorsMatchLines]) {
+            return regex.replaceAll(in: self, with: "")
+        } else {
+            return self
+        }
+    }
 }
 
+
+#if !os(iOS)
 func launch(arguments: [String] = []) throws -> (status: Int32, output: String) {
     // Some of the APIs that we use below are available in macOS 10.13 and above.
     guard #available(macOS 10.13, *) else {
@@ -187,7 +195,10 @@ func launch(arguments: [String] = []) throws -> (status: Int32, output: String) 
 
     return (status, output)
 }
+#endif
 
+
+#if !os(iOS)
 func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (status: Int32, output: String) {
     let arguments = [requestFile.string] + extraArguments
     let (status, output) = try launch(arguments: arguments)
@@ -198,6 +209,7 @@ func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (st
             .maskPath(requestFile.parent)  // this is the workDir we're replacing
     )
 }
+#endif
 
 
 extension Optional {

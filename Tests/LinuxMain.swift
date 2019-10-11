@@ -1,4 +1,4 @@
-// Generated using Sourcery 0.16.0 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.16.2 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 
@@ -15,9 +15,32 @@ extension Dictionary_extTests {
       ("test_processMutations_combined", test_processMutations_combined),
   ]
 }
+extension ExampleTests {
+  static var allTests: [(String, (ExampleTests) -> () throws -> Void)] = [
+      ("test_examples", test_examples),
+      ("test_error_example", test_error_example),
+      ("test_delay_example", test_delay_example),
+      ("test_github_example", test_github_example),
+  ]
+}
 extension IssuesTests {
   static var allTests: [(String, (IssuesTests) -> () throws -> Void)] = [
       ("test_issue_39_referencing_into_empty_array", test_issue_39_referencing_into_empty_array),
+  ]
+}
+extension LaunchTests {
+  static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
+      ("test_launch_binary", test_launch_binary),
+      ("test_launch_binary_verbose", test_launch_binary_verbose),
+      ("test_launch_binary_malformed", test_launch_binary_malformed),
+      ("test_launch_no_requests", test_launch_no_requests),
+      ("test_launch_no_restfiles", test_launch_no_restfiles),
+      ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
+      ("test_launch_loop_count", test_launch_loop_count),
+      ("test_launch_stats", test_launch_stats),
+      ("test_launch_set_up", test_launch_set_up),
+      ("test_launch_binary_help", test_launch_binary_help),
+      ("test_launch_skipped", test_launch_skipped),
   ]
 }
 extension MatcherTests {
@@ -77,6 +100,7 @@ extension RequestTests {
       ("test_variable_definition_remove", test_variable_definition_remove),
       ("test_parse_when", test_parse_when),
       ("test_shouldExecute", test_shouldExecute),
+      ("test_basic_auth_header", test_basic_auth_header),
   ]
 }
 extension RequestValidationTests {
@@ -114,6 +138,7 @@ extension ResterTests {
       ("test_request_variable_append", test_request_variable_append),
       ("test_request_variable_remove", test_request_variable_remove),
       ("test_request_when", test_request_when),
+      ("test_cancel", test_cancel),
   ]
 }
 extension RestfileTests {
@@ -149,6 +174,8 @@ extension SubstitutableTests {
       ("test_substitute", test_substitute),
       ("test_Request", test_Request),
       ("test_Body", test_Body),
+      ("test_Operators_apply", test_Operators_apply),
+      ("test_substitute_with_Operator", test_substitute_with_Operator),
   ]
 }
 extension TestUtilsTests {
@@ -157,6 +184,7 @@ extension TestUtilsTests {
       ("test_maskTime", test_maskTime),
       ("test_maskPath", test_maskPath),
       ("test_maskLine", test_maskLine),
+      ("test_skipLine", test_skipLine),
       ("test_examplesDataDir", test_examplesDataDir),
       ("test_RNG", test_RNG),
   ]
@@ -167,6 +195,7 @@ extension UtilsTests {
       ("test_iterationParameters", test_iterationParameters),
       ("test_loopParameters", test_loopParameters),
       ("test_Iteration_incremented_done", test_Iteration_incremented_done),
+      ("test_base64", test_base64),
   ]
 }
 extension ValidationTests {
@@ -189,33 +218,12 @@ extension ValueTests {
   ]
 }
 
-extension ExampleTests {
-  static var allTests: [(String, (ExampleTests) -> () throws -> Void)] = [
-      ("test_examples", test_examples),
-      ("test_error_example", test_error_example),
-      ("test_delay_example", test_delay_example),
-      ("test_github_example", test_github_example),
-  ]
-}
-extension LaunchTests {
-  static var allTests: [(String, (LaunchTests) -> () throws -> Void)] = [
-      ("test_launch_binary", test_launch_binary),
-      ("test_launch_binary_verbose", test_launch_binary_verbose),
-      ("test_launch_binary_malformed", test_launch_binary_malformed),
-      ("test_launch_no_requests", test_launch_no_requests),
-      ("test_launch_no_restfiles", test_launch_no_restfiles),
-      ("test_launch_binary_loop_termination", test_launch_binary_loop_termination),
-      ("test_launch_loop_count", test_launch_loop_count),
-      ("test_launch_stats", test_launch_stats),
-      ("test_launch_set_up", test_launch_set_up),
-      ("test_launch_binary_help", test_launch_binary_help),
-      ("test_launch_skipped", test_launch_skipped),
-  ]
-}
 
 XCTMain([
   testCase(Dictionary_extTests.allTests),
+  testCase(ExampleTests.allTests),
   testCase(IssuesTests.allTests),
+  testCase(LaunchTests.allTests),
   testCase(MatcherTests.allTests),
   testCase(ParameterTests.allTests),
   testCase(PathTests.allTests),
@@ -231,8 +239,6 @@ XCTMain([
   testCase(UtilsTests.allTests),
   testCase(ValidationTests.allTests),
   testCase(ValueTests.allTests),
-  testCase(ExampleTests.allTests),
-  testCase(LaunchTests.allTests),
 ])
 
 // swiftlint:enable trailing_comma

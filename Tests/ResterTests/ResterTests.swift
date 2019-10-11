@@ -8,6 +8,7 @@
 import XCTest
 
 import Gen
+import PromiseKit
 @testable import ResterCore
 
 
@@ -440,7 +441,7 @@ class ResterTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 555)
+        waitForExpectations(timeout: 5)
     }
 
     func test_request_variable_remove() throws {
@@ -486,7 +487,7 @@ class ResterTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 555)
+        waitForExpectations(timeout: 5)
     }
 
     func test_request_when() throws {
@@ -512,7 +513,41 @@ class ResterTests: XCTestCase {
                 XCTFail($0.legibleLocalizedDescription)
                 expectation.fulfill()
         }
-        waitForExpectations(timeout: 555)
+        waitForExpectations(timeout: 5)
+    }
+
+    func test_cancel() throws {
+        let s = """
+            variables:
+              API_URL: https://httpbin.org
+            requests:
+              timeout:
+                url: ${API_URL}/delay/11
+                method: GET
+                validation:
+                  status: 200
+              not reached:
+                url: ${API_URL}/anything
+                method: GET
+                validation:
+                  status: 200
+            """
+        let r = try Rester(yml: s)
+        let expectation = self.expectation(description: #function)
+        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
+            .done { results in
+                XCTFail("must not receive any results when cancelling")
+                expectation.fulfill()
+            }.catch(policy: .allErrors) { error in
+                if case PMKError.cancelled = error {
+
+                } else {
+                    XCTFail(error.legibleLocalizedDescription)
+                }
+                expectation.fulfill()
+        }
+        r.cancel()
+        waitForExpectations(timeout: 5)
     }
 
 }
