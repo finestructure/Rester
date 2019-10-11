@@ -9,7 +9,6 @@ let package = Package(
     ],
     products: [
         .executable(name: "rester", targets: ["Rester"]),
-        //        .library(name: "ResterCoreStatic", type: .static, targets: ["ResterCore"]),
         .library(name: "ResterCore", targets: ["ResterCore"])
     ],
     dependencies: [
