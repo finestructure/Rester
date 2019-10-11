@@ -1,15 +1,12 @@
 .PHONY: magic version
 
-export VERSION=$(shell git rev-parse HEAD)
+export VERSION=$(shell git describe --always --tags --dirty)
 
 clean:
 	swift package clean
 
 force-clean:
 	rm -rf .build
-
-xcodeproj:
-	swift package generate-xcodeproj
 
 build-docker-base:
 	docker build --tag rester-base -f Dockerfile.base .
@@ -22,10 +19,10 @@ build-docker-app: build-docker-base
 test-linux-spm: build-docker-base
 	docker run --rm rester-base swift test --parallel
 
-test-macos-xcode: xcodeproj
+test-macos-xcode:
 	set -o pipefail && \
 	xcodebuild test \
-		-scheme Rester \
+		-scheme Rester-Package \
 		-destination platform="macOS" \
 		-parallel-testing-enabled YES \
 		-enableCodeCoverage YES \
@@ -41,14 +38,15 @@ test-all: test-linux-spm test-macos-spm test-macos-xcode
 magic:
 	sourcery --templates ./.sourcery --sources Tests --args testimports='@testable import '"ResterTests" --output Tests/LinuxMain.swift
 
-release-macos:
-	# FIXME: release build fails for 5.0.1 when compiling Gen.swift
-	# swift build --static-swift-stdlib -c release
-	swift build --static-swift-stdlib
+release-macos: version
+	swift build -c release
 
 release-linux: build-docker-base
-	docker run --rm -v $(PWD):/host -w /host rester-base swift build --static-swift-stdlib
-	# -c release
+	docker run --rm -v $(PWD):/host -w /host rester-base swift build
+
+install-macos: test-macos-spm release-macos
+	install .build/release/rester /usr/local/bin/
 
 version:
-	echo "public let ResterVersion = \"$(VERSION)\"" > Sources/ResterCore/Version.swift
+	@echo VERSION: $(VERSION)
+	@echo "public let ResterVersion = \"$(VERSION)\"" > Sources/ResterCore/Version.swift

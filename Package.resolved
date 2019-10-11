@@ -6,17 +6,17 @@
         "repositoryURL": "https://github.com/kylef/Commander.git",
         "state": {
           "branch": null,
-          "revision": "e5b50ad7b2e91eeb828393e89b03577b16be7db9",
-          "version": "0.8.0"
+          "revision": "4b6133c3071d521489a80c38fb92d7983f19d438",
+          "version": "0.9.1"
         }
       },
       {
         "package": "PMKFoundation",
-        "repositoryURL": "https://github.com/PromiseKit/Foundation.git",
+        "repositoryURL": "https://github.com/finestructure/Foundation.git",
         "state": {
-          "branch": null,
-          "revision": "0a59b0d89f469979aecacdf9046df14f99d1cc6b",
-          "version": "3.3.2"
+          "branch": "swift-5.1",
+          "revision": "2be3e66a76fddba2ef50de777cb2bb0372be2068",
+          "version": null
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mxcl/Path.swift.git",
         "state": {
           "branch": null,
-          "revision": "f324b4a562ca421fd2905414a10fb0fc91d58b67",
-          "version": "0.16.2"
+          "revision": "dac007e907a4f4c565cfdc55a9ce148a761a11d5",
+          "version": "0.16.3"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
           "branch": null,
-          "revision": "fe1e9c5b62465227cceb7b0e6e79489ba7b824af",
-          "version": "6.8.4"
+          "revision": "4d8d1287d2e50c53a9f8430ffe88925292838c57",
+          "version": "6.11.0"
         }
       },
       {
@@ -84,11 +84,11 @@
       },
       {
         "package": "SnapshotTesting",
-        "repositoryURL": "https://github.com/pointfreeco/swift-snapshot-testing.git",
+        "repositoryURL": "https://github.com/finestructure/swift-snapshot-testing.git",
         "state": {
-          "branch": null,
-          "revision": "883f0b0623ae55f41f42e2399dab428017896448",
-          "version": "1.5.0"
+          "branch": "swift-5.1-linux",
+          "revision": "d7ce36c03e58df3447dffeea0b4bd727112a2685",
+          "version": null
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/finestructure/ValueCodable",
         "state": {
           "branch": null,
-          "revision": "e3c7b2577fa7a39cc6312e5b1d601cf5135facca",
-          "version": "0.0.4"
+          "revision": "a35591ad725cded22794c22b5640f420bb862697",
+          "version": "0.0.5"
         }
       },
       {
@@ -105,8 +105,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "b08dba4bcea978bf1ad37703a384097d3efce5af",
-          "version": "1.0.2"
+          "revision": "c947a306d2e80ecb2c0859047b35c73b8e1ca27f",
+          "version": "2.0.0"
         }
       }
     ]

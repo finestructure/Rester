@@ -52,6 +52,20 @@ class TestUtilsTests: XCTestCase {
         }
     }
 
+    func test_skipLine() throws {
+        let input = """
+            foo
+            +2019-06-11 08:01:24.309156+0200 rester[75017:3018535] NSURLSessionEffectiveConfiguration - _socketStreamProperties is a connection property
+            bar
+            """
+        XCTAssertEqual(input.skipLine(containing: "_socketStreamProperties is a connection property"),
+                       """
+                       foo
+                       bar
+                       """
+                       )
+    }
+
     func test_examplesDataDir() throws {
         XCTAssertEqual(examplesDirectory()?.basename(), "examples")
         XCTAssert((examplesDirectory()!/"array.yml").exists)

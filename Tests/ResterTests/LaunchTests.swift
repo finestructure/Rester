@@ -9,7 +9,8 @@ import XCTest
 import SnapshotTesting
 
 
-class LaunchTests: SnapshotTestCase {
+#if !os(iOS)
+class LaunchTests: XCTestCase {
 
     func test_launch_binary() throws {
         let requestFile = try path(example: "basic.yml").unwrapped()
@@ -93,3 +94,4 @@ class LaunchTests: SnapshotTestCase {
     }
 
 }
+#endif

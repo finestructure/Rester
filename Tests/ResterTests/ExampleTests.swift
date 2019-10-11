@@ -12,7 +12,8 @@ import SnapshotTesting
 import XCTest
 
 
-class ExampleTests: SnapshotTestCase {
+#if !os(iOS)
+class ExampleTests: XCTestCase {
 
     func test_examples() throws {
         // Test all examples except special treatment ones, which have their own tests
@@ -75,3 +76,4 @@ class ExampleTests: SnapshotTestCase {
     }
 
 }
+#endif
