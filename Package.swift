@@ -13,7 +13,6 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
-        .package(url: "https://github.com/finestructure/swift-snapshot-testing.git", .branch("swift-5.1-linux")),
         .package(url: "https://github.com/finestructure/ValueCodable", from: "0.1.0"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
         .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
@@ -22,6 +21,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.7.1"),
         .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.3.4"),
     ],
     targets: [
