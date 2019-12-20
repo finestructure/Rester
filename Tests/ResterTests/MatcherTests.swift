@@ -119,4 +119,9 @@ class MatcherTests: XCTestCase {
         XCTAssertEqual(t.array, .doesNotEqual(.array([])))
     }
 
+    func test_regex_complex() throws {
+        // test some more elaborate regexes
+        let regex = Value.string(".regex(abc(def)?)")
+        XCTAssertEqual(try Matcher(value: regex), .regex("abc(def)?".r!))
+    }
 }
