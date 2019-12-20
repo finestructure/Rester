@@ -1,4 +1,4 @@
-// Generated using Sourcery 0.16.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.17.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 
@@ -53,6 +53,7 @@ extension MatcherTests {
       ("test_substitute", test_substitute),
       ("test_doesNotEqual", test_doesNotEqual),
       ("test_decodable_doesNotEqual", test_decodable_doesNotEqual),
+      ("test_regex_complex", test_regex_complex),
   ]
 }
 extension ParameterTests {
