@@ -53,6 +53,7 @@ extension MatcherTests {
       ("test_substitute", test_substitute),
       ("test_doesNotEqual", test_doesNotEqual),
       ("test_decodable_doesNotEqual", test_decodable_doesNotEqual),
+      ("test_regex_complex", test_regex_complex),
   ]
 }
 extension ParameterTests {
