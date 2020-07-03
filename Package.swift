@@ -6,6 +6,7 @@ let package = Package(
     platforms: [
         .iOS(.v11),
         .macOS(.v10_10),
+        .tvOS(.v10)
     ],
     products: [
         .executable(name: "rester", targets: ["Rester"]),

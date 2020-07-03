@@ -12,7 +12,7 @@ import SnapshotTesting
 import XCTest
 
 
-#if !os(iOS)
+#if !os(iOS) && !os(tvOS)
 class ExampleTests: XCTestCase {
 
     func test_examples() throws {

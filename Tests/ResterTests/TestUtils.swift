@@ -162,7 +162,7 @@ extension String {
 }
 
 
-#if !os(iOS)
+#if !os(iOS) && !os(tvOS)
 func launch(arguments: [String] = []) throws -> (status: Int32, output: String) {
     // Some of the APIs that we use below are available in macOS 10.13 and above.
     guard #available(macOS 10.13, *) else {
@@ -198,7 +198,7 @@ func launch(arguments: [String] = []) throws -> (status: Int32, output: String) 
 #endif
 
 
-#if !os(iOS)
+#if !os(iOS) && !os(tvOS)
 func launch(with requestFile: Path, extraArguments: [String] = []) throws -> (status: Int32, output: String) {
     let arguments = [requestFile.string] + extraArguments
     let (status, output) = try launch(arguments: arguments)
