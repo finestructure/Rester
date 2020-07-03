@@ -21,7 +21,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.7.1"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", .exact("1.7.2")),
         .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.3.4"),
     ],
     targets: [
