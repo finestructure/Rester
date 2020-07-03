@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 31/01/2019.
 //
 
+#if !os(watchOS)
+
 @testable import ResterCore
 import XCTest
 import Yams
@@ -55,3 +57,5 @@ class SubstitutableTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

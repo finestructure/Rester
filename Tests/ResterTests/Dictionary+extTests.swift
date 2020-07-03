@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 16/04/2019.
 //
 
+#if !os(watchOS)
+
 @testable import ResterCore
 import XCTest
 
@@ -45,3 +47,5 @@ class Dictionary_extTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

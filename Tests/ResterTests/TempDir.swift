@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 10/04/2019.
 //
 
+#if !os(watchOS)
+
 import Foundation
 import Path
 
@@ -40,3 +42,5 @@ func withTempDir<T>(body: (Path) throws -> T) throws -> T {
     let tmp = try TempDir()
     return try body(tmp.path)
 }
+
+#endif  // !os(watchOS)

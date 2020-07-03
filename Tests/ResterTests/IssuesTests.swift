@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 01/04/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 
 import Yams
@@ -44,3 +46,5 @@ class IssuesTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

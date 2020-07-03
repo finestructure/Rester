@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 11/04/2019.
 //
 
+#if !os(watchOS)
+
 @testable import ResterCore
 import XCTest
 import Yams
@@ -121,3 +123,5 @@ class RequestValidationTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

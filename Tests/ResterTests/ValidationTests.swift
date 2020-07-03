@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 27/01/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 @testable import ResterCore
 
@@ -103,3 +105,5 @@ class ValidationTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

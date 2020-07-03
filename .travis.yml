@@ -18,13 +18,13 @@ jobs:
     - name: macos spm test
       stage: test
       os: osx
-      osx_image: xcode11.1
+      osx_image: xcode11.5
       script: make test-macos-spm
 
     - name: macos xcode test
       stage: test
       os: osx
-      osx_image: xcode11.1
+      osx_image: xcode11.5
       script: make test-macos-xcode
       after_success:
         # upload coverage data
