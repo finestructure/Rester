@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 17/03/2019.
 //
 
+#if !os(iOS) && !os(tvOS) && !os(watchOS)
+
 import Path
 import Regex
 import ResterCore
@@ -12,7 +14,6 @@ import SnapshotTesting
 import XCTest
 
 
-#if !os(iOS)
 class ExampleTests: XCTestCase {
 
     func test_examples() throws {

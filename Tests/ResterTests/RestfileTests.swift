@@ -5,6 +5,8 @@ import Yams
 @testable import ResterCore
 
 
+#if !os(watchOS)
+
 class RestfileTests: XCTestCase {
 
     func test_decode_variables() throws {
@@ -291,3 +293,5 @@ class RestfileTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

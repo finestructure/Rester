@@ -17,6 +17,7 @@ build-docker-app: build-docker-base
 	docker build --tag rester:$(VERSION) -f Dockerfile.app --build-arg VERSION=$(VERSION) .
 
 test-linux-spm: build-docker-base
+	# NB: the following requires > 4GB RAM for your docker machine
 	docker run --rm rester-base swift test --parallel
 
 test-macos-xcode:

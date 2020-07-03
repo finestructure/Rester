@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 25/03/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 @testable import ResterCore
 
@@ -93,3 +95,5 @@ extension Iteration {
         }
     }
 }
+
+#endif  // !os(watchOS)

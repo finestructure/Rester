@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 16/04/2019.
 //
 
+#if !os(watchOS)
+
 @testable import ResterCore
 import XCTest
 import Yams
@@ -125,3 +127,5 @@ class MatcherTests: XCTestCase {
         XCTAssertEqual(try Matcher(value: regex), .regex("abc(def)?".r!))
     }
 }
+
+#endif  // !os(watchOS)

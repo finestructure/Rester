@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 19/02/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 
 import Gen
@@ -352,7 +354,7 @@ class ResterTests: XCTestCase {
         let expectation = self.expectation(description: #function)
         _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
             .done { results in
-                XCTAssertEqual(results.map { $0.name }, ["r2"])
+                XCTAssertEqual(results.map { $0.name }, ["r1"])
                 expectation.fulfill()
             }.catch {
                 XCTFail($0.legibleLocalizedDescription)
@@ -552,4 +554,4 @@ class ResterTests: XCTestCase {
 
 }
 
-
+#endif  // !os(watchOS)

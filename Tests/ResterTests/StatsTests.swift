@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 10/04/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 @testable import ResterCore
 
@@ -43,3 +45,5 @@ class StatsTests: XCTestCase {
         XCTAssertEqual(values.stddev, 2.19, accuracy: 0.01)
     }
 }
+
+#endif  // !os(watchOS)

@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 14/03/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 
 class PathTests: XCTestCase {
@@ -15,3 +17,5 @@ class PathTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

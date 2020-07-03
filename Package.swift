@@ -4,8 +4,9 @@ import PackageDescription
 let package = Package(
     name: "Rester",
     platforms: [
-        .iOS(.v10),
+        .iOS(.v11),
         .macOS(.v10_10),
+        .tvOS(.v10)
     ],
     products: [
         .executable(name: "rester", targets: ["Rester"]),
@@ -21,7 +22,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.7.1"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.1"),
         .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.3.4"),
     ],
     targets: [

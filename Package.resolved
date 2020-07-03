@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/mxcl/LegibleError.git",
         "state": {
           "branch": null,
-          "revision": "c615c01e461e8a3495ba4ea75f5d671c76820105",
-          "version": "1.0.1"
+          "revision": "ce5c54a30ab3d4e8c3d32cbd85557867eb6221ec",
+          "version": "1.0.3"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/mxcl/PromiseKit",
         "state": {
           "branch": null,
-          "revision": "80963d4317bcdc03891e0fbaa744f20511d1bc08",
-          "version": "6.12.0"
+          "revision": "f6b15b7626a4399864ffa1d5ec2ed9cf0cea5556",
+          "version": "6.13.2"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-snapshot-testing.git",
         "state": {
           "branch": null,
-          "revision": "12c6a7ce9d67f39a23c6bab757bdb073bd997885",
-          "version": "1.7.1"
+          "revision": "2fd91357e90efe82bfa6845d1e7d5bc2f5025d35",
+          "version": "1.8.1"
         }
       },
       {

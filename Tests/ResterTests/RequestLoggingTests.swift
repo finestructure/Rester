@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 11/04/2019.
 //
 
+#if !os(watchOS)
+
 import LegibleError
 import Path
 @testable import ResterCore
@@ -140,3 +142,5 @@ class RequestLoggingTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)
