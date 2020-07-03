@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 04/02/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 
 import Path
@@ -525,3 +527,5 @@ extension Request.Details {
         self.init(url: url, method: nil, headers: nil, query: nil, body: nil, validation: nil, delay: nil, log: nil, variables: nil, when: when)
     }
 }
+
+#endif  // !os(watchOS)

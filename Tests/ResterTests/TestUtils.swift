@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 30/01/2019.
 //
 
+#if !os(watchOS)
+
 import Foundation
 import Path
 import Regex
@@ -221,3 +223,5 @@ extension Optional {
         }
     }
 }
+
+#endif  // !os(watchOS)

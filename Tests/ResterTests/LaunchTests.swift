@@ -5,11 +5,12 @@
 //  Created by Sven A. Schmidt on 19/02/2019.
 //
 
+#if !os(iOS) && !os(tvOS) && !os(watchOS)
+
 import XCTest
 import SnapshotTesting
 
 
-#if !os(iOS) && !os(tvOS)
 class LaunchTests: XCTestCase {
 
     func test_launch_binary() throws {

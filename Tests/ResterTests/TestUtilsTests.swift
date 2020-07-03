@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 17/03/2019.
 //
 
+#if !os(watchOS)
+
 import Gen
 import Path
 @testable import ResterCore
@@ -94,3 +96,5 @@ class TestUtilsTests: XCTestCase {
     }
 
 }
+
+#endif  // !os(watchOS)

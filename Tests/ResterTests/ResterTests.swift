@@ -5,6 +5,8 @@
 //  Created by Sven A. Schmidt on 19/02/2019.
 //
 
+#if !os(watchOS)
+
 import XCTest
 
 import Gen
@@ -552,4 +554,4 @@ class ResterTests: XCTestCase {
 
 }
 
-
+#endif  // !os(watchOS)
