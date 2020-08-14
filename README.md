@@ -1,7 +1,6 @@
 # Rester
 
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fstaging.swiftpackageindex.com%2Fapi%2Fpackages%2Ffinestructure%2FRester%2Fbadge%3Ftype%3Dswift-versions)](https://staging.swiftpackageindex.com/finestructure/Rester)
-
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fstaging.swiftpackageindex.com%2Fapi%2Fpackages%2Ffinestructure%2FRester%2Fbadge%3Ftype%3Dplatforms)](https://staging.swiftpackageindex.com/finestructure/Rester)
 
 [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
