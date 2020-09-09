@@ -1,9 +1,12 @@
 # Rester
 
-![Swift 5](https://img.shields.io/badge/Swift-5-blue.svg)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ffinestructure%2FRester%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/finestructure/Rester)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ffinestructure%2FRester%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/finestructure/Rester)
+
 [![Build Status](https://travis-ci.org/finestructure/Rester.svg?branch=develop)](https://travis-ci.org/finestructure/Rester)
 [![codecov](https://codecov.io/gh/finestructure/Rester/branch/develop/graph/badge.svg)](https://codecov.io/gh/finestructure/Rester)
 [![Twitter: @_sa_s](https://img.shields.io/badge/twitter-@_sa_s-blue.svg?style=flat)](https://twitter.com/_sa_s)
+
 
 
 Rester is a command line tool to test HTTP APIs. It processes declaratively written request descriptions as a test script, executing and validating the requests as specified.
