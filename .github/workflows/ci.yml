@@ -1,8 +1,11 @@
 name: CI
 
+on: [push]
+
 jobs:
 
   test-macos:
+    name: Test macOS xcodebuild
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
