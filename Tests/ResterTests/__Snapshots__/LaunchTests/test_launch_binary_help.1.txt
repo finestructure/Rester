@@ -8,9 +8,9 @@ Arguments:
 
 Options:
     --insecure [default: false] - do not validate SSL certificate (macOS only)
-    --count [default: ] - number of iterations to loop for (implies `--loop 0`)
-    --duration [default: ] - duration <seconds> to loop for (implies `--loop 0`
-    --loop [default: ] - keep executing file every <loop> seconds
+    --count - number of iterations to loop for (implies `--loop 0`)
+    --duration - duration <seconds> to loop for (implies `--loop 0`
+    --loop - keep executing file every <loop> seconds
     -s, --stats [default: false] - Show stats
     --timeout [default: 10.0] - Request timeout
     -v, --verbose [default: false] - Verbose output
