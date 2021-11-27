@@ -1,0 +1,8 @@
+jobs:
+
+  build:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2
+      - name: test-macos-xcode
+        run: make test-macos-xcode
