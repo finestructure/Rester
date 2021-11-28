@@ -1,14 +1,6 @@
-//
-//  Main.swift
-//  ResterCore
-//
-//  Created by Sven A. Schmidt on 05/04/2019.
-//
-
 import Commander
 import Foundation
 import Path
-import PromiseKit
 
 
 var statistics: [Request.Name: Stats]? = nil
@@ -113,38 +105,57 @@ public let app = command(
 
     if let loop = loopParameters(count: count, duration: duration, loop: loop) {
         print("Running every \(loop.delay) seconds ...\n")
-        var globalResults = [TestResult]()
-        var runSetup = true
 
-        run(loop.iteration, interval: loop.delay.seconds) {
-            Current.console.display("🚀  Resting \(filename.bold) ...\n")
+        Task {
+            do {
+                var iter = loop.iteration
+                var firstIteration = true
+                var globalResults = [TestResult]()
 
-            return rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure, runSetup: runSetup)
-                .done { results in
+                while !iter.done {
+                    defer {
+                        iter.increment()
+                        firstIteration = false
+                    }
+
+                    if !firstIteration {
+                        try await Task.sleep(seconds: loop.delay)
+                    }
+
+                    Current.console.display("🚀  Resting \(filename.bold) ...\n")
+                    let results = try await rester.test(before: before,
+                                                        after: after,
+                                                        timeout: timeout,
+                                                        validateCertificate: !insecure,
+                                                        runSetup: firstIteration)
                     globalResults += results
                     Current.console.display(results: results)
                     Current.console.display("")
                     Current.console.display("TOTAL: ", terminator: "")
                     Current.console.display(results: globalResults)
                     Current.console.display("")
-                    runSetup = false
-            }
-            }.done {
+                }
+
                 exit(globalResults.failureCount == 0 ? 0 : 1)
-            }.catch { error in
+            } catch {
                 Current.console.display(error)
                 exit(1)
+            }
         }
     } else {
         Current.console.display("🚀  Resting \(filename.bold) ...\n")
-
-        _ = rester.test(before: before, after: after, timeout: timeout, validateCertificate: !insecure)
-            .done { results in
+        Task {
+            do {
+                let results = try await rester.test(before: before,
+                                                    after: after,
+                                                    timeout: timeout,
+                                                    validateCertificate: !insecure)
                 Current.console.display(results: results)
                 exit(results.failureCount == 0 ? 0 : 1)
-            }.catch { error in
+            } catch {
                 Current.console.display(error)
                 exit(1)
+            }
         }
     }
 

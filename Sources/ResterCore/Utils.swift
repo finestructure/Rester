@@ -81,23 +81,13 @@ public enum Iteration {
             return self
         }
     }
+
+    mutating func increment() {
+        self = incremented
+    }
 }
 
 extension Iteration: Equatable {}
-
-
-public func loop(_ iteration: Iteration, interval: TimeInterval = 2.0, _ body: @escaping () async -> Void) async throws -> Void {
-    var iteration = iteration
-    var firstLoop = true
-    while !iteration.done {
-        if !firstLoop {
-            try await Task.sleep(seconds: interval)
-        }
-        firstLoop = false
-        iteration = iteration.incremented
-        await body()
-    }
-}
 
 
 extension Task where Success == Never, Failure == Never {
