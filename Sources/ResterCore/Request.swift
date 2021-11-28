@@ -9,8 +9,6 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-import PMKFoundation
-import PromiseKit
 import Regex
 
 
@@ -36,8 +34,9 @@ public struct Request {
 
     let name: Name
     let details: Details
-    private let session: URLSession
-    private let sessionDelegate: SessionDelegate
+    // FIXME: make private again after removing Request+deprecated.swift
+    internal let session: URLSession
+    internal let sessionDelegate: SessionDelegate
 
     init(name: Name, details: Details) {
         self.name = name
@@ -109,7 +108,9 @@ extension Request: Substitutable {
 
 
 extension Request {
-    public func execute(timeout: TimeInterval = Request.defaultTimeout, validateCertificate: Bool = true) throws -> Promise<Response> {
+
+    public func execute(timeout: TimeInterval = Request.defaultTimeout,
+                        validateCertificate: Bool = true) async throws -> Response {
 
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
 
@@ -151,48 +152,32 @@ extension Request {
 
         if delay > 0 {
             Current.console.display(verbose: "Delaying for \(delay)s")
+            try await Task.sleep(seconds: delay)
         }
 
-        let request = after(seconds: delay)
-            .then { () -> Promise<(start: Date, response: (data: Data, response: URLResponse))> in
-                let start = Date()
-                return self.session.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
-            }.map {
-                try Response(
-                    elapsed: Date().timeIntervalSince($0.start),
-                    data: $0.response.data,
-                    response: $0.response.response,
-                    variables: self.variables
-                )
-            }.map { Result<Response>.fulfilled($0) }
-
-        let timeout: Promise<Result<Response>> = after(seconds: delay + timeout).map { _ in
-            .rejected(ResterError.timeout(requestName: self.name))
+        let result = try await run(timeout: timeout) { () -> Response in
+            let start = Date()
+            let (data, resp) = try await session.data(for: urlRequest)
+            let response = try Response(
+                elapsed: Date().timeIntervalSince(start),
+                data: data,
+                response: resp,
+                variables: variables
+            )
+            if let value = self.log { try _log(value: value, of: response) }
+            return response
         }
 
-        return race(request, timeout)
-            .map { winner -> Response in
-                switch winner {
-                case .fulfilled(let result):
-                    return result
-                case .rejected(let error):
-                    throw error
-                }
-            }.map { response in
-                if let value = self.log { try _log(value: value, of: response) }
-                return response
-        }
+        return try result.get()
     }
-
 
     public func cancel() {
         session.invalidateAndCancel()
     }
 
-
     // TODO: remove - it's only used in tests
-    public func test() throws -> Promise<ValidationResult> {
-        return try execute().map { self.validate($0) }
+    public func test() async throws -> ValidationResult {
+        try await validate(execute())
     }
 
 
@@ -292,4 +277,34 @@ extension Request {
             completionHandler(.performDefaultHandling, nil)
         }
     }
+}
+
+
+// TODO: temporary, find better name/home
+private func run<T>(timeout: TimeInterval,
+                    task: @escaping () async throws -> T) async throws -> Swift.Result<T, Error>{
+    let task = Task {
+        try await task()
+    }
+
+    let deadline = Task {
+        try await Task.sleep(seconds: timeout)
+        task.cancel()
+    }
+
+    defer { deadline.cancel() }
+    return await task.result
+}
+
+
+func run<T>(requestName: String,
+            timeout: TimeInterval,
+            request: @escaping () async throws -> T) async throws -> Swift.Result<T, Error> {
+    try await run(timeout: timeout, task: request)
+        .mapError { error in
+            if error is CancellationError {
+                return ResterError.timeout(requestName: requestName)
+            }
+            return error
+        }
 }
