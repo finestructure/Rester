@@ -1,13 +1,5 @@
-//
-//  Utils.swift
-//  ResterCore
-//
-//  Created by Sven A. Schmidt on 04/02/2019.
-//
-
 import Foundation
 import Path
-import PromiseKit
 
 
 public func getWorkDir(input: String) -> Path? {
@@ -92,23 +84,6 @@ public enum Iteration {
 }
 
 extension Iteration: Equatable {}
-
-
-@available(*, deprecated, message: "Use loop(...) async instead")
-public func run<T>(_ interation: Iteration, interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
-    var iteration = interation
-    func loop() -> Promise<T> {
-        iteration = iteration.incremented
-        if iteration.done {
-            return body()
-        }
-        return body().then { res in
-            return after(interval).then(on: nil, loop)
-        }
-    }
-    return loop()
-}
-
 
 
 public func loop(_ iteration: Iteration, interval: TimeInterval = 2.0, _ body: @escaping () async -> Void) async throws -> Void {
