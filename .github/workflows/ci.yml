@@ -1,0 +1,23 @@
+name: CI
+
+on: [push]
+
+jobs:
+
+  test-macos:
+    name: Test macOS
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      # - name: test-macos-xcode
+      #   run: make test-macos-xcode
+      - name: test-macos-spm
+        run: make test-macos-spm
+
+  # test-linux:
+  #   name: Test Linux
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: test
+  #       run: swift test --parallel
