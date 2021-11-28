@@ -167,8 +167,22 @@ extension Request {
             if let value = self.log { try _log(value: value, of: response) }
             return response
         }
-
-        return try result.get()
+            .mapError { error -> Error in
+                if error is CancellationError {
+                    return ResterError.timeout(requestName: name)
+                }
+                return error
+            }
+        do {
+            return try result.get()
+        } catch is CancellationError {
+            throw ResterError.timeout(requestName: name)
+        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -999 {
+            // Cancellation error can originate from the underlying session.data task,
+            // in which case it is an NSError with the given domain and error code:
+            //   Error Domain=NSURLErrorDomain Code=-999 "cancelled"
+            throw ResterError.timeout(requestName: name)
+        }
     }
 
     public func cancel() {
@@ -294,17 +308,4 @@ private func run<T>(timeout: TimeInterval,
 
     defer { deadline.cancel() }
     return await task.result
-}
-
-
-func run<T>(requestName: String,
-            timeout: TimeInterval,
-            request: @escaping () async throws -> T) async throws -> Swift.Result<T, Error> {
-    try await run(timeout: timeout, task: request)
-        .mapError { error in
-            if error is CancellationError {
-                return ResterError.timeout(requestName: requestName)
-            }
-            return error
-        }
 }
