@@ -94,6 +94,7 @@ public enum Iteration {
 extension Iteration: Equatable {}
 
 
+@available(*, deprecated, message: "Use loop(...) async instead")
 public func run<T>(_ interation: Iteration, interval: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
     var iteration = interation
     func loop() -> Promise<T> {
@@ -106,4 +107,26 @@ public func run<T>(_ interation: Iteration, interval: DispatchTimeInterval = .se
         }
     }
     return loop()
+}
+
+
+
+public func loop(_ iteration: Iteration, interval: TimeInterval = 2.0, _ body: @escaping () async -> Void) async throws -> Void {
+    var iteration = iteration
+    var firstLoop = true
+    while !iteration.done {
+        if !firstLoop {
+            try await Task.sleep(seconds: interval)
+        }
+        firstLoop = false
+        iteration = iteration.incremented
+        await body()
+    }
+}
+
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: TimeInterval) async throws {
+        try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000.0))
+    }
 }
