@@ -1,6 +1,5 @@
 import Foundation
 import Path
-import PromiseKit
 import Yams
 
 
