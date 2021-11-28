@@ -19,6 +19,7 @@ func before(name: Request.Name) {
 }
 
 
+// FIXME: make this (Request.Name, TestResult) -> Void?
 func after(name: Request.Name, result: TestResult) -> TestResult {
     switch result {
     case .success(let response):
