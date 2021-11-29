@@ -21,6 +21,7 @@ public class Rester {
     var setupRequests: [Request] { return _setupRequests }
     // FIXME: make private again after removing Rester+deprecated.swift
     internal var _cancel: Bool = false
+    private var task: Task<[TestResult], Error>?
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -52,30 +53,25 @@ extension Rester {
                      validateCertificate: Bool = true,
                      runSetup: Bool = true) async throws -> [TestResult] {
 
-        func process(requests: [Request]) async throws -> [TestResult] {
-            var results = [TestResult]()
-            for req in requests {
-                before(req.name)
-                guard req.shouldExecute(given: variables) else {
-                    // FIXME: after(..., Response?, ...) ?
-                    let result = TestResult.skipped(req.name)
-                    after(result)
-                    results.append(result)
-                    return results
-                }
-
-                let resolved = try req.substitute(variables: variables)
-                let response = try await resolved.execute(
-                    timeout: timeout, validateCertificate: validateCertificate
-                )
-                variables = variables.processMutations(values: response.variables)
-                variables[req.name] = response.variables
-                let result = resolved.validate(response)
-                let testResult = TestResult(name: req.name, validationResult: result, response: response)
-                results.append(testResult)
-                after(testResult)
+        @Sendable func _process(_ req: Request) async throws -> TestResult {
+            before(req.name)
+            guard req.shouldExecute(given: variables) else {
+                // FIXME: after(..., Response?, ...) ?
+                let result = TestResult.skipped(req.name)
+                after(result)
+                return result
             }
-            return results
+
+            let resolved = try req.substitute(variables: variables)
+            let response = try await resolved.execute(
+                timeout: timeout, validateCertificate: validateCertificate
+            )
+            variables = variables.processMutations(values: response.variables)
+            variables[req.name] = response.variables
+            let result = resolved.validate(response)
+            let testResult = TestResult(name: req.name, validationResult: result, response: response)
+            after(testResult)
+            return testResult
         }
 
         let toProcess: [Request]
@@ -91,14 +87,17 @@ extension Rester {
         }
 
         if runSetup {
-            _ = try await process(requests: setupRequests)
+            _ = try await setupRequests.map(_process)
         }
 
-        return try await process(requests: toProcess)
+        task = Task {
+            try await toProcess.map(_process)
+        }
+        return try await task?.value ?? []
     }
 
     public func cancel() {
-        _cancel = true
+        task?.cancel()
     }
 }
 

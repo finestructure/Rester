@@ -436,15 +436,19 @@ class ResterTests: XCTestCase {
                   status: 200
             """
         let r = try Rester(yml: s)
-        do {
-            _ = try await r.test(before: {_ in}, after: {_ in})
-            XCTFail("must not receive any results when cancelling")
-        } catch is CancellationError {
-            // ok
-        } catch {
-            XCTFail(error.legibleLocalizedDescription)
+        let task = Task {
+            do {
+                _ = try await r.test(before: {_ in}, after: {_ in})
+                XCTFail("must not receive any results when cancelling")
+            } catch is CancellationError {
+                // ok
+            } catch {
+                XCTFail(error.legibleLocalizedDescription)
+            }
         }
+        print("cancelling ...")
         r.cancel()
+        await task.value
     }
 
 }
