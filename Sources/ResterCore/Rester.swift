@@ -47,7 +47,7 @@ public class Rester {
 
 extension Rester {
     public func test(before: @escaping (Request.Name) -> (),
-                     after: @escaping (Request.Name, TestResult) -> TestResult,
+                     after: @escaping (TestResult) -> Void,
                      timeout: TimeInterval = Request.defaultTimeout,
                      validateCertificate: Bool = true,
                      runSetup: Bool = true) async throws -> [TestResult] {
@@ -55,16 +55,12 @@ extension Rester {
         func process(requests: [Request]) async throws -> [TestResult] {
             var results = [TestResult]()
             for req in requests {
-                guard !self._cancel else {
-                    requests.forEach { $0.cancel() }
-                    return results
-                }
-
                 before(req.name)
                 guard req.shouldExecute(given: variables) else {
                     // FIXME: after(..., Response?, ...) ?
-                    let res = after(req.name, .skipped)
-                    results.append(res)
+                    let result = TestResult.skipped(req.name)
+                    after(result)
+                    results.append(result)
                     return results
                 }
 
@@ -75,9 +71,9 @@ extension Rester {
                 variables = variables.processMutations(values: response.variables)
                 variables[req.name] = response.variables
                 let result = resolved.validate(response)
-                let testResult = TestResult(validationResult: result, response: response)
-                let afterResult = after(req.name, testResult)
-                results.append(afterResult)
+                let testResult = TestResult(name: req.name, validationResult: result, response: response)
+                results.append(testResult)
+                after(testResult)
             }
             return results
         }

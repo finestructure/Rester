@@ -11,24 +11,22 @@ func before(name: Request.Name) {
 }
 
 
-// FIXME: make this (Request.Name, TestResult) -> Void?
-func after(name: Request.Name, result: TestResult) -> TestResult {
+func after(result: TestResult) {
     switch result {
-    case .success(let response):
+    case let .success(name, response):
         let duration = format(response.elapsed).map { " (\($0)s)" } ?? ""
         Current.console.display("✅  \(name.blue) \("PASSED".green.bold)\(duration)\n")
         if statistics != nil {
             statistics?[name, default: Stats()].add(response.elapsed)
             Current.console.display(statistics)
         }
-    case let .failure(response, reason):
+    case let .failure(name, response, reason):
         Current.console.display(verbose: "Response:".bold)
         Current.console.display(verbose: "\(response)\n")
         Current.console.display("❌  \(name.blue) \("FAILED".red.bold) : \(reason.red)\n")
-    case .skipped:
+    case let .skipped(name):
         Current.console.display("↪️   \(name.blue) \("SKIPPED".yellow)\n")
     }
-    return result
 }
 
 

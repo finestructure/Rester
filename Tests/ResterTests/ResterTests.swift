@@ -63,7 +63,7 @@ class ResterTests: XCTestCase {
         XCTAssertEqual(r.setupRequests.count, 0)
     }
 
-    func test_basic() throws {
+    func test_basic() async throws {
         let s = """
             variables:
               API_URL: https://httpbin.org
@@ -75,17 +75,12 @@ class ResterTests: XCTestCase {
                   status: 200
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 1)
-                XCTAssert(results[0].result.isSuccess)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 1)
+        XCTAssert(results[0].isSuccess)
     }
 
-    func test_substitute_env() throws {
+    func test_substitute_env() async throws {
         Current.environment = ["TEST_ID": "foo"]
         let s = """
             requests:
@@ -105,22 +100,13 @@ class ResterTests: XCTestCase {
                       value2: v2 ${TEST_ID}
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 1)
-                XCTAssertEqual(results[0].name, "post")
-                XCTAssert(results[0].result.isSuccess)
-                expectation.fulfill()
-            }
-            .catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 1)
+        XCTAssertEqual(results[0].name, "post")
+        XCTAssert(results[0].isSuccess)
     }
 
-    func test_response_array_validation() throws {
+    func test_response_array_validation() async throws {
         let s = """
             requests:
               post-array:
@@ -144,21 +130,13 @@ class ResterTests: XCTestCase {
                         1: .regex(\\d+)
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 1)
-                XCTAssertEqual(results[0].name, "post-array")
-                XCTAssert(results[0].result.isSuccess)
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 1)
+        XCTAssertEqual(results[0].name, "post-array")
+        XCTAssert(results[0].isSuccess)
     }
 
-    func test_response_variable_legacy() throws {
+    func test_response_variable_legacy() async throws {
         // Tests references a value from a previous request's response
         // (legacy syntax .1 to reference array element at index 1)
         let s = """
@@ -180,23 +158,15 @@ class ResterTests: XCTestCase {
                     url: https://httpbin.org/anything/42
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 2)
-                XCTAssertEqual(results[0].name, "post-array")
-                XCTAssert(results[0].result.isSuccess)
-                XCTAssertEqual(results[1].name, "reference")
-                XCTAssert(results[1].result.isSuccess)
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 2)
+        XCTAssertEqual(results[0].name, "post-array")
+        XCTAssert(results[0].isSuccess)
+        XCTAssertEqual(results[1].name, "reference")
+        XCTAssert(results[1].isSuccess)
     }
 
-    func test_response_variable() throws {
+    func test_response_variable() async throws {
         // Tests references a value from a previous request's response
         // (using syntax [1] to reference array element at index 1)
         let s = """
@@ -218,23 +188,15 @@ class ResterTests: XCTestCase {
                     url: https://httpbin.org/anything/42
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 2)
-                XCTAssertEqual(results[0].name, "post-array")
-                XCTAssert(results[0].result.isSuccess)
-                XCTAssertEqual(results[1].name, "reference")
-                XCTAssert(results[1].result.isSuccess)
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 2)
+        XCTAssertEqual(results[0].name, "post-array")
+        XCTAssert(results[0].isSuccess)
+        XCTAssertEqual(results[1].name, "reference")
+        XCTAssert(results[1].isSuccess)
     }
 
-    func test_delay_env_var_substitution() throws {
+    func test_delay_env_var_substitution() async throws {
         Current.environment = ["DELAY": "2"]
         let console = TestConsole()
         Current.console = console
@@ -247,24 +209,16 @@ class ResterTests: XCTestCase {
                   status: 200
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
         let start = Date()
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 1)
-                XCTAssert(results[0].result.isSuccess)
-                XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 1)
+        XCTAssert(results[0].isSuccess)
+        XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
         let elapsed = Date().timeIntervalSince(start)
         XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
-    func test_timeout_error() throws {
+    func test_timeout_error() async throws {
         let console = TestConsole()
         Current.console = console
         let s = """
@@ -287,19 +241,15 @@ class ResterTests: XCTestCase {
                   status: 200
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in }, after: { (name: $0, result: $1) }, timeout: 0.1)
-            .done { _ in
-                XCTFail("expected timeout to be raised")
-                expectation.fulfill()
-            }.catch {
-                XCTAssertEqual($0.legibleLocalizedDescription, "request timed out: \("timeout".blue)")
-                expectation.fulfill()
+        do {
+            _ = try await r.test(before: {_ in }, after: {_ in}, timeout: 0.1)
+            XCTFail("expected timeout to be raised")
+        } catch {
+            XCTAssertEqual(error.legibleLocalizedDescription, "request timed out: \("timeout".blue)")
         }
-        waitForExpectations(timeout: 10)
     }
 
-    func test_set_up() throws {
+    func test_set_up() async throws {
         let s = """
             variables:
               API_URL: https://httpbin.org
@@ -322,20 +272,12 @@ class ResterTests: XCTestCase {
                     url: https://httpbin.org/anything/foo
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 1)
-                XCTAssert(results[0].result.isSuccess)
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 500)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 1)
+        XCTAssert(results[0].isSuccess)
     }
 
-    func test_mode_random() throws {
+    func test_mode_random() async throws {
         // https://xkcd.com/221
         Current.rng = AnyRandomNumberGenerator(LCRNG(seed: 0))
         let s = """
@@ -351,19 +293,11 @@ class ResterTests: XCTestCase {
                   status: 200
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.map { $0.name }, ["r1"])
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 500)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.map { $0.name }, ["r1"])
     }
 
-    func test_request_variable_definition_pick_up() throws {
+    func test_request_variable_definition_pick_up() async throws {
         // Tests that a request variable defintion can be picked up in subsequent requests
         let s = """
             requests:
@@ -386,21 +320,13 @@ class ResterTests: XCTestCase {
                       value: GET
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 2)
-                XCTAssert(results[0].result.isSuccess)
-                XCTAssert(results[1].result.isSuccess)
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 2)
+        XCTAssert(results[0].isSuccess)
+        XCTAssert(results[1].isSuccess)
     }
 
-    func test_request_variable_append() throws {
+    func test_request_variable_append() async throws {
         // Tests that a request variable can appended to a global
         let s = """
             variables:
@@ -431,22 +357,14 @@ class ResterTests: XCTestCase {
                   values: .append(json.json.value)
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 2)
-                XCTAssert(results[0].result.isSuccess)
-                XCTAssert(results[1].result.isSuccess)
-                XCTAssertEqual(r.variables["values"], .array(["r1", "r2"]))
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 2)
+        XCTAssert(results[0].isSuccess)
+        XCTAssert(results[1].isSuccess)
+        XCTAssertEqual(r.variables["values"], .array(["r1", "r2"]))
     }
 
-    func test_request_variable_remove() throws {
+    func test_request_variable_remove() async throws {
         // Tests that a request variable can removed from a global
         let s = """
             variables:
@@ -477,22 +395,14 @@ class ResterTests: XCTestCase {
                   values: .remove(json.json.value)
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 2)
-                XCTAssert(results[0].result.isSuccess)
-                XCTAssert(results[1].result.isSuccess)
-                XCTAssertEqual(r.variables["values"], .array(["r0", "r3"]))
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results.count, 2)
+        XCTAssert(results[0].isSuccess)
+        XCTAssert(results[1].isSuccess)
+        XCTAssertEqual(r.variables["values"], .array(["r0", "r3"]))
     }
 
-    func test_request_when() throws {
+    func test_request_when() async throws {
         let s = """
             variables:
               values: []
@@ -505,20 +415,11 @@ class ResterTests: XCTestCase {
                   status: 500  # deliberately invalid, as this test must not run
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTAssertEqual(results.count, 1)
-                XCTAssertEqual(results[0].result, .skipped)
-                expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let results = try await r.test(before: {_ in}, after: {_ in})
+        XCTAssertEqual(results, [.skipped("r1")])
     }
 
-    func test_cancel() throws {
+    func test_cancel() async throws {
         let s = """
             variables:
               API_URL: https://httpbin.org
@@ -535,21 +436,15 @@ class ResterTests: XCTestCase {
                   status: 200
             """
         let r = try Rester(yml: s)
-        let expectation = self.expectation(description: #function)
-        _ = r.test(before: {_ in}, after: { (name: $0, result: $1) })
-            .done { results in
-                XCTFail("must not receive any results when cancelling")
-                expectation.fulfill()
-            }.catch(policy: .allErrors) { error in
-                if case PMKError.cancelled = error {
-
-                } else {
-                    XCTFail(error.legibleLocalizedDescription)
-                }
-                expectation.fulfill()
+        do {
+            _ = try await r.test(before: {_ in}, after: {_ in})
+            XCTFail("must not receive any results when cancelling")
+        } catch is CancellationError {
+            // ok
+        } catch {
+            XCTFail(error.legibleLocalizedDescription)
         }
         r.cancel()
-        waitForExpectations(timeout: 5)
     }
 
 }
