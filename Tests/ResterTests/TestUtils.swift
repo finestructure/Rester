@@ -201,3 +201,10 @@ extension Optional {
 }
 
 #endif  // !os(watchOS)
+
+
+extension Request {
+    public func test(name: String = "test") async throws -> ValidationResult {
+        try await validate(execute(name: name))
+    }
+}
