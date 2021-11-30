@@ -23,21 +23,7 @@ public class Rester {
     // FIXME: remove when removing Rester+deprecated.swift
     internal var _cancel: Bool = false
 
-    private var taskQueue = DispatchQueue(label: "taskQueue")
-    private var _task: TaskStatus<[TestResult]> = .idle
-    private var task: TaskStatus<[TestResult]> {
-        get {
-            taskQueue.sync {
-                return _task
-            }
-        }
-        set {
-            taskQueue.async {
-                guard !self._task.isCancelled else { return }
-                self._task = newValue
-            }
-        }
-    }
+    private var runner = Runner<[TestResult]>()
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -94,42 +80,38 @@ extension Rester {
                      timeout: TimeInterval = Request.defaultTimeout,
                      validateCertificate: Bool = true,
                      runSetup: Bool = true) async throws -> [TestResult] {
-        guard !task.isCancelled else {
-            throw CancellationError()
-        }
-
-        task = .inProgress(Task {
+        try await runner.run {
             if runSetup {
                 // TODO: use forEach instead
-                _ = try await setupRequests.map {
-                    try await _process($0, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
+                _ = try await self.setupRequests.map {
+                    try await self._process($0, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
                 }
             }
 
             let toProcess: [Request]
 
-            if mode == .random {
-                let rnd = Gen.element(of: requests)
+            if self.mode == .random {
+                let rnd = Gen.element(of: self.requests)
                 guard let chosenRequest = rnd.run(using: &Current.rng) else {
                     throw ResterError.internalError("failed to choose random request")
                 }
                 toProcess = [chosenRequest]
             } else {
-                toProcess = requests
+                toProcess = self.requests
             }
 
             return try await toProcess.map { req in
                 do {
-                    return try await _process(req, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
+                    return try await self._process(req, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
                 } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
                     // convert URLSession timeout errors to ResterError
                     throw ResterError.timeout(requestName: req.name)
                 }
             }
-        })
+        }
 
         do {
-            if let results = try await task.value {
+            if let results = try await runner.value {
                 return results
             } else {
                 // cancelled while in flight but before URLRequest was launched
@@ -141,8 +123,8 @@ extension Rester {
         }
     }
 
-    public func cancel() {
-        task.cancel()
+    public func cancel() async {
+        await runner.cancel()
     }
 }
 

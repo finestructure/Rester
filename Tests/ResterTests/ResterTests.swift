@@ -448,7 +448,7 @@ class ResterTests: XCTestCase {
                 XCTFail(error.legibleLocalizedDescription)
             }
         }
-        r.cancel()
+        await r.cancel()
         await task.value
         XCTAssert(Date().timeIntervalSince(start) < timeout, "Cancel did not take effect")
     }
