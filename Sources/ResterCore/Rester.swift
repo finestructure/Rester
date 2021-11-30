@@ -63,8 +63,7 @@ extension Rester {
             }
 
             let resolved = try req.substitute(variables: variables)
-            let response = try await resolved.execute(name: req.name,
-                                                      timeout: timeout,
+            let response = try await resolved.execute(timeout: timeout,
                                                       validateCertificate: validateCertificate)
             variables = variables.processMutations(values: response.variables)
             variables[req.name] = response.variables

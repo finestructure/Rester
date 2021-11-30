@@ -109,8 +109,7 @@ extension Request: Substitutable {
 
 extension Request {
 
-    public func execute(name: Request.Name,
-                        timeout: TimeInterval = Request.defaultTimeout,
+    public func execute(timeout: TimeInterval = Request.defaultTimeout,
                         validateCertificate: Bool = true) async throws -> Response {
 
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }

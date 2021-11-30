@@ -204,7 +204,7 @@ extension Optional {
 
 
 extension Request {
-    public func test(name: String = "test") async throws -> ValidationResult {
-        try await validate(execute(name: name))
+    public func test() async throws -> ValidationResult {
+        try await validate(execute())
     }
 }
