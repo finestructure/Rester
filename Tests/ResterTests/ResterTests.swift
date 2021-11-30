@@ -10,7 +10,6 @@
 import XCTest
 
 import Gen
-import PromiseKit
 @testable import ResterCore
 
 
