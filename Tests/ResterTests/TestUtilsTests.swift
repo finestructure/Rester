@@ -78,20 +78,20 @@ class TestUtilsTests: XCTestCase {
         do {
             Current.rng = AnyRandomNumberGenerator(Xoshiro(seed: 0))
             let g = Gen.int(in: 0...10)
+            XCTAssertEqual(g.run(using: &Current.rng), 1)
             XCTAssertEqual(g.run(using: &Current.rng), 0)
-            XCTAssertEqual(g.run(using: &Current.rng), 4)
-            XCTAssertEqual(g.run(using: &Current.rng), 9)
             XCTAssertEqual(g.run(using: &Current.rng), 5)
-            XCTAssertEqual(g.run(using: &Current.rng), 2)
+            XCTAssertEqual(g.run(using: &Current.rng), 7)
+            XCTAssertEqual(g.run(using: &Current.rng), 6)
         }
         do {
             Current.rng = AnyRandomNumberGenerator(Xoshiro(seed: 0))
             let g = Gen.element(of: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+            XCTAssertEqual(g.run(using: &Current.rng), 2)
             XCTAssertEqual(g.run(using: &Current.rng), 1)
-            XCTAssertEqual(g.run(using: &Current.rng), 4)
-            XCTAssertEqual(g.run(using: &Current.rng), 9)
             XCTAssertEqual(g.run(using: &Current.rng), 5)
-            XCTAssertEqual(g.run(using: &Current.rng), 3)
+            XCTAssertEqual(g.run(using: &Current.rng), 7)
+            XCTAssertEqual(g.run(using: &Current.rng), 6)
         }
     }
 
