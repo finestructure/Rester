@@ -19,9 +19,25 @@ public class Rester {
     let _requests: [Request]
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
-    // FIXME: make private again after removing Rester+deprecated.swift
+
+    // FIXME: remove when removing Rester+deprecated.swift
     internal var _cancel: Bool = false
-    private var task: Task<[TestResult], Error>?
+
+    private var taskQueue = DispatchQueue(label: "taskQueue")
+    private var _task: TaskStatus<[TestResult]> = .idle
+    private var task: TaskStatus<[TestResult]> {
+        get {
+            taskQueue.sync {
+                return _task
+            }
+        }
+        set {
+            taskQueue.async {
+                guard !self._task.isCancelled else { return }
+                self._task = newValue
+            }
+        }
+    }
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -47,57 +63,83 @@ public class Rester {
 
 
 extension Rester {
+    private func _process(_ req: Request,
+                          before: @escaping (Request.Name) -> (),
+                          after: @escaping (TestResult) -> Void,
+                          timeout: TimeInterval = Request.defaultTimeout,
+                          validateCertificate: Bool = true) async throws -> TestResult {
+        before(req.name)
+        guard req.shouldExecute(given: variables) else {
+            // FIXME: after(..., Response?, ...) ?
+            let result = TestResult.skipped(req.name)
+            after(result)
+            return result
+        }
+
+        let resolved = try req.substitute(variables: variables)
+        let response = try await resolved.execute(
+            timeout: timeout, validateCertificate: validateCertificate
+        )
+        variables = variables.processMutations(values: response.variables)
+        variables[req.name] = response.variables
+        let result = resolved.validate(response)
+        let testResult = TestResult(name: req.name, validationResult: result, response: response)
+        after(testResult)
+        return testResult
+    }
+
+
     public func test(before: @escaping (Request.Name) -> (),
                      after: @escaping (TestResult) -> Void,
                      timeout: TimeInterval = Request.defaultTimeout,
                      validateCertificate: Bool = true,
                      runSetup: Bool = true) async throws -> [TestResult] {
+        guard !task.isCancelled else {
+            throw CancellationError()
+        }
 
-        @Sendable func _process(_ req: Request) async throws -> TestResult {
-            before(req.name)
-            guard req.shouldExecute(given: variables) else {
-                // FIXME: after(..., Response?, ...) ?
-                let result = TestResult.skipped(req.name)
-                after(result)
-                return result
+        task = .inProgress(Task {
+            if runSetup {
+                // TODO: use forEach instead
+                _ = try await setupRequests.map {
+                    try await _process($0, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
+                }
             }
 
-            let resolved = try req.substitute(variables: variables)
-            let response = try await resolved.execute(
-                timeout: timeout, validateCertificate: validateCertificate
-            )
-            variables = variables.processMutations(values: response.variables)
-            variables[req.name] = response.variables
-            let result = resolved.validate(response)
-            let testResult = TestResult(name: req.name, validationResult: result, response: response)
-            after(testResult)
-            return testResult
-        }
+            let toProcess: [Request]
 
-        let toProcess: [Request]
-
-        if mode == .random {
-            let rnd = Gen.element(of: requests)
-            guard let chosenRequest = rnd.run(using: &Current.rng) else {
-                throw ResterError.internalError("failed to choose random request")
+            if mode == .random {
+                let rnd = Gen.element(of: requests)
+                guard let chosenRequest = rnd.run(using: &Current.rng) else {
+                    throw ResterError.internalError("failed to choose random request")
+                }
+                toProcess = [chosenRequest]
+            } else {
+                toProcess = requests
             }
-            toProcess = [chosenRequest]
-        } else {
-            toProcess = requests
-        }
 
-        if runSetup {
-            _ = try await setupRequests.map(_process)
-        }
+            try await Task.sleep(seconds: 0.1)
 
-        task = Task {
-            try await toProcess.map(_process)
+            return try await toProcess.map{
+                try await _process($0, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
+            }
+        })
+
+        do {
+            if let results = try await task.value {
+                return results
+            } else {
+                // cancelled while in flight but before URLRequest was launched
+                throw CancellationError()
+            }
+        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -999 {
+            // cancelled while in flight after URLRequest was launched
+            throw CancellationError()
         }
-        return try await task?.value ?? []
     }
 
     public func cancel() {
-        task?.cancel()
+        task.cancel()
     }
 }
 

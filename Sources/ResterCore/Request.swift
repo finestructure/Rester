@@ -116,7 +116,7 @@ extension Request {
 
         self.sessionDelegate.validateCertificate = validateCertificate
 
-        var urlRequest = URLRequest(url: url)
+        var urlRequest = URLRequest(url: url, timeoutInterval: timeout)
         urlRequest.httpMethod = method.rawValue
 
         if [.post, .put].contains(method), let body = body {
@@ -155,34 +155,16 @@ extension Request {
             try await Task.sleep(seconds: delay)
         }
 
-        let result = try await run(timeout: timeout) { () -> Response in
-            let start = Date()
-            let (data, resp) = try await session.data(for: urlRequest)
-            let response = try Response(
-                elapsed: Date().timeIntervalSince(start),
-                data: data,
-                response: resp,
-                variables: variables
-            )
-            if let value = self.log { try _log(value: value, of: response) }
-            return response
-        }
-            .mapError { error -> Error in
-                if error is CancellationError {
-                    return ResterError.timeout(requestName: name)
-                }
-                return error
-            }
-        do {
-            return try result.get()
-        } catch is CancellationError {
-            throw ResterError.timeout(requestName: name)
-        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -999 {
-            // Cancellation error can originate from the underlying session.data task,
-            // in which case it is an NSError with the given domain and error code:
-            //   Error Domain=NSURLErrorDomain Code=-999 "cancelled"
-            throw ResterError.timeout(requestName: name)
-        }
+        let start = Date()
+        let (data, resp) = try await session.data(for: urlRequest)
+        let response = try Response(
+            elapsed: Date().timeIntervalSince(start),
+            data: data,
+            response: resp,
+            variables: variables
+        )
+        if let value = self.log { try _log(value: value, of: response) }
+        return response
     }
 
     public func cancel() {
@@ -291,21 +273,4 @@ extension Request {
             completionHandler(.performDefaultHandling, nil)
         }
     }
-}
-
-
-// TODO: temporary, find better name/home
-private func run<T>(timeout: TimeInterval,
-                    task: @escaping () async throws -> T) async throws -> Swift.Result<T, Error>{
-    let task = Task {
-        try await task()
-    }
-
-    let deadline = Task {
-        try await Task.sleep(seconds: timeout)
-        task.cancel()
-    }
-
-    defer { deadline.cancel() }
-    return await task.result
 }

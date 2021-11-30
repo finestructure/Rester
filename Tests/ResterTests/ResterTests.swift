@@ -435,10 +435,12 @@ class ResterTests: XCTestCase {
                 validation:
                   status: 200
             """
+        let timeout: TimeInterval = 5
+        let start = Date()
         let r = try Rester(yml: s)
         let task = Task {
             do {
-                _ = try await r.test(before: {_ in}, after: {_ in})
+                _ = try await r.test(before: {_ in}, after: {_ in}, timeout: timeout)
                 XCTFail("must not receive any results when cancelling")
             } catch is CancellationError {
                 // ok
@@ -446,9 +448,9 @@ class ResterTests: XCTestCase {
                 XCTFail(error.legibleLocalizedDescription)
             }
         }
-        print("cancelling ...")
         r.cancel()
         await task.value
+        XCTAssert(Date().timeIntervalSince(start) < timeout, "Cancel did not take effect")
     }
 
 }
