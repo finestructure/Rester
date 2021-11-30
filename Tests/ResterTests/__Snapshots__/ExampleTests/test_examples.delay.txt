@@ -1,4 +1,4 @@
-Request timeout: 1.0s
+Request timeout: 0.1s
 
 🚀  Resting delay.yml ...
 

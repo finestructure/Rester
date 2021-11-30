@@ -31,94 +31,59 @@ extension Restfile {
 
 class RequestValidationTests: XCTestCase {
 
-    func test_validate_status() throws {
+    func test_validate_status() async throws {
         let s = try read(fixture: "httpbin.yml")!
         var r = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
-            let expectation = self.expectation(description: #function)
-            _ = try r.expandedRequest("status-success").test()
-                .map { result in
-                    XCTAssertEqual(result, ValidationResult.valid)
-                    expectation.fulfill()
-            }
-            waitForExpectations(timeout: 5)
+            let result = try await r.expandedRequest("status-success").test()
+            XCTAssertEqual(result, ValidationResult.valid)
         }
 
         do {
-            let expectation = self.expectation(description: #function)
-            _ = try r.expandedRequest("status-failure").test()
-                .map { result in
-                    XCTAssertEqual(result, .invalid("status invalid: (200) is not equal to (500)"))
-                    expectation.fulfill()
-            }
-            waitForExpectations(timeout: 5)
+            let result = try await r.expandedRequest("status-failure").test()
+            XCTAssertEqual(result, .invalid("status invalid: (200) is not equal to (500)"))
         }
     }
 
-    func test_validate_json() throws {
+    func test_validate_json() async throws {
         let s = try read(fixture: "httpbin.yml")!
         var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
-            let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("json-success").test()
-                .map {
-                    XCTAssertEqual($0, ValidationResult.valid)
-                    expectation.fulfill()
-            }
-            waitForExpectations(timeout: 5)
+            let res = try await rester.expandedRequest("json-success").test()
+            XCTAssertEqual(res, ValidationResult.valid)
         }
 
         do {
-            let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("json-failure").test()
-                .map {
-                    XCTAssertEqual($0, .invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
-                    expectation.fulfill()
-            }
-            waitForExpectations(timeout: 5)
+            let res = try await rester.expandedRequest("json-failure").test()
+            XCTAssertEqual(res, .invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (\"nope\")"))
         }
 
         do {
-            let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("json-failure-type").test()
-                .map {
-                    XCTAssertEqual($0, .invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
-                    expectation.fulfill()
-            }
-            waitForExpectations(timeout: 5)
+            let res = try await rester.expandedRequest("json-failure-type").test()
+            XCTAssertEqual(res, .invalid("json invalid: key \'method\' validation error: (\"GET\") is not equal to (42)"))
         }
     }
 
-    func test_validate_json_regex() throws {
+    func test_validate_json_regex() async throws {
         let s = try read(fixture: "httpbin.yml")!
         var rester = try YAMLDecoder().decode(Restfile.self, from: s)
 
         do {
-            let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("json-regex").test()
-                .map {
-                    XCTAssertEqual($0, ValidationResult.valid)
-                    expectation.fulfill()
-            }
-            waitForExpectations(timeout: 5)
+            let res = try await rester.expandedRequest("json-regex").test()
+            XCTAssertEqual(res, ValidationResult.valid)
         }
 
         do {
-            let expectation = self.expectation(description: #function)
-            _ = try rester.expandedRequest("json-regex-failure").test()
-                .map {
-                    switch $0 {
-                    case let .invalid(message):
-                        XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
-                        XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
-                    default:
-                        XCTFail("expected failure, received: \($0)")
-                    }
-                    expectation.fulfill()
+            let res = try await rester.expandedRequest("json-regex-failure").test()
+            switch res {
+                case let .invalid(message):
+                    XCTAssert(message.starts(with: "json invalid: key 'uuid' validation error"), "message was: \(message)")
+                    XCTAssert(message.ends(with: "does not match (^\\w{8}$)"), "message was: \(message)")
+                default:
+                    XCTFail("expected failure, received: \(res)")
             }
-            waitForExpectations(timeout: 5)
         }
     }
 

@@ -8,17 +8,17 @@
 import Foundation
 
 
-public enum TestResult {
-    case success(Response)
-    case failure(Response, Reason)
-    case skipped
+public enum TestResult: Equatable {
+    case success(Request.Name, Response)
+    case failure(Request.Name, Response, Reason)
+    case skipped(Request.Name)
 
-    init(validationResult: ValidationResult, response: Response) {
+    init(name: Request.Name, validationResult: ValidationResult, response: Response) {
         switch validationResult {
-        case .valid:
-            self = .success(response)
-        case .invalid(let reason):
-            self = .failure(response, reason)
+            case .valid:
+                self = .success(name, response)
+            case .invalid(let reason):
+                self = .failure(name, response, reason)
         }
     }
 
@@ -35,6 +35,17 @@ public enum TestResult {
     var isSkipped: Bool {
         if case .skipped = self { return true }
         return false
+    }
+
+    var name: String {
+        switch self {
+            case let .success(name, _):
+                return name
+            case let .failure(name, _, _):
+                return name
+            case let .skipped(name):
+                return name
+        }
     }
 }
 

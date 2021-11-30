@@ -64,7 +64,7 @@ class RequestLoggingTests: XCTestCase {
         XCTAssertEqual(r.log, .array(["json.data.property"]))
     }
 
-    func test_log_request() throws {
+    func test_log_request() async throws {
         let console = TestConsole()
         Current.console = console
         let s = """
@@ -73,23 +73,16 @@ class RequestLoggingTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            // confirm the console receives output
-            XCTAssertEqual(console.keys, ["Status", "Headers", "JSON"])
-            XCTAssertEqual(console.values[0] as? Int, 200)
-            XCTAssert("\(console.values[1])".contains("\"Content-Type\": \"application/json\""))
-            XCTAssert("\(console.values[2])".contains("\"method\": \"GET\""))
-            expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
+        // confirm the console receives output
+        XCTAssertEqual(console.keys, ["Status", "Headers", "JSON"])
+        XCTAssertEqual(console.values[0] as? Int, 200)
+        XCTAssert("\(console.values[1])".contains("\"Content-Type\": \"application/json\""))
+        XCTAssert("\(console.values[2])".contains("\"method\": \"GET\""))
     }
 
-    func test_log_request_json_keypath() throws {
+    func test_log_request_json_keypath() async throws {
         let console = TestConsole()
         Current.console = console
         let s = """
@@ -99,22 +92,15 @@ class RequestLoggingTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            // confirm the console receives output
-            // we're expecting the value pulled from the key path `headers.Host` in the json response
-            XCTAssertEqual(console.keys, ["headers.Host"])
-            XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
-            expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
+        // confirm the console receives output
+        // we're expecting the value pulled from the key path `headers.Host` in the json response
+        XCTAssertEqual(console.keys, ["headers.Host"])
+        XCTAssertEqual(console.values.first as? Value?, "httpbin.org")
     }
 
-    func test_log_request_file() throws {
+    func test_log_request_file() async throws {
         Current.workDir = testDataDirectory()!
         let fname = "log.txt"
         let logfile = Current.workDir/fname
@@ -127,18 +113,11 @@ class RequestLoggingTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            XCTAssert(logfile.exists, "log file must exist after test")
-            let log = try String(contentsOf: logfile)
-            XCTAssert(log.contains("\"url\": \"https://httpbin.org/anything\""), "logfile was: \(log)")
-            expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
+        XCTAssert(logfile.exists, "log file must exist after test")
+        let log = try String(contentsOf: logfile)
+        XCTAssert(log.contains("\"url\": \"https://httpbin.org/anything\""), "logfile was: \(log)")
     }
 
 }

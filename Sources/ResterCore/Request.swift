@@ -9,8 +9,6 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-import PMKFoundation
-import PromiseKit
 import Regex
 
 
@@ -109,13 +107,15 @@ extension Request: Substitutable {
 
 
 extension Request {
-    public func execute(timeout: TimeInterval = Request.defaultTimeout, validateCertificate: Bool = true) throws -> Promise<Response> {
+
+    public func execute(timeout: TimeInterval = Request.defaultTimeout,
+                        validateCertificate: Bool = true) async throws -> Response {
 
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
 
         self.sessionDelegate.validateCertificate = validateCertificate
 
-        var urlRequest = URLRequest(url: url)
+        var urlRequest = URLRequest(url: url, timeoutInterval: timeout)
         urlRequest.httpMethod = method.rawValue
 
         if [.post, .put].contains(method), let body = body {
@@ -151,50 +151,29 @@ extension Request {
 
         if delay > 0 {
             Current.console.display(verbose: "Delaying for \(delay)s")
+            try await Task.sleep(seconds: delay)
         }
 
-        let request = after(seconds: delay)
-            .then { () -> Promise<(start: Date, response: (data: Data, response: URLResponse))> in
-                let start = Date()
-                return self.session.dataTask(.promise, with: urlRequest).map { (start: start, response: $0)}
-            }.map {
-                try Response(
-                    elapsed: Date().timeIntervalSince($0.start),
-                    data: $0.response.data,
-                    response: $0.response.response,
-                    variables: self.variables
-                )
-            }.map { Result<Response>.fulfilled($0) }
-
-        let timeout: Promise<Result<Response>> = after(seconds: delay + timeout).map { _ in
-            .rejected(ResterError.timeout(requestName: self.name))
-        }
-
-        return race(request, timeout)
-            .map { winner -> Response in
-                switch winner {
-                case .fulfilled(let result):
-                    return result
-                case .rejected(let error):
-                    throw error
-                }
-            }.map { response in
-                if let value = self.log { try _log(value: value, of: response) }
-                return response
+        do {
+            let start = Date()
+            let (data, resp) = try await session.data(for: urlRequest)
+            let response = try Response(
+                elapsed: Date().timeIntervalSince(start),
+                data: data,
+                response: resp,
+                variables: variables
+            )
+            if let value = self.log { try _log(value: value, of: response) }
+            return response
+        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
+            // convert URLSession timeout errors to ResterError
+            throw ResterError.timeout(requestName: name)
         }
     }
-
 
     public func cancel() {
         session.invalidateAndCancel()
     }
-
-
-    // TODO: remove - it's only used in tests
-    public func test() throws -> Promise<ValidationResult> {
-        return try execute().map { self.validate($0) }
-    }
-
 
     public func validate(_ response: Response) -> ValidationResult {
         if

@@ -14,7 +14,7 @@ import Yams
 
 class IssuesTests: XCTestCase {
 
-    func test_issue_39_referencing_into_empty_array() throws {
+    func test_issue_39_referencing_into_empty_array() async throws {
         // https://github.com/finestructure/Rester/issues/39
         // terminated by signal SIGILL (Illegal instruction)
         // when referencing into empty array
@@ -34,15 +34,8 @@ class IssuesTests: XCTestCase {
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "post-array", details: d)
 
-        let expectation = self.expectation(description: #function)
-
-        _ = try r.test()
-            .map {
-                XCTAssertEqual($0, .invalid("json invalid: key 'json' validation error: key 'values' validation error: index 0 out of bounds"))
-                expectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 5)
+        let result = try await r.test()
+        XCTAssertEqual(result, .invalid("json invalid: key 'json' validation error: key 'values' validation error: index 0 out of bounds"))
     }
 
 }

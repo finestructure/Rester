@@ -16,7 +16,7 @@ import Yams
 
 class RequestTests: XCTestCase {
 
-    func test_post_json() throws {
+    func test_post_json() async throws {
         let s = """
             url: https://httpbin.org/anything
             method: POST
@@ -32,15 +32,11 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
-    func test_post_form() throws {
+    func test_post_form() async throws {
         let s = """
             url: https://httpbin.org/anything
             method: POST
@@ -56,15 +52,11 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
-    func test_post_multipart() throws {
+    func test_post_multipart() async throws {
         let testFile = path(fixture: "test.jpg")!
         let s = """
             url: https://httpbin.org/anything
@@ -81,15 +73,11 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
-    func test_post_text() throws {
+    func test_post_text() async throws {
         let s = """
             url: https://httpbin.org/anything
             method: POST
@@ -105,15 +93,11 @@ class RequestTests: XCTestCase {
         """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
-    func test_post_file() throws {
+    func test_post_file() async throws {
         let testFile = path(fixture: "test.jpg")!
         let s = """
              url: https://httpbin.org/anything
@@ -130,15 +114,11 @@ class RequestTests: XCTestCase {
          """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
-    func test_put_json() throws {
+    func test_put_json() async throws {
         let s = """
             url: https://httpbin.org/anything
             method: PUT
@@ -154,15 +134,11 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
-    func test_delete() throws {
+    func test_delete() async throws {
         let s = """
             url: https://httpbin.org/anything
             method: DELETE
@@ -173,12 +149,8 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
     func test_parse_headers() throws {
@@ -192,7 +164,7 @@ class RequestTests: XCTestCase {
         XCTAssertEqual(r.headers, ["H1": "header1", "H2": "header2"])
     }
 
-    func test_request_execute_with_headers() throws {
+    func test_request_execute_with_headers() async throws {
         let s = """
             url: https://httpbin.org/anything
             method: GET
@@ -202,23 +174,16 @@ class RequestTests: XCTestCase {
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "basic", details: d)
 
-        let expectation = self.expectation(description: #function)
-
-        _ = try r.execute()
-            .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                // httpbin returns the request data back to us:
-                // { "headers": { ... } }
-                struct Result: Codable { let headers: Request.Headers }
-                let res = try JSONDecoder().decode(Result.self, from: $0.data)
-                XCTAssertEqual(res.headers["H1"], "header1")
-                expectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 5)
+        let res = try await r.execute()
+        XCTAssertEqual(res.response.statusCode, 200)
+        // httpbin returns the request data back to us:
+        // { "headers": { ... } }
+        struct Result: Codable { let headers: Request.Headers }
+        let result = try JSONDecoder().decode(Result.self, from: res.data)
+        XCTAssertEqual(result.headers["H1"], "header1")
     }
 
-    func test_validate_headers() throws {
+    func test_validate_headers() async throws {
         let s = """
             url: https://httpbin.org/anything
             validation:
@@ -228,15 +193,8 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
     }
 
     func test_parse_query() throws {
@@ -250,7 +208,7 @@ class RequestTests: XCTestCase {
         XCTAssertEqual(r.query, ["q1": "value", "q2": 2])
     }
 
-    func test_request_execute_with_query() throws {
+    func test_request_execute_with_query() async throws {
         let s = """
             url: https://httpbin.org/anything
             method: GET
@@ -260,20 +218,13 @@ class RequestTests: XCTestCase {
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "basic", details: d)
 
-        let expectation = self.expectation(description: #function)
-
-        _ = try r.execute()
-            .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                // httpbin returns the request parameters back to us:
-                // { "args": { ... } }
-                struct Result: Codable { let args: Request.QueryParameters }
-                let res = try JSONDecoder().decode(Result.self, from: $0.data)
-                XCTAssertEqual(res.args["q"], "value")
-                expectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 5)
+        let res = try await r.execute()
+        XCTAssertEqual(res.response.statusCode, 200)
+        // httpbin returns the request parameters back to us:
+        // { "args": { ... } }
+        struct Result: Codable { let args: Request.QueryParameters }
+        let result = try JSONDecoder().decode(Result.self, from: res.data)
+        XCTAssertEqual(result.args["q"], "value")
     }
 
     func test_parse_delay() throws {
@@ -326,86 +277,52 @@ class RequestTests: XCTestCase {
         }
     }
 
-    func test_delay_execution() throws {
+    func test_delay_execution() async throws {
         let console = TestConsole()
         Current.console = console
         let s = """
-            delay: 2
+            delay: 1
             url: https://httpbin.org/anything
             validation:
               status: 200
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
         let start = Date()
-        _ = try r.test().map {
-            XCTAssertEqual($0, ValidationResult.valid)
-            XCTAssertEqual(console.verbose, ["Delaying for 2.0s"])
-            expectation.fulfill()
-            }.catch {
-                XCTFail($0.legibleLocalizedDescription)
-                expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.test()
+        XCTAssertEqual(res, ValidationResult.valid)
+        XCTAssertEqual(console.verbose, ["Delaying for 1.0s"])
         let elapsed = Date().timeIntervalSince(start)
-        XCTAssert(elapsed > 2, "elapsed time must be larger than delay, was \(elapsed)")
+        XCTAssert(elapsed > 1, "elapsed time must be larger than delay, was \(elapsed)")
     }
 
-    func test_request_execute_elapsed() throws {
+    func test_request_execute_elapsed() async throws {
         let d = Request.Details(url: "https://httpbin.org/delay/1")
         let r = Request(name: "basic", details: d)
 
-        let expectation = self.expectation(description: #function)
-
-        _ = try r.execute()
-            .map {
-                XCTAssertEqual($0.response.statusCode, 200)
-                XCTAssert($0.elapsed >= 1.0, "elapsed must be >= 1.0, was: \($0.elapsed)")
-                expectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 5)
+        let res = try await r.execute()
+        XCTAssertEqual(res.response.statusCode, 200)
+        XCTAssert(res.elapsed >= 1.0, "elapsed must be >= 1.0, was: \(res.elapsed)")
     }
 
-    func test_execute_validateCertificate() throws {
-        // switching off certificate validation only works on macOS for now
-        #if os(macOS)
+    func test_execute_validateCertificate() async throws {
+#if !os(macOS)
+        throw XCTSkip("switching off certificate validation only supported on macOS")
+#endif
         let d = Request.Details(url: "https://self-signed.badssl.com")
         let r = Request(name: "test", details: d)
 
         do {  // test that verification (default case) raises exception
-            let expectation = self.expectation(description: #function)
-
-            _ = try r.execute(validateCertificate: true)
-                .map { _ in
-                    XCTFail("bad SSL certificate must not succeed")
-                    expectation.fulfill()
-                }.catch {
-                    XCTAssert($0.legibleLocalizedDescription.starts(with: "The certificate for this server is invalid"), "was instead: \($0.legibleLocalizedDescription)")
-                    expectation.fulfill()
-            }
-
-            waitForExpectations(timeout: 5)
+            _ = try await r.execute(validateCertificate: true)
+            XCTFail("bad SSL certificate must not succeed")
+        } catch {
+            XCTAssert(error.legibleLocalizedDescription.starts(with: "The certificate for this server is invalid"), "was instead: \(error.legibleLocalizedDescription)")
         }
 
         do {  // test that insecure process succeeds
-            let expectation = self.expectation(description: #function)
-
-            _ = try r.execute(validateCertificate: false)
-                .map {
-                    XCTAssertEqual($0.response.statusCode, 200)
-                    expectation.fulfill()
-                }.catch {
-                    XCTFail($0.legibleLocalizedDescription)
-                    expectation.fulfill()
-            }
-
-            waitForExpectations(timeout: 5)
+            let res = try await r.execute(validateCertificate: false)
+            XCTAssertEqual(res.response.statusCode, 200)
         }
-        #else
-        print("test disabled - switching off certificate validation unsupported on Linux")
-        #endif
     }
 
     func test_parse_variables() throws {
@@ -418,7 +335,7 @@ class RequestTests: XCTestCase {
         XCTAssertEqual(d.variables, ["foo": "bar"])
     }
 
-    func test_variable_definition() throws {
+    func test_variable_definition() async throws {
         // tests defining a new variable within a request body
         let s = """
             url: https://httpbin.org/anything
@@ -427,16 +344,12 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.execute().map { response in
-            XCTAssertEqual(response.status, 200)
-            XCTAssertEqual(response.variables?["foo"], "GET")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.execute()
+        XCTAssertEqual(res.status, 200)
+        XCTAssertEqual(res.variables?["foo"], "GET")
     }
 
-    func test_variable_definition_append() throws {
+    func test_variable_definition_append() async throws {
         // tests substitution for variable with append syntax
         let s = """
             url: https://httpbin.org/anything
@@ -445,16 +358,12 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.execute().map { response in
-            XCTAssertEqual(response.status, 200)
-            XCTAssertEqual(response.variables?["foo"], ".append(GET)")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.execute()
+        XCTAssertEqual(res.status, 200)
+        XCTAssertEqual(res.variables?["foo"], ".append(GET)")
     }
 
-    func test_variable_definition_remove() throws {
+    func test_variable_definition_remove() async throws {
         // tests substitution for variable with remove syntax
         let s = """
             url: https://httpbin.org/anything
@@ -463,13 +372,9 @@ class RequestTests: XCTestCase {
             """
         let d = try YAMLDecoder().decode(Request.Details.self, from: s)
         let r = Request(name: "request", details: d)
-        let expectation = self.expectation(description: #function)
-        _ = try r.execute().map { response in
-            XCTAssertEqual(response.status, 200)
-            XCTAssertEqual(response.variables?["foo"], ".remove(GET)")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 5)
+        let res = try await r.execute()
+        XCTAssertEqual(res.status, 200)
+        XCTAssertEqual(res.variables?["foo"], ".remove(GET)")
     }
 
     func test_parse_when() throws {

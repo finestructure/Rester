@@ -6,9 +6,7 @@
 //
 
 import Foundation
-import Gen
 import Path
-import PromiseKit
 import Yams
 
 
@@ -20,7 +18,8 @@ public class Rester {
     let _requests: [Request]
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
-    private var _cancel: Bool = false
+
+    private var runner = Runner<[TestResult]>()
 
     /// Execution mode, determined by top level restfile
     var mode: Mode { return restfile.mode }
@@ -46,70 +45,58 @@ public class Rester {
 
 
 extension Rester {
-    public func test<T>(before: @escaping (Request.Name) -> (),
-                        after: @escaping (Request.Name, TestResult) -> T,
-                        timeout: TimeInterval = Request.defaultTimeout,
-                        validateCertificate: Bool = true,
-                        runSetup: Bool = true
-        ) -> Promise<[T]> {
-
-        func process(requests: [Request]) -> Promise<[T]> {
-            var results = [T]()
-            var chain = Promise()
-            for req in requests {
-                chain = chain.then { _ -> Promise<Void> in
-                    guard !self._cancel else {
-                        requests.forEach({ $0.cancel() })
-                        return Promise<Void> { seal in seal.reject(PMKError.cancelled) }
-                    }
-                    before(req.name)
-                    guard req.shouldExecute(given: self.variables) else {
-                        // FIXME: after(..., Response?, ...) ?
-                        let res = after(req.name, .skipped)
-                        results.append(res)
-                        return Promise()
-                    }
-                    let resolved = try req.substitute(variables: self.variables)
-                    return try resolved
-                        .execute(timeout: timeout, validateCertificate: validateCertificate)
-                        .map { response -> (Response, ValidationResult) in
-                            self.variables = self.variables.processMutations(values: response.variables)
-                            self.variables[req.name] = response.variables
-                            return (response, resolved.validate(response))
-                        }.map { response, result in
-                            let testResult = TestResult(validationResult: result, response: response)
-                            let res = after(req.name, testResult)
-                            results.append(res)
-                    }
-                }
+    public func test(before: @escaping (Request.Name) -> (),
+                     after: @escaping (TestResult) -> Void,
+                     timeout: TimeInterval = Request.defaultTimeout,
+                     validateCertificate: Bool = true,
+                     runSetup: Bool = true) async throws -> [TestResult] {
+        func _process(_ req: Request) async throws -> TestResult {
+            before(req.name)
+            guard req.shouldExecute(given: variables) else {
+                // FIXME: after(..., Response?, ...) ?
+                let result = TestResult.skipped(req.name)
+                after(result)
+                return result
             }
-            return chain.map { results }
+
+            let resolved = try req.substitute(variables: variables)
+            let response = try await resolved.execute(timeout: timeout,
+                                                      validateCertificate: validateCertificate)
+            variables = variables.processMutations(values: response.variables)
+            variables[req.name] = response.variables
+            let result = resolved.validate(response)
+            let testResult = TestResult(name: req.name, validationResult: result, response: response)
+            after(testResult)
+            return testResult
         }
 
-        let toProcess: [Request]
-
-        if mode == .random {
-            let rnd = Gen.element(of: requests)
-            guard let chosenRequest = rnd.run(using: &Current.rng) else {
-                let err = ResterError.internalError("failed to choose random request")
-                return Promise(error: err)
+        try await runner.run {
+            if runSetup {
+                _ = try await self.setupRequests.map(_process)
             }
-            toProcess = [chosenRequest]
-        } else {
-            toProcess = requests
+
+            let toProcess = (self.mode == .random)
+            ? try [self.requests.chooseRandom]
+            : self.requests
+
+            return try await toProcess.map(_process)
         }
 
-        if runSetup {
-            return process(requests: setupRequests).then { _ in
-                process(requests: toProcess)
+        do {
+            if let results = try await runner.value {
+                return results
+            } else {
+                // cancelled while in flight but before URLRequest was launched
+                throw CancellationError()
             }
-        } else {
-            return process(requests: toProcess)
+        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -999 {
+            // cancelled while in flight after URLRequest was launched
+            throw CancellationError()
         }
     }
 
-    public func cancel() {
-        _cancel = true
+    public func cancel() async {
+        await runner.cancel()
     }
 }
 
