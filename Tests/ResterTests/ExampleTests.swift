@@ -41,7 +41,7 @@ class ExampleTests: XCTestCase {
     func test_delay_example() throws {
         let file = path(example: "delay.yml")!
         let name = file.basename(dropExtension: true)
-        let (status, output) = try launch(with: file, extraArguments: ["-t", "1"])
+        let (status, output) = try launch(with: file, extraArguments: ["-t", "0.1"])
         // expected to fail
         XCTAssertEqual(status, 1)
         assertSnapshot(matching: output, as: .description, named: name, testName: "test_examples")

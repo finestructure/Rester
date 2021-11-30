@@ -148,6 +148,10 @@ func launch(arguments: [String] = []) throws -> (status: Int32, output: String) 
     let process = Process()
     process.executableURL = binary
     process.arguments = arguments
+    // set TERM to suppress
+    // Error Domain=NSURLErrorDomain Code=-1001 "The request timed out."
+    // from leaking out (it wouldn't happen for users)
+    process.environment?["TERM"] = "xterm"
 
     let pipe = Pipe()
     process.standardOutput = pipe
