@@ -109,7 +109,8 @@ extension Request: Substitutable {
 
 extension Request {
 
-    public func execute(timeout: TimeInterval = Request.defaultTimeout,
+    public func execute(name: Request.Name,
+                        timeout: TimeInterval = Request.defaultTimeout,
                         validateCertificate: Bool = true) async throws -> Response {
 
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
@@ -156,26 +157,25 @@ extension Request {
         }
 
         let start = Date()
-        let (data, resp) = try await session.data(for: urlRequest)
-        let response = try Response(
-            elapsed: Date().timeIntervalSince(start),
-            data: data,
-            response: resp,
-            variables: variables
-        )
-        if let value = self.log { try _log(value: value, of: response) }
-        return response
+        do {
+            let (data, resp) = try await session.data(for: urlRequest)
+            let response = try Response(
+                elapsed: Date().timeIntervalSince(start),
+                data: data,
+                response: resp,
+                variables: variables
+            )
+            if let value = self.log { try _log(value: value, of: response) }
+            return response
+        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
+            // convert URLSession timeout errors to ResterError
+            throw ResterError.timeout(requestName: name)
+        }
     }
 
     public func cancel() {
         session.invalidateAndCancel()
     }
-
-    // TODO: remove - it's only used in tests
-    public func test() async throws -> ValidationResult {
-        try await validate(execute())
-    }
-
 
     public func validate(_ response: Response) -> ValidationResult {
         if

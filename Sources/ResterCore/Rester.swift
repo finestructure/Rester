@@ -49,43 +49,36 @@ public class Rester {
 
 
 extension Rester {
-    private func _process(_ req: Request,
-                          before: @escaping (Request.Name) -> (),
-                          after: @escaping (TestResult) -> Void,
-                          timeout: TimeInterval = Request.defaultTimeout,
-                          validateCertificate: Bool = true) async throws -> TestResult {
-        before(req.name)
-        guard req.shouldExecute(given: variables) else {
-            // FIXME: after(..., Response?, ...) ?
-            let result = TestResult.skipped(req.name)
-            after(result)
-            return result
-        }
-
-        let resolved = try req.substitute(variables: variables)
-        let response = try await resolved.execute(
-            timeout: timeout, validateCertificate: validateCertificate
-        )
-        variables = variables.processMutations(values: response.variables)
-        variables[req.name] = response.variables
-        let result = resolved.validate(response)
-        let testResult = TestResult(name: req.name, validationResult: result, response: response)
-        after(testResult)
-        return testResult
-    }
-
-
     public func test(before: @escaping (Request.Name) -> (),
                      after: @escaping (TestResult) -> Void,
                      timeout: TimeInterval = Request.defaultTimeout,
                      validateCertificate: Bool = true,
                      runSetup: Bool = true) async throws -> [TestResult] {
+        func _process(_ req: Request) async throws -> TestResult {
+            before(req.name)
+            guard req.shouldExecute(given: variables) else {
+                // FIXME: after(..., Response?, ...) ?
+                let result = TestResult.skipped(req.name)
+                after(result)
+                return result
+            }
+
+            let resolved = try req.substitute(variables: variables)
+            let response = try await resolved.execute(name: req.name,
+                                                      timeout: timeout,
+                                                      validateCertificate: validateCertificate)
+            variables = variables.processMutations(values: response.variables)
+            variables[req.name] = response.variables
+            let result = resolved.validate(response)
+            let testResult = TestResult(name: req.name, validationResult: result, response: response)
+            after(testResult)
+            return testResult
+        }
+
         try await runner.run {
             if runSetup {
                 // TODO: use forEach instead
-                _ = try await self.setupRequests.map {
-                    try await self._process($0, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
-                }
+                _ = try await self.setupRequests.map(_process)
             }
 
             let toProcess: [Request]
@@ -100,14 +93,7 @@ extension Rester {
                 toProcess = self.requests
             }
 
-            return try await toProcess.map { req in
-                do {
-                    return try await self._process(req, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
-                } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
-                    // convert URLSession timeout errors to ResterError
-                    throw ResterError.timeout(requestName: req.name)
-                }
-            }
+            return try await toProcess.map(_process)
         }
 
         do {
