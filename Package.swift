@@ -19,11 +19,9 @@ let package = Package(
         .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
         .package(url: "https://github.com/mxcl/LegibleError.git", from: "1.0.0"),
         .package(url: "https://github.com/mxcl/Path.swift.git", from: "0.0.0"),
-        .package(url: "https://github.com/mxcl/PromiseKit", from: "6.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.1"),
-        .package(url: "https://github.com/PromiseKit/Foundation.git", from: "3.3.4"),
     ],
     targets: [
         .executableTarget(
@@ -36,8 +34,7 @@ let package = Package(
                 .product(name: "Gen", package: "swift-gen"),
                 "LegibleError",
                 .product(name: "Path", package: "Path.swift"),
-                .product(name: "PMKFoundation", package: "Foundation"),
-                "PromiseKit", "Rainbow", "Regex", "ValueCodable", "Yams"
+                "Rainbow", "Regex", "ValueCodable", "Yams"
             ]
         ),
         .testTarget(

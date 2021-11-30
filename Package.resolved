@@ -11,15 +11,6 @@
         }
       },
       {
-        "package": "PMKFoundation",
-        "repositoryURL": "https://github.com/PromiseKit/Foundation.git",
-        "state": {
-          "branch": null,
-          "revision": "985f17fa69ee0e5b7eb3ff9be87ffc4e05fc0927",
-          "version": "3.4.0"
-        }
-      },
-      {
         "package": "LegibleError",
         "repositoryURL": "https://github.com/mxcl/LegibleError.git",
         "state": {
@@ -35,15 +26,6 @@
           "branch": null,
           "revision": "dac007e907a4f4c565cfdc55a9ce148a761a11d5",
           "version": "0.16.3"
-        }
-      },
-      {
-        "package": "PromiseKit",
-        "repositoryURL": "https://github.com/mxcl/PromiseKit",
-        "state": {
-          "branch": null,
-          "revision": "93c8d41ce96ed78f36c3948be396d76f3ca3de1b",
-          "version": "6.16.2"
         }
       },
       {
