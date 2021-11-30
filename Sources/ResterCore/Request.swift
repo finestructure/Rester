@@ -109,14 +109,15 @@ extension Request: Substitutable {
 
 extension Request {
 
-    public func execute(timeout: TimeInterval = Request.defaultTimeout,
+    public func execute(name: Request.Name,
+                        timeout: TimeInterval = Request.defaultTimeout,
                         validateCertificate: Bool = true) async throws -> Response {
 
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
 
         self.sessionDelegate.validateCertificate = validateCertificate
 
-        var urlRequest = URLRequest(url: url)
+        var urlRequest = URLRequest(url: url, timeoutInterval: timeout)
         urlRequest.httpMethod = method.rawValue
 
         if [.post, .put].contains(method), let body = body {
@@ -155,8 +156,8 @@ extension Request {
             try await Task.sleep(seconds: delay)
         }
 
-        let result = try await run(timeout: timeout) { () -> Response in
-            let start = Date()
+        let start = Date()
+        do {
             let (data, resp) = try await session.data(for: urlRequest)
             let response = try Response(
                 elapsed: Date().timeIntervalSince(start),
@@ -166,21 +167,8 @@ extension Request {
             )
             if let value = self.log { try _log(value: value, of: response) }
             return response
-        }
-            .mapError { error -> Error in
-                if error is CancellationError {
-                    return ResterError.timeout(requestName: name)
-                }
-                return error
-            }
-        do {
-            return try result.get()
-        } catch is CancellationError {
-            throw ResterError.timeout(requestName: name)
-        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -999 {
-            // Cancellation error can originate from the underlying session.data task,
-            // in which case it is an NSError with the given domain and error code:
-            //   Error Domain=NSURLErrorDomain Code=-999 "cancelled"
+        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
+            // convert URLSession timeout errors to ResterError
             throw ResterError.timeout(requestName: name)
         }
     }
@@ -188,12 +176,6 @@ extension Request {
     public func cancel() {
         session.invalidateAndCancel()
     }
-
-    // TODO: remove - it's only used in tests
-    public func test() async throws -> ValidationResult {
-        try await validate(execute())
-    }
-
 
     public func validate(_ response: Response) -> ValidationResult {
         if
@@ -291,21 +273,4 @@ extension Request {
             completionHandler(.performDefaultHandling, nil)
         }
     }
-}
-
-
-// TODO: temporary, find better name/home
-private func run<T>(timeout: TimeInterval,
-                    task: @escaping () async throws -> T) async throws -> Swift.Result<T, Error>{
-    let task = Task {
-        try await task()
-    }
-
-    let deadline = Task {
-        try await Task.sleep(seconds: timeout)
-        task.cancel()
-    }
-
-    defer { deadline.cancel() }
-    return await task.result
 }

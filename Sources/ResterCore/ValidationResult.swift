@@ -11,7 +11,7 @@ import Foundation
 public typealias Reason = String
 
 
-public enum ValidationResult {
+public enum ValidationResult: Equatable {
     case valid
     case invalid(Reason)
 }

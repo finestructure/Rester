@@ -25,7 +25,7 @@ extension Rester {
                     before(req.name)
                     guard req.shouldExecute(given: self.variables) else {
                         // FIXME: after(..., Response?, ...) ?
-                        let res = after(req.name, .skipped)
+                        let res = after(req.name, .skipped(req.name))
                         results.append(res)
                         return Promise()
                     }
@@ -37,7 +37,7 @@ extension Rester {
                             self.variables[req.name] = response.variables
                             return (response, resolved.validate(response))
                         }.map { response, result in
-                            let testResult = TestResult(validationResult: result, response: response)
+                            let testResult = TestResult(name: req.name, validationResult: result, response: response)
                             let res = after(req.name, testResult)
                             results.append(res)
                     }
