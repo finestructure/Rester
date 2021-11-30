@@ -76,7 +76,7 @@ class TestUtilsTests: XCTestCase {
     func test_RNG() {
         // ensure we get stable random number so the other tests pass
         do {
-            Current.rng = AnyRandomNumberGenerator(LCRNG(seed: 0))
+            Current.rng = AnyRandomNumberGenerator(Xoshiro(seed: 0))
             let g = Gen.int(in: 0...10)
             XCTAssertEqual(g.run(using: &Current.rng), 0)
             XCTAssertEqual(g.run(using: &Current.rng), 4)
@@ -85,7 +85,7 @@ class TestUtilsTests: XCTestCase {
             XCTAssertEqual(g.run(using: &Current.rng), 2)
         }
         do {
-            Current.rng = AnyRandomNumberGenerator(LCRNG(seed: 0))
+            Current.rng = AnyRandomNumberGenerator(Xoshiro(seed: 0))
             let g = Gen.element(of: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
             XCTAssertEqual(g.run(using: &Current.rng), 1)
             XCTAssertEqual(g.run(using: &Current.rng), 4)

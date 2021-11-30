@@ -279,7 +279,7 @@ class ResterTests: XCTestCase {
 
     func test_mode_random() async throws {
         // https://xkcd.com/221
-        Current.rng = AnyRandomNumberGenerator(LCRNG(seed: 0))
+        Current.rng = AnyRandomNumberGenerator(Xoshiro(seed: 0))
         let s = """
             mode: random
             requests:
