@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Gen
 import Path
 import Yams
 
@@ -77,21 +76,12 @@ extension Rester {
 
         try await runner.run {
             if runSetup {
-                // TODO: use forEach instead
                 _ = try await self.setupRequests.map(_process)
             }
 
-            let toProcess: [Request]
-
-            if self.mode == .random {
-                let rnd = Gen.element(of: self.requests)
-                guard let chosenRequest = rnd.run(using: &Current.rng) else {
-                    throw ResterError.internalError("failed to choose random request")
-                }
-                toProcess = [chosenRequest]
-            } else {
-                toProcess = self.requests
-            }
+            let toProcess = (self.mode == .random)
+            ? try [self.requests.chooseRandom]
+            : self.requests
 
             return try await toProcess.map(_process)
         }
