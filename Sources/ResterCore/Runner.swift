@@ -23,15 +23,6 @@ extension Runner {
         case idle
         case cancelled
 
-        var task: Task<T, Error>? {
-            switch self {
-                case .cancelled, .idle:
-                    return nil
-                case .inProgress(let task):
-                    return task
-            }
-        }
-
         var value: T? {
             get async throws {
                 switch self {

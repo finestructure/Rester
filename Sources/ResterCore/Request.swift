@@ -154,8 +154,8 @@ extension Request {
             try await Task.sleep(seconds: delay)
         }
 
-        let start = Date()
         do {
+            let start = Date()
             let (data, resp) = try await session.data(for: urlRequest)
             let response = try Response(
                 elapsed: Date().timeIntervalSince(start),
