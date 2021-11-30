@@ -19,9 +19,6 @@ public class Rester {
     let _setupRequests: [Request]
     var setupRequests: [Request] { return _setupRequests }
 
-    // FIXME: remove when removing Rester+deprecated.swift
-    internal var _cancel: Bool = false
-
     private var runner = Runner<[TestResult]>()
 
     /// Execution mode, determined by top level restfile

@@ -34,9 +34,8 @@ public struct Request {
 
     let name: Name
     let details: Details
-    // FIXME: make private again after removing Request+deprecated.swift
-    internal let session: URLSession
-    internal let sessionDelegate: SessionDelegate
+    private let session: URLSession
+    private let sessionDelegate: SessionDelegate
 
     init(name: Name, details: Details) {
         self.name = name
