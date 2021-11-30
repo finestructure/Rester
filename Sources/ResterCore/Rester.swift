@@ -118,10 +118,13 @@ extension Rester {
                 toProcess = requests
             }
 
-            try await Task.sleep(seconds: 0.1)
-
-            return try await toProcess.map{
-                try await _process($0, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
+            return try await toProcess.map { req in
+                do {
+                    return try await _process(req, before: before, after: after, timeout: timeout, validateCertificate: validateCertificate)
+                } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
+                    // convert URLSession timeout errors to ResterError
+                    throw ResterError.timeout(requestName: req.name)
+                }
             }
         })
 
