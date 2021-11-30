@@ -19,7 +19,6 @@ let package = Package(
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
         .package(url: "https://github.com/finestructure/ValueCodable", from: "0.1.0"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
-        .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
         .package(url: "https://github.com/mxcl/LegibleError.git", from: "1.0.0"),
         .package(url: "https://github.com/mxcl/Path.swift.git", from: "0.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
@@ -33,7 +32,7 @@ let package = Package(
         .target(
             name: "ResterCore",
             dependencies: [
-                "Commander",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Gen", package: "swift-gen"),
                 "LegibleError",
                 .product(name: "Path", package: "Path.swift"),
