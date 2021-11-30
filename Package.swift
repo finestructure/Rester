@@ -13,6 +13,9 @@ let package = Package(
         .library(name: "ResterCore", targets: ["ResterCore"])
     ],
     dependencies: [
+        .package(name: "swift-argument-parser",
+                 url: "https://github.com/apple/swift-argument-parser",
+                 from: "1.0.0"),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
         .package(url: "https://github.com/finestructure/ValueCodable", from: "0.1.0"),
         .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
