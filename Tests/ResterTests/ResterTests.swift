@@ -452,6 +452,44 @@ class ResterTests: XCTestCase {
         XCTAssert(Date().timeIntervalSince(start) < timeout, "Cancel did not take effect")
     }
 
+    func test_cancel_2() async throws {
+        // Tast cancellation behaviour when URLRequest is in flight
+        // This ensures the NSURLErrorDomain error is converted to a CancellationError
+        let s = """
+            variables:
+              API_URL: https://httpbin.org
+            requests:
+              timeout:
+                url: ${API_URL}/delay/11
+                method: GET
+                validation:
+                  status: 200
+              not reached:
+                url: ${API_URL}/anything
+                method: GET
+                validation:
+                  status: 200
+            """
+        let timeout: TimeInterval = 5
+        let start = Date()
+        let r = try Rester(yml: s)
+        let task = Task {
+            do {
+                _ = try await r.test(before: {_ in}, after: {_ in}, timeout: timeout)
+                XCTFail("must not receive any results when cancelling")
+            } catch is CancellationError {
+                // ok
+            } catch {
+                XCTFail(error.legibleLocalizedDescription)
+            }
+        }
+        // short sleep to ensure we cancel when the URLRequest has been launched
+        try await Task.sleep(seconds: 0.1)
+        await r.cancel()
+        await task.value
+        XCTAssert(Date().timeIntervalSince(start) < timeout, "Cancel did not take effect")
+    }
+
 }
 
 #endif  // !os(watchOS)

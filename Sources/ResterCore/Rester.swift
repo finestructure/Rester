@@ -82,17 +82,7 @@ extension Rester {
             return try await toProcess.map(_process)
         }
 
-        do {
-            if let results = try await runner.value {
-                return results
-            } else {
-                // cancelled while in flight but before URLRequest was launched
-                throw CancellationError()
-            }
-        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -999 {
-            // cancelled while in flight after URLRequest was launched
-            throw CancellationError()
-        }
+        return try await runner.value
     }
 
     public func cancel() async {

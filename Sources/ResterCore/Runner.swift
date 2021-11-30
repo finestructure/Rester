@@ -12,7 +12,7 @@ actor Runner<T> {
         })
     }
 
-    var value: T? { get async throws { try await activeTask.value } }
+    var value: T { get async throws { try await activeTask.value } }
 
     func cancel() { activeTask.cancel() }
 }
@@ -23,11 +23,11 @@ extension Runner {
         case idle
         case cancelled
 
-        var value: T? {
+        var value: T {
             get async throws {
                 switch self {
                     case .cancelled, .idle:
-                        return nil
+                        throw CancellationError()
                     case .inProgress(let task):
                         return try await task.value
                 }

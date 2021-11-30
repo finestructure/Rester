@@ -168,6 +168,9 @@ extension Request {
         } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
             // convert URLSession timeout errors to ResterError
             throw ResterError.timeout(requestName: name)
+        } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -999 {
+            // convert URLSession cancellation errors to CancellationError
+            throw CancellationError()
         }
     }
 
