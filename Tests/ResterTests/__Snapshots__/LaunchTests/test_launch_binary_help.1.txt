@@ -1,4 +1,4 @@
-USAGE: app [--count <count>] [--duration <duration>] [--insecure] [--loop <loop>] [--stats] [--timeout <timeout>] [--verbose] [--workdir <workdir>] <filename>
+USAGE: app [--count <count>] [--duration <duration>] [--insecure] [--loop <loop>] [--stats] [--timeout <timeout>] [--verbose] [--version] [--workdir <workdir>] [<filename>]
 
 ARGUMENTS:
   <filename>              A Restfile
@@ -12,6 +12,7 @@ OPTIONS:
   -s, --stats             Show stats
   -t, --timeout <timeout> Request timeout (default: 10.0)
   -v, --verbose           Verbose output
+  --version               Show version
   -w, --workdir <workdir> Working directory (for the purpose of resolving
                           relative paths in Restfiles)
   -h, --help              Show help information.
