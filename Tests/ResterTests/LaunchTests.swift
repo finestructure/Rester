@@ -83,7 +83,7 @@ class LaunchTests: XCTestCase {
 
     func test_launch_binary_help() throws {
         let (status, output) = try launch(arguments: ["--help"])
-        XCTAssertEqual(status, 1)
+        XCTAssertEqual(status, 0)
         assertSnapshot(matching: output, as: .description)
     }
 
