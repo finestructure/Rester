@@ -93,7 +93,7 @@ public struct App: ParsableCommand {
 
         signal(SIGINT) { s in
             print("\nInterrupted by user, terminating ...")
-            App.exit(withError: nil)
+            App.exit(0)
         }
 
 #if !os(macOS)
@@ -112,13 +112,7 @@ public struct App: ParsableCommand {
             rester = try read(restfile: filename, timeout: timeout, verbose: verbose, workdir: workdir)
         } catch {
             Current.console.display(error)
-            // TODO: drop the above line after checking what it looks like
-            // i.e. this will a duplicate error, choose one: either
-            // console.display(error)
-            // throw ExitCode(xxx)
-            // or just let the error bubble up (probably the former)
-            //            throw error
-            App.exit(withError: error)
+            App.exit(1)
         }
 
         if count != nil && duration != nil {
@@ -166,7 +160,7 @@ public struct App: ParsableCommand {
                     App.exit(globalResults.failureCount == 0 ? 0 : 1)
                 } catch {
                     Current.console.display(error)
-                    App.exit(withError: error)
+                    App.exit(1)
                 }
             }
         } else {
@@ -181,7 +175,7 @@ public struct App: ParsableCommand {
                     App.exit(results.failureCount == 0 ? 0 : 1)
                 } catch {
                     Current.console.display(error)
-                    App.exit(withError: error)
+                    App.exit(1)
                 }
             }
         }
