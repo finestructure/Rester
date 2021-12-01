@@ -1,4 +1,4 @@
-import Commander
+import ArgumentParser
 import Foundation
 import Path
 
@@ -57,105 +57,135 @@ func read(restfile: String, timeout: TimeInterval, verbose: Bool, workdir: Strin
 }
 
 
-public let app = command(
-    Flag("insecure", default: false, description: "do not validate SSL certificate (macOS only)"),
-    Option<Int?>("count", default: .none, flag: "c",
-                 description: "number of iterations to loop for (implies `--loop 0`)"),
-    Option<Double?>("duration", default: .none, flag: "d",
-                    description: "duration <seconds> to loop for (implies `--loop 0`"),
-    Option<Double?>("loop", default: .none, flag: "l",
-                    description: "keep executing file every <loop> seconds"),
-    Flag("stats", flag: "s", description: "Show stats"),
-    Option<TimeInterval>("timeout", default: Request.defaultTimeout, flag: "t", description: "Request timeout"),
-    Flag("verbose", flag: "v", description: "Verbose output"),
-    Option<String>("workdir", default: "", flag: "w",
-                   description: "Working directory (for the purpose of resolving relative paths in Restfiles)"),
-    Argument<String>("filename", description: "A Restfile")
-) { insecure, count, duration, loop, stats, timeout, verbose, workdir, filename in
+public struct App: ParsableCommand {
+    @Option(name: .shortAndLong,
+            help: "number of iterations to loop for (implies `--loop 0`)")
+    var count: Int?
 
-    signal(SIGINT) { s in
-        print("\nInterrupted by user, terminating ...")
-        exit(0)
-    }
+    @Option(name: .shortAndLong, help: "duration <seconds> to loop for (implies `--loop 0`")
+    var duration: Double?
 
-    #if !os(macOS)
-    if insecure {
-        Current.console.display("--insecure flag currently only supported on macOS")
-        exit(1)
-    }
-    #endif
+    @Flag(help: "do not validate SSL certificate (macOS only)")
+    var insecure = false
 
-    if stats {
-        statistics = [:]
-    }
+    @Option(name: .shortAndLong, help: "keep executing file every <loop> seconds")
+    var loop: Double?
 
-    let rester: Rester
-    do {
-        rester = try read(restfile: filename, timeout: timeout, verbose: verbose, workdir: workdir)
-    } catch {
-        Current.console.display(error)
-        exit(1)
-    }
+    @Flag(name: .shortAndLong, help: "Show stats")
+    var stats = false
 
-    if count != nil && duration != nil {
-        Current.console.display("⚠️  Both count and duration specified, using count.\n")
-    }
+    @Option(name: .shortAndLong, help: "Request timeout")
+    var timeout: TimeInterval = Request.defaultTimeout
 
-    if let loop = loopParameters(count: count, duration: duration, loop: loop) {
-        print("Running every \(loop.delay) seconds ...\n")
+    @Flag(name: .shortAndLong, help: "Verbose output")
+    var verbose = false
 
-        Task {
-            do {
-                var iter = loop.iteration
-                var firstIteration = true
-                var globalResults = [TestResult]()
+    @Option(name: .shortAndLong,
+            help: "Working directory (for the purpose of resolving relative paths in Restfiles)")
+    var workdir = ""
 
-                while !iter.done {
-                    defer {
-                        iter.increment()
-                        firstIteration = false
+    @Argument(help: "A Restfile")
+    var filename: String
+
+    public init() {}
+
+    public mutating func run() throws {
+
+        signal(SIGINT) { s in
+            print("\nInterrupted by user, terminating ...")
+            App.exit(0)
+        }
+
+#if !os(macOS)
+        if insecure {
+            Current.console.display("--insecure flag currently only supported on macOS")
+            exit(1)
+        }
+#endif
+
+        if stats {
+            statistics = [:]
+        }
+
+        let rester: Rester
+        do {
+            rester = try read(restfile: filename, timeout: timeout, verbose: verbose, workdir: workdir)
+        } catch {
+            Current.console.display(error)
+            App.exit(1)
+        }
+
+        if count != nil && duration != nil {
+            Current.console.display("⚠️  Both count and duration specified, using count.\n")
+        }
+
+        // avoid self-captures
+        let filename = filename
+        let timeout = timeout
+        let insecure = insecure
+
+        if let loop = loopParameters(count: count, duration: duration, loop: loop) {
+            print("Running every \(loop.delay) seconds ...\n")
+
+            Task {
+                do {
+                    var iter = loop.iteration
+                    var firstIteration = true
+                    var globalResults = [TestResult]()
+
+                    while !iter.done {
+                        defer {
+                            iter.increment()
+                            firstIteration = false
+                        }
+
+                        if !firstIteration {
+                            try await Task.sleep(seconds: loop.delay)
+                        }
+
+                        Current.console.display("🚀  Resting \(filename.bold) ...\n")
+                        let results = try await rester.test(before: before,
+                                                            after: after,
+                                                            timeout: timeout,
+                                                            validateCertificate: !insecure,
+                                                            runSetup: firstIteration)
+                        globalResults += results
+                        Current.console.display(results: results)
+                        Current.console.display("")
+                        Current.console.display("TOTAL: ", terminator: "")
+                        Current.console.display(results: globalResults)
+                        Current.console.display("")
                     }
 
-                    if !firstIteration {
-                        try await Task.sleep(seconds: loop.delay)
-                    }
-
-                    Current.console.display("🚀  Resting \(filename.bold) ...\n")
+                    App.exit(globalResults.failureCount == 0 ? 0 : 1)
+                } catch {
+                    Current.console.display(error)
+                    App.exit(1)
+                }
+            }
+        } else {
+            Current.console.display("🚀  Resting \(filename.bold) ...\n")
+            Task {
+                do {
                     let results = try await rester.test(before: before,
                                                         after: after,
                                                         timeout: timeout,
-                                                        validateCertificate: !insecure,
-                                                        runSetup: firstIteration)
-                    globalResults += results
+                                                        validateCertificate: !insecure)
                     Current.console.display(results: results)
-                    Current.console.display("")
-                    Current.console.display("TOTAL: ", terminator: "")
-                    Current.console.display(results: globalResults)
-                    Current.console.display("")
+                    App.exit(results.failureCount == 0 ? 0 : 1)
+                } catch {
+                    Current.console.display(error)
+                    App.exit(1)
                 }
+            }
+        }
 
-                exit(globalResults.failureCount == 0 ? 0 : 1)
-            } catch {
-                Current.console.display(error)
-                exit(1)
-            }
-        }
-    } else {
-        Current.console.display("🚀  Resting \(filename.bold) ...\n")
-        Task {
-            do {
-                let results = try await rester.test(before: before,
-                                                    after: after,
-                                                    timeout: timeout,
-                                                    validateCertificate: !insecure)
-                Current.console.display(results: results)
-                exit(results.failureCount == 0 ? 0 : 1)
-            } catch {
-                Current.console.display(error)
-                exit(1)
-            }
-        }
+        RunLoop.main.run()
     }
 
-    RunLoop.main.run()
+    static func exit(_ returnCode: Int32) -> Never {
+        fflush(stdout)
+        fflush(stderr)
+        _exit(returnCode)
+    }
 }
