@@ -80,12 +80,15 @@ public struct App: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Verbose output")
     var verbose = false
 
+    @Flag(name: .customLong("version"), help: "Show version")
+    var showVersion = false
+
     @Option(name: .shortAndLong,
             help: "Working directory (for the purpose of resolving relative paths in Restfiles)")
     var workdir = ""
 
     @Argument(help: "A Restfile")
-    var filename: String
+    var filename: String?
 
     public init() {}
 
@@ -102,6 +105,15 @@ public struct App: ParsableCommand {
             exit(1)
         }
 #endif
+
+        if showVersion {
+            print("Version: \(ResterVersion)")
+            App.exit(0)
+        }
+
+        guard let filename = filename else {
+            throw ValidationError("Error: Missing expected argument '<filename>'")
+        }
 
         if stats {
             statistics = [:]
@@ -120,7 +132,6 @@ public struct App: ParsableCommand {
         }
 
         // avoid self-captures
-        let filename = filename
         let timeout = timeout
         let insecure = insecure
 
