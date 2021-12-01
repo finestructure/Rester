@@ -163,7 +163,7 @@ public struct App: ParsableCommand {
                         Current.console.display("")
                     }
 
-                    _exit(globalResults.failureCount == 0 ? 0 : 1)
+                    App.exit(globalResults.failureCount == 0 ? 0 : 1)
                 } catch {
                     Current.console.display(error)
                     App.exit(withError: error)
@@ -178,7 +178,7 @@ public struct App: ParsableCommand {
                                                         timeout: timeout,
                                                         validateCertificate: !insecure)
                     Current.console.display(results: results)
-                    _exit(results.failureCount == 0 ? 0 : 1)
+                    App.exit(results.failureCount == 0 ? 0 : 1)
                 } catch {
                     Current.console.display(error)
                     App.exit(withError: error)
@@ -187,5 +187,11 @@ public struct App: ParsableCommand {
         }
 
         RunLoop.main.run()
+    }
+
+    static func exit(_ returnCode: Int32) -> Never {
+        fflush(stdout)
+        fflush(stderr)
+        _exit(returnCode)
     }
 }
