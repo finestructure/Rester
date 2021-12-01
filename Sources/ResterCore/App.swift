@@ -163,7 +163,7 @@ public struct App: ParsableCommand {
                         Current.console.display("")
                     }
 
-                    throw ExitCode(globalResults.failureCount == 0 ? 0 : 1)
+                    _exit(globalResults.failureCount == 0 ? 0 : 1)
                 } catch {
                     Current.console.display(error)
                     App.exit(withError: error)
@@ -178,7 +178,7 @@ public struct App: ParsableCommand {
                                                         timeout: timeout,
                                                         validateCertificate: !insecure)
                     Current.console.display(results: results)
-                    throw ExitCode(results.failureCount == 0 ? 0 : 1)
+                    _exit(results.failureCount == 0 ? 0 : 1)
                 } catch {
                     Current.console.display(error)
                     App.exit(withError: error)
