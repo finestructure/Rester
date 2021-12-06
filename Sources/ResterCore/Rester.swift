@@ -11,13 +11,11 @@ import Yams
 
 
 public class Rester {
-    public var requests: [Request] { return _requests }
+    public private(set) var requests: [Request]
 
     let restfile: Restfile
     var variables = [Key: Value]()
-    let _requests: [Request]
-    let _setupRequests: [Request]
-    var setupRequests: [Request] { return _setupRequests }
+    private(set) var setupRequests: [Request]
 
     private var runner = Runner<[TestResult]>()
 
@@ -36,8 +34,8 @@ public class Rester {
         let r = try YAMLDecoder().decode(Restfile.self, from: yml, userInfo: [.relativePath: workDir])
 
         variables = aggregate(variables: r.variables, from: r.restfiles)
-        _requests = r.requests + aggregate(keyPath: \.requests, from: r.restfiles)
-        _setupRequests = r.setupRequests + aggregate(keyPath: \.setupRequests, from: r.restfiles)
+        requests = r.requests + aggregate(keyPath: \.requests, from: r.restfiles)
+        setupRequests = r.setupRequests + aggregate(keyPath: \.setupRequests, from: r.restfiles)
 
         restfile = r
     }
@@ -92,7 +90,7 @@ extension Rester {
 
 
 func aggregate(variables: [Key: Value], from restfiles: [Restfile]) -> [Key: Value] {
-    return restfiles.map({ $0.variables }).reduce(variables) { aggregate, next in
+    return restfiles.map(\.variables).reduce(variables) { aggregate, next in
         aggregate.merging(next, strategy: .lastWins)
     }
 }
