@@ -6,3 +6,4 @@ Tests/ResterTests/TestData/log.txt
 doc-assets/
 .swiftpm/
 Sources/ResterCore/Version.swift
+.vscode/
