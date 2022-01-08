@@ -239,7 +239,10 @@ func _log(value: Value, of response: Response) throws {
         }
     case .string("json"):
         if let json = response.json {
-            Current.console.display(key: "JSON", value: json)
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let str = try String(decoding: encoder.encode(json), as: UTF8.self)
+            Current.console.display(key: "JSON", value: "\n" + str)
         }
     case .string where (try? value.path()) != nil:      // a bit clumsy but can't see how to
         try response.data.write(to: try value.path())   // avoid the double call to path()
