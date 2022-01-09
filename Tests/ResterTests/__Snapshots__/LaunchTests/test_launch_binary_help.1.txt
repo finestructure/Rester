@@ -1,4 +1,4 @@
-USAGE: app [--count <count>] [--duration <duration>] [--insecure] [--loop <loop>] [--stats] [--timeout <timeout>] [--verbose] [--version] [--workdir <workdir>] [<filename>]
+USAGE: app [--count <count>] [--duration <duration>] [--insecure] [--json] [--loop <loop>] [--stats] [--timeout <timeout>] [--verbose] [--version] [--workdir <workdir>] [<filename>]
 
 ARGUMENTS:
   <filename>              A Restfile
@@ -8,6 +8,7 @@ OPTIONS:
   -d, --duration <duration>
                           duration <seconds> to loop for (implies `--loop 0`
   --insecure              do not validate SSL certificate (macOS only)
+  -j, --json              log JSON result
   -l, --loop <loop>       keep executing file every <loop> seconds
   -s, --stats             Show stats
   -t, --timeout <timeout> Request timeout (default: 10.0)

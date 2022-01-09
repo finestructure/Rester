@@ -68,6 +68,9 @@ public struct App: ParsableCommand {
     @Flag(help: "do not validate SSL certificate (macOS only)")
     var insecure = false
 
+    @Flag(name: .shortAndLong, help: "log JSON result")
+    var json = false
+
     @Option(name: .shortAndLong, help: "keep executing file every <loop> seconds")
     var loop: Double?
 
@@ -134,6 +137,7 @@ public struct App: ParsableCommand {
         // avoid self-captures
         let timeout = timeout
         let insecure = insecure
+        let logJson = json
 
         if let loop = loopParameters(count: count, duration: duration, loop: loop) {
             print("Running every \(loop.delay) seconds ...\n")
@@ -159,7 +163,8 @@ public struct App: ParsableCommand {
                                                             after: after,
                                                             timeout: timeout,
                                                             validateCertificate: !insecure,
-                                                            runSetup: firstIteration)
+                                                            runSetup: firstIteration,
+                                                            logJson: logJson)
                         globalResults += results
                         Current.console.display(results: results)
                         Current.console.display("")
@@ -181,7 +186,8 @@ public struct App: ParsableCommand {
                     let results = try await rester.test(before: before,
                                                         after: after,
                                                         timeout: timeout,
-                                                        validateCertificate: !insecure)
+                                                        validateCertificate: !insecure,
+                                                        logJson: logJson)
                     Current.console.display(results: results)
                     App.exit(results.failureCount == 0 ? 0 : 1)
                 } catch {

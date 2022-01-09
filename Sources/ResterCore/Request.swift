@@ -109,7 +109,8 @@ extension Request: Substitutable {
 extension Request {
 
     public func execute(timeout: TimeInterval = Request.defaultTimeout,
-                        validateCertificate: Bool = true) async throws -> Response {
+                        validateCertificate: Bool = true,
+                        logJson: Bool) async throws -> Response {
 
         guard let url = url else { throw ResterError.invalidURL(self.details.url) }
 
@@ -163,7 +164,7 @@ extension Request {
                 response: resp,
                 variables: variables
             )
-            if let value = self.log { try _log(value: value, of: response) }
+            if let value = self.log { try _log(value: value, of: response, logJson: logJson) }
             return response
         } catch let error as NSError where error.domain == "NSURLErrorDomain" && error.code == -1001 {
             // convert URLSession timeout errors to ResterError
@@ -221,37 +222,43 @@ extension Array where Element == Request {
 }
 
 
-func _log(value: Value, of response: Response) throws {
-    switch value {
-    case .bool(true):
-        try ["status", "headers", "json"].forEach { try _log(value: $0, of: response) }
-    case .string("status"):
-        Current.console.display(key: "Status", value: response.status)
-    case .string("headers"):
-        Current.console.display(key: "Headers", value: response.headers)
-    case let .string(keyPath) where keyPath.starts(with: "json."),
-         let .string(keyPath) where keyPath.starts(with: "json["):
-        guard let json = response.json else { return }
-        let res = Value.dictionary(["json": json])
-        if let value = res[keyPath] {
-            let displayKeyPath = keyPath.deletingPrefix("json").deletingPrefix(".")
-            Current.console.display(key: displayKeyPath, value: value)
+func _log(value: Value, of response: Response, logJson: Bool) throws {
+    if logJson,
+       case .string("json") = value,
+       let json = response.json {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let str = try String(decoding: encoder.encode(json), as: UTF8.self)
+        Current.console.display(key: "JSON", value: "\n" + str)
+    } else {
+        switch value {
+            case .bool(true):
+                try ["status", "headers", "json"].forEach { try _log(value: $0, of: response, logJson: logJson) }
+            case .string("status"):
+                Current.console.display(key: "Status", value: response.status)
+            case .string("headers"):
+                Current.console.display(key: "Headers", value: response.headers)
+            case let .string(keyPath) where keyPath.starts(with: "json."),
+                let .string(keyPath) where keyPath.starts(with: "json["):
+                guard let json = response.json else { return }
+                let res = Value.dictionary(["json": json])
+                if let value = res[keyPath] {
+                    let displayKeyPath = keyPath.deletingPrefix("json").deletingPrefix(".")
+                    Current.console.display(key: displayKeyPath, value: value)
+                }
+            case .string("json"):
+                if let json = response.json {
+                    Current.console.display(key: "JSON", value: json)
+                }
+            case .string where (try? value.path()) != nil:      // a bit clumsy but can't see how to
+                try response.data.write(to: try value.path())   // avoid the double call to path()
+            case let .array(array) where !array.isEmpty:
+                for item in array {
+                    try _log(value: item, of: response, logJson: logJson)
+                }
+            default:
+                break
         }
-    case .string("json"):
-        if let json = response.json {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            let str = try String(decoding: encoder.encode(json), as: UTF8.self)
-            Current.console.display(key: "JSON", value: "\n" + str)
-        }
-    case .string where (try? value.path()) != nil:      // a bit clumsy but can't see how to
-        try response.data.write(to: try value.path())   // avoid the double call to path()
-    case let .array(array) where !array.isEmpty:
-        for item in array {
-            try _log(value: item, of: response)
-        }
-    default:
-        break
     }
 }
 
