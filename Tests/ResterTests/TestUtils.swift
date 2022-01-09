@@ -205,10 +205,6 @@ extension Optional {
 
 extension Request {
     public func test() async throws -> ValidationResult {
-        try await validate(execute(logJson: false))
-    }
-
-    func execute() async throws -> Response {
-        try await execute(logJson: false)
+        try await validate(execute())
     }
 }

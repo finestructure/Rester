@@ -313,14 +313,14 @@ class RequestTests: XCTestCase {
         let r = Request(name: "test", details: d)
 
         do {  // test that verification (default case) raises exception
-            _ = try await r.execute(validateCertificate: true, logJson: false)
+            _ = try await r.execute(validateCertificate: true)
             XCTFail("bad SSL certificate must not succeed")
         } catch {
             XCTAssert(error.legibleLocalizedDescription.starts(with: "The certificate for this server is invalid"), "was instead: \(error.legibleLocalizedDescription)")
         }
 
         do {  // test that insecure process succeeds
-            let res = try await r.execute(validateCertificate: false, logJson: false)
+            let res = try await r.execute(validateCertificate: false)
             XCTAssertEqual(res.response.statusCode, 200)
         }
     }

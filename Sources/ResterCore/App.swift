@@ -134,10 +134,13 @@ public struct App: ParsableCommand {
             Current.console.display("⚠️  Both count and duration specified, using count.\n")
         }
 
+        if json {
+            Current.console = JsonConsole()
+        }
+
         // avoid self-captures
         let timeout = timeout
         let insecure = insecure
-        let logJson = json
 
         if let loop = loopParameters(count: count, duration: duration, loop: loop) {
             print("Running every \(loop.delay) seconds ...\n")
@@ -163,8 +166,7 @@ public struct App: ParsableCommand {
                                                             after: after,
                                                             timeout: timeout,
                                                             validateCertificate: !insecure,
-                                                            runSetup: firstIteration,
-                                                            logJson: logJson)
+                                                            runSetup: firstIteration)
                         globalResults += results
                         Current.console.display(results: results)
                         Current.console.display("")
@@ -186,8 +188,7 @@ public struct App: ParsableCommand {
                     let results = try await rester.test(before: before,
                                                         after: after,
                                                         timeout: timeout,
-                                                        validateCertificate: !insecure,
-                                                        logJson: logJson)
+                                                        validateCertificate: !insecure)
                     Current.console.display(results: results)
                     App.exit(results.failureCount == 0 ? 0 : 1)
                 } catch {

@@ -47,8 +47,7 @@ extension Rester {
                      after: @escaping (TestResult) -> Void,
                      timeout: TimeInterval = Request.defaultTimeout,
                      validateCertificate: Bool = true,
-                     runSetup: Bool = true,
-                     logJson: Bool = false) async throws -> [TestResult] {
+                     runSetup: Bool = true) async throws -> [TestResult] {
         func _process(_ req: Request) async throws -> TestResult {
             before(req.name)
             guard req.shouldExecute(given: variables) else {
@@ -60,8 +59,7 @@ extension Rester {
 
             let resolved = try req.substitute(variables: variables)
             let response = try await resolved.execute(timeout: timeout,
-                                                      validateCertificate: validateCertificate,
-                                                      logJson: logJson)
+                                                      validateCertificate: validateCertificate)
             variables = variables.processMutations(values: response.variables)
             variables[req.name] = response.variables
             let result = resolved.validate(response)
