@@ -82,3 +82,32 @@ struct DefaultConsole: Console {
         }
     }
 }
+
+
+/// Specialised Console that only logs JSON output and errors.
+struct JsonConsole: Console {
+    var defaultConsole = DefaultConsole()
+    lazy var encoder: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        return encoder
+    }()
+
+    mutating func display(_ message: String, terminator: String) { }
+
+    mutating func display(key: String, value: Any) {
+        guard key == "JSON",
+              let value = value as? Value,
+              let str = try? String(decoding: encoder.encode(value),
+                                    as: UTF8.self) else {
+            return
+        }
+        defaultConsole.display(str)
+    }
+
+    mutating func display(verbose message: String) { }
+
+    mutating func display(_ error: Error) {
+        defaultConsole.display(error)
+    }
+}

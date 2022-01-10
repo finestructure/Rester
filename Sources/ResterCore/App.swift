@@ -68,6 +68,9 @@ public struct App: ParsableCommand {
     @Flag(help: "do not validate SSL certificate (macOS only)")
     var insecure = false
 
+    @Flag(name: .shortAndLong, help: "log JSON result")
+    var json = false
+
     @Option(name: .shortAndLong, help: "keep executing file every <loop> seconds")
     var loop: Double?
 
@@ -129,6 +132,10 @@ public struct App: ParsableCommand {
 
         if count != nil && duration != nil {
             Current.console.display("⚠️  Both count and duration specified, using count.\n")
+        }
+
+        if json {
+            Current.console = JsonConsole()
         }
 
         // avoid self-captures
