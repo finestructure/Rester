@@ -278,6 +278,7 @@ extension Request {
 
 
 #if canImport(FoundationNetworking)
+// FoundationNetworking does not currently have a/a URLSession.data
 private extension URLSession {
     struct URLSessionError: Error {
         var message: String
