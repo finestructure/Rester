@@ -4,20 +4,41 @@ on: [push]
 
 jobs:
 
-  test-macos:
-    name: Test macOS
-    runs-on: self-hosted
+  macOS:
+    # https://github.com/actions/runner-images
+    runs-on: macos-13
+    strategy:
+      matrix:
+        xcode: ['15.0', '14.3.1']
     steps:
-      - uses: actions/checkout@v2
-      # - name: test-macos-xcode
-      #   run: make test-macos-xcode
-      - name: test-macos-spm
-        run: make test-macos-spm
+      - uses: actions/checkout@v3
+      - run: git config --global user.email "me@example.com"
+      - run: git config --global user.name "Name"
+      - name: Get swift version
+        run: env DEVELOPER_DIR="/Applications/Xcode_${{ matrix.xcode }}.app" swift --version
+      - name: Test
+        run: env DEVELOPER_DIR="/Applications/Xcode_${{ matrix.xcode }}.app" swift test
+      - name: Build release
+        run: env DEVELOPER_DIR="/Applications/Xcode_${{ matrix.xcode }}.app" swift build -c release
 
-  # test-linux:
-  #   name: Test Linux
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: test
-  #       run: swift test --parallel
+  Linux:
+    # https://github.com/actions/runner-images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [
+          'swift:5.8',
+          'swift:5.9'
+        ]
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v3
+      - run: git config --global user.email "me@example.com"
+      - run: git config --global user.name "Name"
+      - name: Get swift version
+        run: swift --version
+      - name: Test
+        run: swift test
+      - name: Build release
+        run: swift build -c release

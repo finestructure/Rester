@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.8
 import PackageDescription
 
 let package = Package(
@@ -13,15 +13,13 @@ let package = Package(
         .library(name: "ResterCore", targets: ["ResterCore"])
     ],
     dependencies: [
-        .package(name: "swift-argument-parser",
-                 url: "https://github.com/apple/swift-argument-parser",
-                 from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.2.0"),
-        .package(url: "https://github.com/finestructure/ValueCodable", from: "0.1.0"),
-        .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
+        .package(url: "https://github.com/finestructure/ValueCodable", from: "0.2.0"),
+        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.0"),
         .package(url: "https://github.com/mxcl/LegibleError.git", from: "1.0.0"),
         .package(url: "https://github.com/mxcl/Path.swift.git", from: "0.0.0"),
-        .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
+        .package(url: "https://github.com/onevcat/Rainbow.git", from: "4.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-gen.git", from: "0.2.0"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing.git", from: "1.8.1"),
     ],
