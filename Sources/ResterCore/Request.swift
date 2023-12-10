@@ -275,3 +275,32 @@ extension Request {
         }
     }
 }
+
+
+#if canImport(FoundationNetworking)
+private extension URLSession {
+    struct URLSessionError: Error {
+        var message: String
+    }
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)  {
+        try await withCheckedThrowingContinuation { continuation in
+            self.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard let data = data else {
+                    continuation.resume(throwing: URLSessionError(message: "no data"))
+                    return
+                }
+                guard let response = response else {
+                    continuation.resume(throwing: URLSessionError(message: "no response"))
+                    return
+                }
+                continuation.resume(returning: (data, response))
+            }.resume()
+
+        }
+    }
+}
+#endif

@@ -105,7 +105,7 @@ public struct App: ParsableCommand {
 #if !os(macOS)
         if insecure {
             Current.console.display("--insecure flag currently only supported on macOS")
-            exit(1)
+            App.exit(1)
         }
 #endif
 
