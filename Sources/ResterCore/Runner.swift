@@ -18,12 +18,12 @@ actor Runner<T> {
 }
 
 extension Runner {
-    enum Status<T> {
-        case inProgress(Task<T, Error>)
+    enum Status<U> {
+        case inProgress(Task<U, Error>)
         case idle
         case cancelled
 
-        var value: T {
+        var value: U {
             get async throws {
                 switch self {
                     case .cancelled, .idle:
